@@ -11,6 +11,27 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import json
+from django.core.exceptions import ImproperlyConfigured
+
+with open(os.environ.get('FEDIVERSE_CONFIG')) as f:
+    configs = json.loads(f.read())
+
+
+def get_config(setting):
+    try:
+        val = configs[setting]
+        if val == 'True':
+            val = True
+        elif val == 'False':
+            val = False
+        return val
+    except KeyError:
+        error_msg = "ImproperlyConfigured: Set {0} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+
+SECRET_KEY = get_config("SECRET_KEY")
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -18,12 +39,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'df4p)6h(#ktn*#ckh2m^^(-)w6_9mn$b%^!+$02vnb&e3sz&!r'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -78,10 +93,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fediverse',
-        'USER': 'tao',
-        'PASSWORD': 'tao',
+        'ENGINE': get_config("DATABASE_ENGINE"),
+        'NAME': get_config("DATABASE_NAME"),
+        'USER': get_config("DATABASE_USER"),
+        'PASSWORD': get_config("DATABASE_PASSWORD"),
     }
 }
 
@@ -124,11 +139,3 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-if DEBUG:
-    MIDDLEWARE += (
-        'silk.middleware.SilkyMiddleware',
-    )
-
-    INSTALLED_APPS += (
-        'silk',
-    )
