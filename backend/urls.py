@@ -16,10 +16,14 @@ Including another URLconf
 from django.urls import path, include
 from rest_framework import routers
 from apiv1 import views
+from backend import settings
 
 router = routers.DefaultRouter()
 router.register(r'instances', views.InstanceViewSet)
 
 urlpatterns = [
-    path(r'', include(router.urls))
+    path(r'api/v1/', include(router.urls))
 ]
+
+if settings.DEBUG:
+    urlpatterns += [path(r'silk/', include('silk.urls', namespace='silk'))]

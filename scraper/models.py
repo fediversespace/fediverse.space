@@ -11,6 +11,7 @@ class InstanceStats(models.Model):
     instance = models.ForeignKey(
         Instance,
         on_delete=models.CASCADE,
+        related_name='stats',
     )
     num_peers = models.IntegerField(blank=True, null=True)
     num_statuses = models.IntegerField(blank=True, null=True)

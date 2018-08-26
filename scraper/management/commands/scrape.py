@@ -8,7 +8,9 @@ import multiprocessing
 import requests
 import time
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from scraper.models import Instance, InstanceStats
+from scraper.management.commands._util import require_lock
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Because the script uses the Mastodon API other platforms like         #
@@ -48,7 +50,6 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.done_bag = set()
-        self.existing_instance_ids = []
 
     @staticmethod
     def get_instance_info(instance_name: str):
@@ -87,6 +88,8 @@ class Command(BaseCommand):
             print("Failed: {}".format(instance_name))
             return data
 
+    @transaction.atomic
+    @require_lock(Instance, 'ACCESS EXCLUSIVE')
     def save_data(self, data):
         """Save data"""
         instance, _ = Instance.objects.get_or_create(name=get_key(data, ['instance']))
@@ -102,18 +105,13 @@ class Command(BaseCommand):
             )
             stats.save()
             # Save peers
-            # Save the list of instances we already have in the database
-            existing_peers = Instance.objects.filter(name__in=self.existing_instance_ids)
-            print("setting new_peer_ids")
-            new_peer_ids = [peer for peer in data['peers'] if peer not in self.existing_instance_ids]
+            # TODO: make this shared amongst threads so the database only needs to be queried once
+            existing_instance_ids = Instance.objects.values_list('name', flat=True)
+            existing_peers = Instance.objects.filter(name__in=existing_instance_ids)
+            new_peer_ids = [peer for peer in data['peers'] if peer not in existing_instance_ids]
             if new_peer_ids:
-                print("setting new_peers (ids: {})".format(new_peer_ids))
                 new_peers = Instance.objects.bulk_create([Instance(name=peer) for peer in new_peer_ids])
-                print("adding to existing_instance_ids")
-                self.existing_instance_ids.extend(new_peer_ids)
-                print("adding new peers")
                 instance.peers.set(new_peers)
-            print("adding existing peers")
             instance.peers.set(existing_peers)
         else:
             stats = InstanceStats(
@@ -141,8 +139,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = time.time()
-        self.existing_instance_ids = Instance.objects.all().values_list('name', flat=True)
-        print("Existing instances: {}".format(self.existing_instance_ids))
         queue = multiprocessing.JoinableQueue()
         queue.put(SEED)
         # pool = multiprocessing.Pool(1, initializer=self.worker, initargs=(queue, ))  # Disable concurrency (debug)
