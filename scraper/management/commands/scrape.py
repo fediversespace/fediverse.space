@@ -7,10 +7,11 @@ import json
 import multiprocessing
 import requests
 import time
+from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from scraper.models import Instance, InstanceStats
-from scraper.management.commands._util import require_lock
+from scraper.management.commands._util import require_lock, InvalidResponseError, get_key
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Because the script uses the Mastodon API other platforms like         #
@@ -27,21 +28,6 @@ from scraper.management.commands._util import require_lock
 
 SEED = 'mastodon.social'
 TIMEOUT = 20
-
-
-class InvalidResponseError(Exception):
-    """Used for all responses other than HTTP 200"""
-    pass
-
-
-def get_key(data, keys: list):
-    try:
-        val = data[keys.pop(0)]
-        while keys:
-            val = val[keys.pop(0)]
-        return val
-    except KeyError:
-        return ''
 
 
 class Command(BaseCommand):
@@ -71,21 +57,19 @@ class Command(BaseCommand):
 
     def process_instance(self, instance_name: str):
         """Given an instance, get all the data we're interested in"""
-        print("Processing {}".format(instance_name))
+        self.stdout.write("{} - Processing {}".format(datetime.now().isoformat(), instance_name))
         data = dict()
         try:
             data['instance'] = instance_name
             data['info'] = self.get_instance_info(instance_name)
-            data['peers'] = self.get_instance_peers(instance_name)
+            data['peers'] = [peer for peer in self.get_instance_peers(instance_name) if peer]  # get rid of null peers
             data['status'] = 'success'
-            print("Processed: {}".format(instance_name))
             return data
         except (InvalidResponseError,
                 requests.exceptions.RequestException,
                 json.decoder.JSONDecodeError) as e:
             data['instance'] = instance_name
             data['status'] = type(e).__name__
-            print("Failed: {}".format(instance_name))
             return data
 
     @transaction.atomic
@@ -119,6 +103,7 @@ class Command(BaseCommand):
                 status=get_key(data, ['status'])
             )
             stats.save()
+        self.stdout.write("{} - Saved {}".format(datetime.now().isoformat(), data['instance']))
 
     def worker(self, queue: multiprocessing.JoinableQueue):
         """The main worker that processes URLs"""
@@ -145,4 +130,4 @@ class Command(BaseCommand):
         pool = multiprocessing.Pool(initializer=self.worker, initargs=(queue, ))
         queue.join()
         end_time = time.time()
-        self.stdout.write(self.style.SUCCESS("Successfully scraped the fediverse in {}s".format(end_time-start_time)))
+        self.stdout.write(self.style.SUCCESS("Successfully scraped the fediverse in {:.0f}s".format(end_time-start_time)))

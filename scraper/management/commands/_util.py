@@ -38,3 +38,18 @@ def require_lock(model, lock):
         return wrapper
 
     return require_lock_decorator
+
+
+class InvalidResponseError(Exception):
+    """Used for all responses other than HTTP 200"""
+    pass
+
+
+def get_key(data, keys: list):
+    try:
+        val = data[keys.pop(0)]
+        while keys:
+            val = val[keys.pop(0)]
+        return val
+    except KeyError:
+        return ''
