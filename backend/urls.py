@@ -17,7 +17,15 @@ from django.urls import path, include
 from rest_framework import routers
 from apiv1 import views
 
-router = routers.DefaultRouter()
+
+class OptionalTrailingSlashRouter(routers.DefaultRouter):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.trailing_slash = r'/?'
+
+
+router = OptionalTrailingSlashRouter()
 router.register(r'instances', views.InstanceViewSet)
 
 urlpatterns = [
