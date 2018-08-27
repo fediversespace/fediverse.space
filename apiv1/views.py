@@ -6,6 +6,7 @@ from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer
 class InstanceViewSet(viewsets.ModelViewSet):
     """API endpoint to view instances"""
 
+    lookup_field = 'name'
     lookup_value_regex = '[a-zA-Z0-9-_\.]+'
 
     queryset = Instance.objects.all()
