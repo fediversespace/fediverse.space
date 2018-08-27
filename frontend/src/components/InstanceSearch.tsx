@@ -15,41 +15,48 @@ interface IInstanceSearchProps {
 }
 
 class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
+
     public render() {
-        // TODO: make prettier when no instances loaded
-        if (!this.props.instances) {
-            return (
-                <Suggest
-                    items={[]}
-                    inputValueRenderer={this.inputValueRenderer}
-                    itemRenderer={this.itemRenderer}
-                    onItemSelect={this.onItemSelect}
-                    popoverProps={{minimal: true}}
-                />
-            )
-        }
         return (
             <Suggest
-                items={this.props.instances!.map(i => i.name)}
                 inputValueRenderer={this.inputValueRenderer}
                 itemRenderer={this.itemRenderer}
+                items={this.props.instances || []}
                 onItemSelect={this.onItemSelect}
-                popoverProps={{minimal: true}}
+                // itemListRenderer={this.itemListRenderer}
             />
         )
     }
 
-    private inputValueRenderer = (item: string) => {
-        return item;
+    private inputValueRenderer = (item: IInstance): string => {
+        return item.name;
     }
 
-    private itemRenderer = (item: string, itemProps: IItemRendererProps) => {
-        return <MenuItem text={item} />;
+    private itemRenderer = (item: IInstance, itemProps: IItemRendererProps): JSX.Element => {
+        return <MenuItem label={item.name} key={item.name} />;
     }
 
-    private onItemSelect = (item: string) => {
-        return;
+    private onItemSelect = (item: IInstance, event?: React.SyntheticEvent<HTMLElement>) => {
+        this.props.selectInstance(item.name);
     }
+
+    // private itemListRenderer = (itemListProps: IItemListRendererProps<IInstance>): JSX.Element => {
+    //     return (
+    //         <List
+    //             height={350}
+    //             rowHeight={30}
+    //             rowCount={(this.props.instances && this.props.instances.length) || 0}
+    //             // tslint:disable-next-line
+    //             rowRenderer={this.rowRenderer}
+    //             width={214}
+    //         />
+    //     )
+    // }
+
+    // private rowRenderer = (listRowProps: ListRowProps) => {
+    //     const instanceName = (this.props.instances && this.props.instances[listRowProps.index].name) || "";
+    //     return <MenuItem label={instanceName} key={instanceName} />;
+    // }
 }
 
 const mapStateToProps = (state: IAppState) => ({

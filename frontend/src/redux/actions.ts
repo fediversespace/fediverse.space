@@ -1,9 +1,7 @@
-import fetch from 'cross-fetch';
 import { Dispatch } from 'redux';
 
+import { getFromApi } from '../util';
 import { ActionType, IInstance } from './types';
-
-const API_ROOT = "https://fediverse.space/api/v1"
 
 export const selectInstance = (instance: string) => {
     return {
@@ -33,8 +31,10 @@ export const fetchInstances = () => {
     // TODO: handle errors
     return (dispatch: Dispatch) => {
         dispatch(requestInstances());
-        return fetch(`${API_ROOT}/instances/`)
-            .then(response => response.json())
+        return getFromApi("instances")
+            .then(response => {
+                return response.json();
+            })
             .then(instances => dispatch(receiveInstances(instances))
         );
     }

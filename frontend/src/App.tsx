@@ -10,6 +10,7 @@ import { fetchInstances } from './redux/actions';
 import { IAppState, IInstance } from './redux/types';
 
 interface IAppProps {
+  currentInstance: IInstance;
   instances?: IInstance[],
   isLoadingInstances: boolean,
   fetchInstances: () => void;
@@ -19,6 +20,8 @@ class AppImpl extends React.Component<IAppProps> {
     let body = this.welcomeState();
     if (this.props.isLoadingInstances) {
       body = this.loadingState();
+    } else if (!!this.props.instances) {
+      body = this.renderGraph()
     }
     // TODO: show the number of instances up front
     return (
@@ -46,14 +49,26 @@ class AppImpl extends React.Component<IAppProps> {
         <NonIdealState
           className="fediverse-welcome"
           icon={<Spinner />}
-          title="Welcome to fediverse.space!"
+          title="Loading..."
         />
+    )
+  }
+
+  private renderGraph = () => {
+    return (
+      <NonIdealState
+        className="fediverse-welcome"
+        icon={IconNames.SEARCH_AROUND}
+        title="Graph. TODO"
+        description={"Selected " + this.props.currentInstance.name}
+      />
     )
   }
 
 }
 
 const mapStateToProps = (state: IAppState) => ({
+  currentInstance: state.currentInstance,
   instances: state.data.instances,
   isLoadingInstances: state.data.isLoadingInstances,
 })
