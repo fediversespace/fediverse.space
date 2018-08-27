@@ -1,5 +1,5 @@
-# fediverse-space-backend
-The Django backend for fediverse.space. Scrapes the fediverse and exposes an API to get data about it.
+# fediverse.space
+fediverse.space is a tool to explore instances in the fediverse.
 
 ## Running it
 * `cp config.json.template config.json` and enter your configuration details.
