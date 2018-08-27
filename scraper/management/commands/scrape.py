@@ -26,7 +26,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseError
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'mastodon.social'
+SEED = 'geekly.social'
 TIMEOUT = 20
 
 
@@ -90,6 +90,8 @@ class Command(BaseCommand):
             stats.save()
             # Save peers
             # TODO: make this shared amongst threads so the database only needs to be queried once
+            if not data['peers']:
+                return
             existing_instance_ids = Instance.objects.values_list('name', flat=True)
             existing_peers = Instance.objects.filter(name__in=existing_instance_ids)
             new_peer_ids = [peer for peer in data['peers'] if peer not in existing_instance_ids]
