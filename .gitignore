@@ -1,6 +1,7 @@
 *.csv
 .idea/
 config.json
+backend/static/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
