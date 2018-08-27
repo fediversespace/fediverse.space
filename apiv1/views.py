@@ -3,8 +3,8 @@ from scraper.models import Instance
 from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer
 
 
-class InstanceViewSet(viewsets.ModelViewSet):
-    """API endpoint to view instances"""
+class InstanceViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint to view stats for, and the peers of, an instance"""
 
     lookup_field = 'name'
     lookup_value_regex = '[a-zA-Z0-9-_\.]+'
