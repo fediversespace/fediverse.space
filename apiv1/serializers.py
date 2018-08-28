@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from collections import OrderedDict
 from scraper.models import Instance, InstanceStats
 
 
@@ -11,7 +12,15 @@ class InstanceStatsSerializer(serializers.ModelSerializer):
 class InstanceListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Instance
-        fields = ('name', )
+        fields = ('name', 'user_count')
+
+    def to_representation(self, instance):
+        """
+        Object instance -> Dict of primitive datatypes.
+        """
+        ret = super(InstanceListSerializer, self).to_representation(instance)
+        ret = OrderedDict(list(filter(lambda x: x[1], ret.items())))
+        return ret
 
 
 class InstanceDetailSerializer(serializers.ModelSerializer):

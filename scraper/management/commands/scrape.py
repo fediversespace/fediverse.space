@@ -26,7 +26,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseError
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'geekly.social'
+SEED = 'mastodon.social'
 TIMEOUT = 20
 
 
@@ -76,14 +76,21 @@ class Command(BaseCommand):
     @require_lock(Instance, 'ACCESS EXCLUSIVE')
     def save_data(self, data):
         """Save data"""
-        instance, _ = Instance.objects.get_or_create(name=get_key(data, ['instance']))
+        user_count = get_key(data, ['info', 'stats', 'user_count'])
+        if user_count:
+            instance, _ = Instance.objects.update_or_create(
+                name=get_key(data, ['instance']),
+                defaults={'user_count': user_count},
+            )
+        else:
+            instance, _ = Instance.objects.get_or_create(name=get_key(data, ['instance']))
         if data['status'] == 'success':
             # Save stats
             stats = InstanceStats(
                 instance=instance,
-                num_peers=get_key(data, ['info', 'stats', 'domain_count']),
-                num_statuses=get_key(data, ['info', 'stats', 'status_count']),
-                num_users=get_key(data, ['info', 'stats', 'user_count']),
+                domain_count=get_key(data, ['info', 'stats', 'domain_count']),
+                status_count=get_key(data, ['info', 'stats', 'status_count']),
+                user_count=get_key(data, ['info', 'stats', 'user_count']),
                 version=get_key(data, ['info', 'version']),
                 status=get_key(data, ['status']),
             )
