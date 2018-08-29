@@ -1,12 +1,6 @@
 from rest_framework import serializers
 from collections import OrderedDict
-from scraper.models import Instance, InstanceStats
-
-
-class InstanceStatsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InstanceStats
-        exclude = ('id', 'instance', 'status')
+from scraper.models import Instance
 
 
 class InstanceListSerializer(serializers.ModelSerializer):
@@ -25,8 +19,7 @@ class InstanceListSerializer(serializers.ModelSerializer):
 
 class InstanceDetailSerializer(serializers.ModelSerializer):
     peers = InstanceListSerializer(many=True, read_only=True)
-    stats = InstanceStatsSerializer(many=True, read_only=True)
 
     class Meta:
         model = Instance
-        fields = ('name', 'stats', 'peers')
+        fields = '__all__'

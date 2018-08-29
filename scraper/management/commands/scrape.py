@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from scraper.models import Instance, InstanceStats
+from scraper.models import Instance
 from scraper.management.commands._util import require_lock, InvalidResponseError, get_key
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -80,29 +80,19 @@ class Command(BaseCommand):
     @require_lock(Instance, 'ACCESS EXCLUSIVE')
     def save_data(self, data):
         """Save data"""
-        user_count = get_key(data, ['info', 'stats', 'user_count'])
-        if user_count:
-            instance, _ = Instance.objects.update_or_create(
-                name=get_key(data, ['instance']),
-                defaults={'user_count': user_count},
-            )
-        else:
-            instance, _ = Instance.objects.get_or_create(name=get_key(data, ['instance']))
-        if data['status'] == 'success':
-            # Save stats
-            stats = InstanceStats(
-                instance=instance,
-                domain_count=get_key(data, ['info', 'stats', 'domain_count']),
-                status_count=get_key(data, ['info', 'stats', 'status_count']),
-                user_count=get_key(data, ['info', 'stats', 'user_count']),
-                version=get_key(data, ['info', 'version']),
-                status=get_key(data, ['status']),
-            )
-            stats.save()
+        defaults = dict()
+        defaults['domain_count'] = get_key(data, ['info', 'stats', 'domain_count']) or None
+        defaults['status_count'] = get_key(data, ['info', 'stats', 'status_count']) or None
+        defaults['user_count'] = get_key(data, ['info', 'stats', 'user_count']) or None
+        defaults['version'] = get_key(data, ['info', 'version'])
+        defaults['status'] = get_key(data, ['status'])
+        instance, _ = Instance.objects.update_or_create(
+            name=get_key(data, ['instance']),
+            defaults=defaults,
+        )
+        if defaults['status'] == 'success' and data['peers']:
             # Save peers
             # TODO: make this shared amongst threads so the database only needs to be queried once
-            if not data['peers']:
-                return
             existing_instance_ids = Instance.objects.values_list('name', flat=True)
             existing_peers = Instance.objects.filter(name__in=existing_instance_ids)
             new_peer_ids = [peer for peer in data['peers'] if peer not in existing_instance_ids]
@@ -110,12 +100,6 @@ class Command(BaseCommand):
                 new_peers = Instance.objects.bulk_create([Instance(name=peer) for peer in new_peer_ids])
                 instance.peers.set(new_peers)
             instance.peers.set(existing_peers)
-        else:
-            stats = InstanceStats(
-                instance=instance,
-                status=get_key(data, ['status'])
-            )
-            stats.save()
         self.stdout.write("{} - Saved {}".format(datetime.now().isoformat(), data['instance']))
 
     def worker(self, queue: multiprocessing.JoinableQueue):
