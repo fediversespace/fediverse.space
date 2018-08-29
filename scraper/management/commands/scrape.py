@@ -27,7 +27,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseError
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
 SEED = 'mastodon.social'
-TIMEOUT = 20
+TIMEOUT = 1
 
 
 class Command(BaseCommand):
@@ -51,9 +51,10 @@ class Command(BaseCommand):
         """Collect connected instances"""
         url = 'https://' + instance_name + '/api/v1/instance/peers'
         response = requests.get(url, timeout=TIMEOUT)
-        if response.status_code != 200:
+        json = response.json()
+        if response.status_code != 200 or not isinstance(json, list):
             raise InvalidResponseError("Could not get peers for {}".format(instance_name))
-        return response.json()
+        return json
 
     def process_instance(self, instance_name: str):
         """Given an instance, get all the data we're interested in"""
@@ -63,6 +64,9 @@ class Command(BaseCommand):
             data['instance'] = instance_name
             data['info'] = self.get_instance_info(instance_name)
             data['peers'] = [peer for peer in self.get_instance_peers(instance_name) if peer]  # get rid of null peers
+            if not data['info'] and not data['peers']:
+                # We got a response from the instance, but it didn't have any of the information we were expecting.
+                raise InvalidResponseError
             data['status'] = 'success'
             return data
         except (InvalidResponseError,
