@@ -10,7 +10,7 @@ import { fetchInstances } from './redux/actions';
 import { IAppState, IInstance } from './redux/types';
 
 interface IAppProps {
-  currentInstance: IInstance;
+  currentInstance: IInstance | null;
   instances?: IInstance[],
   isLoadingInstances: boolean,
   fetchInstances: () => void;
@@ -56,13 +56,15 @@ class AppImpl extends React.Component<IAppProps> {
 
   private renderGraph = () => {
     return (
-      <NonIdealState
-        className="fediverse-welcome"
-        icon={IconNames.SEARCH_AROUND}
-        title="Graph. TODO"
-        description={"Selected " + this.props.currentInstance.name}
-      />
-    )
+      <div>
+        <NonIdealState
+          className="fediverse-welcome"
+          icon={IconNames.SEARCH_AROUND}
+          title="Graph. TODO"
+          description={"Selected " + ((this.props.currentInstance && this.props.currentInstance.name) || "nothing")}
+        />
+      </div>
+    );
   }
 
 }

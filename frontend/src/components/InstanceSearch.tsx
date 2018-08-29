@@ -1,62 +1,68 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
+// import { List, ListRowProps } from 'react-virtualized';
 import { Dispatch } from 'redux';
 
-import { MenuItem } from '@blueprintjs/core';
-import { IItemRendererProps, Suggest } from '@blueprintjs/select';
+import { Button, MenuItem } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
+import { ItemPredicate, ItemRenderer, Select } from '@blueprintjs/select';
 
 import { selectInstance } from '../redux/actions';
 import { IAppState, IInstance } from '../redux/types';
 
 interface IInstanceSearchProps {
-    currentInstance: IInstance;
+    currentInstance: IInstance | null;
     instances?: IInstance[];
     selectInstance: (instanceName: string) => void;
 }
+
+const InstanceSelect = Select.ofType<IInstance>();
 
 class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
 
     public render() {
         return (
-            <Suggest
-                inputValueRenderer={this.inputValueRenderer}
+            <InstanceSelect
+                items={this.props.instances && this.props.instances.slice(50) || []}
                 itemRenderer={this.itemRenderer}
-                items={this.props.instances || []}
                 onItemSelect={this.onItemSelect}
-                // itemListRenderer={this.itemListRenderer}
+                itemPredicate={this.itemPredicate}
+                disabled={!this.props.instances}
+            >
+                <Button
+                    icon={IconNames.SELECTION}
+                    rightIcon={IconNames.CARET_DOWN}
+                    text={(this.props.currentInstance && this.props.currentInstance.name) || ("Select an instance")}
+                    disabled={!this.props.instances}
+                />
+            </InstanceSelect>
+        );
+    }
+
+    private itemRenderer: ItemRenderer<IInstance> = (item, { handleClick, modifiers }) => {
+        if (!modifiers.matchesPredicate) {
+            return null;
+        }
+        return (
+            <MenuItem
+                text={item.name}
+                key={item.name}
+                active={modifiers.active}
+                onClick={handleClick}
             />
-        )
+        );
     }
 
-    private inputValueRenderer = (item: IInstance): string => {
-        return item.name;
-    }
-
-    private itemRenderer = (item: IInstance, itemProps: IItemRendererProps): JSX.Element => {
-        return <MenuItem label={item.name} key={item.name} />;
+    private itemPredicate: ItemPredicate<IInstance> = (query, item, index) => {
+        if (!item.name) {
+            return false;
+        }
+        return item.name.toLowerCase().indexOf(query.toLowerCase()) >= 0;
     }
 
     private onItemSelect = (item: IInstance, event?: React.SyntheticEvent<HTMLElement>) => {
         this.props.selectInstance(item.name);
     }
-
-    // private itemListRenderer = (itemListProps: IItemListRendererProps<IInstance>): JSX.Element => {
-    //     return (
-    //         <List
-    //             height={350}
-    //             rowHeight={30}
-    //             rowCount={(this.props.instances && this.props.instances.length) || 0}
-    //             // tslint:disable-next-line
-    //             rowRenderer={this.rowRenderer}
-    //             width={214}
-    //         />
-    //     )
-    // }
-
-    // private rowRenderer = (listRowProps: ListRowProps) => {
-    //     const instanceName = (this.props.instances && this.props.instances[listRowProps.index].name) || "";
-    //     return <MenuItem label={instanceName} key={instanceName} />;
-    // }
 }
 
 const mapStateToProps = (state: IAppState) => ({

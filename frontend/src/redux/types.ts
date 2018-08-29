@@ -9,10 +9,6 @@ export interface IAction {
     payload: any,
 }
 
-export interface IInstanceState {
-    currentInstance?: string,
-}
-
 export interface IInstance {
     name: string,
     numUsers?: number,
@@ -24,6 +20,6 @@ export interface IDataState {
 }
 
 export interface IAppState {
-    currentInstance: IInstance,
+    currentInstance: IInstance | null,
     data: IDataState,
 }

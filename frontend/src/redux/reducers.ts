@@ -24,8 +24,7 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
     }
 }
 
-const initialInstanceState = {'name': 'mastodon.social'}
-const currentInstance = (state: IInstance = initialInstanceState, action: IAction): IInstance => {
+const currentInstance = (state: IInstance | null = null, action: IAction): IInstance | null => {
     switch (action.type) {
         case ActionType.SELECT_INSTANCE:
             return action.payload;
