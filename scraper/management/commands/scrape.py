@@ -84,6 +84,7 @@ class Command(BaseCommand):
         defaults['domain_count'] = get_key(data, ['info', 'stats', 'domain_count']) or None
         defaults['status_count'] = get_key(data, ['info', 'stats', 'status_count']) or None
         defaults['user_count'] = get_key(data, ['info', 'stats', 'user_count']) or None
+        defaults['description'] = get_key(data, ['info', 'description'])
         defaults['version'] = get_key(data, ['info', 'version'])
         defaults['status'] = get_key(data, ['status'])
         instance, _ = Instance.objects.update_or_create(

@@ -6,6 +6,7 @@ class Instance(models.Model):
     name = models.CharField(max_length=200, primary_key=True)
 
     # Details
+    description = models.TextField(blank=True)
     domain_count = models.IntegerField(blank=True, null=True)
     status_count = models.IntegerField(blank=True, null=True)
     user_count = models.IntegerField(blank=True, null=True)
