@@ -12,7 +12,7 @@ html, body {
 }
 
 .fediverse-instance-search-popover {
-  height: 350px;
-  min-width: 214px;
+  max-height: 350px;
+  min-width: 300px;
   overflow-x: hidden;
 }

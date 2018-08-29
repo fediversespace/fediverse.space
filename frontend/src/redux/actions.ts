@@ -3,11 +3,9 @@ import { Dispatch } from 'redux';
 import { getFromApi } from '../util';
 import { ActionType, IInstance } from './types';
 
-export const selectInstance = (instance: string) => {
+export const selectInstance = (instanceName: string) => {
     return {
-        payload: {
-            instance,
-        },
+        payload: instanceName,
         type: ActionType.SELECT_INSTANCE,
     }
 }

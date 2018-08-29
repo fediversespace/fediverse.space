@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { ActionType, IAction, IDataState, IInstance } from './types';
+import { ActionType, IAction, IDataState } from './types';
 
 const initialDataState = {
     isLoadingInstances: false,
@@ -24,7 +24,7 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
     }
 }
 
-const currentInstance = (state: IInstance | null = null, action: IAction): IInstance | null => {
+const currentInstanceName = (state: string | null = null, action: IAction): string | null => {
     switch (action.type) {
         case ActionType.SELECT_INSTANCE:
             return action.payload;
@@ -34,6 +34,6 @@ const currentInstance = (state: IInstance | null = null, action: IAction): IInst
 }
 
 export const rootReducer = combineReducers({
-    currentInstance,
+    currentInstanceName,
     data,
 })

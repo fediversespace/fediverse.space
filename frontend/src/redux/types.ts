@@ -20,6 +20,6 @@ export interface IDataState {
 }
 
 export interface IAppState {
-    currentInstance: IInstance | null,
+    currentInstanceName: string | null,
     data: IDataState,
 }

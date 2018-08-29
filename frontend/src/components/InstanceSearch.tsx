@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-// import { List, ListRowProps } from 'react-virtualized';
 import { Dispatch } from 'redux';
 
 import { Button, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import { ItemPredicate, ItemRenderer, Select } from '@blueprintjs/select';
+import { IItemRendererProps, ItemPredicate, Select } from '@blueprintjs/select';
 
 import { selectInstance } from '../redux/actions';
 import { IAppState, IInstance } from '../redux/types';
 
 interface IInstanceSearchProps {
-    currentInstance: IInstance | null;
+    currentInstanceName: string | null;
     instances?: IInstance[];
     selectInstance: (instanceName: string) => void;
 }
@@ -28,33 +27,48 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
                 onItemSelect={this.onItemSelect}
                 itemPredicate={this.itemPredicate}
                 disabled={!this.props.instances}
+                initialContent={this.renderInitialContent()}
+                noResults={this.renderNoResults()}
+                popoverProps={{popoverClassName: "fediverse-instance-search-popover"}}
             >
                 <Button
                     icon={IconNames.SELECTION}
                     rightIcon={IconNames.CARET_DOWN}
-                    text={(this.props.currentInstance && this.props.currentInstance.name) || ("Select an instance")}
+                    text={this.props.currentInstanceName || ("Select an instance")}
                     disabled={!this.props.instances}
                 />
             </InstanceSelect>
         );
     }
 
-    private itemRenderer: ItemRenderer<IInstance> = (item, { handleClick, modifiers }) => {
-        if (!modifiers.matchesPredicate) {
+    private renderInitialContent = () => {
+        return (
+            <MenuItem disabled={true} text={"Start typing"} />
+        );
+    }
+
+    private renderNoResults = () => {
+        return (
+            <MenuItem disabled={true} text={"Keep typing"} />
+        );
+    }
+
+    private itemRenderer = (item: IInstance, itemProps: IItemRendererProps)  => {
+        if (!itemProps.modifiers.matchesPredicate) {
             return null;
         }
         return (
             <MenuItem
                 text={item.name}
                 key={item.name}
-                active={modifiers.active}
-                onClick={handleClick}
+                active={itemProps.modifiers.active}
+                onClick={itemProps.handleClick}
             />
         );
     }
 
     private itemPredicate: ItemPredicate<IInstance> = (query, item, index) => {
-        if (!item.name) {
+        if (!item.name || query.length < 4) {
             return false;
         }
         return item.name.toLowerCase().indexOf(query.toLowerCase()) >= 0;
@@ -66,7 +80,7 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
 }
 
 const mapStateToProps = (state: IAppState) => ({
-    currentInstance: state.currentInstance,
+    currentInstanceName: state.currentInstanceName,
     instances: state.data.instances,
 })
 const mapDispatchToProps = (dispatch: Dispatch) => ({
