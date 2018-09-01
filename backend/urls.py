@@ -29,7 +29,7 @@ class OptionalTrailingSlashRouter(routers.DefaultRouter):
 router = OptionalTrailingSlashRouter()
 router.register(r'instances', views.InstanceViewSet)
 router.register(r'graph/nodes', views.NodeView)
-router.register(r'graph/edges', views.EdgeView)
+router.register(r'graph/edges', views.EdgeView, base_name='edge')
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),

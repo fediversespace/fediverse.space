@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from django.db.models import Prefetch
 from scraper.models import Instance, PeerRelationship
 from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer, NodeSerializer, EdgeSerializer
 
@@ -32,6 +33,5 @@ class NodeView(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint to get a list of the graph's nodes in a SigmaJS-friendly format.
     """
-    # queryset = Instance.objects.filter(status='success')
-    queryset = Instance.objects.all()
+    queryset = Instance.objects.filter(status='success')
     serializer_class = NodeSerializer
