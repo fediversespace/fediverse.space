@@ -58,7 +58,7 @@ def get_key(data, keys: list):
 
 
 def validate_int(integer):
-    return isinstance(integer, int) and 0 <= integer < 2147483647 or None
+    return integer if (isinstance(integer, int) and 0 <= integer < 2147483647) else None
 
 
 def log(text):

@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
@@ -74,6 +75,7 @@ class SidebarImpl extends React.Component<ISidebarProps> {
         const userCount = this.props.instanceDetails!.userCount;
         const statusCount = this.props.instanceDetails!.statusCount;
         const domainCount = this.props.instanceDetails!.domainCount;
+        const lastUpdated = this.props.instanceDetails!.lastUpdated;
         if (!userCount && !statusCount && !domainCount) {
             return;
         }
@@ -94,6 +96,10 @@ class SidebarImpl extends React.Component<ISidebarProps> {
                             <td>Known peers</td>
                             <td>{domainCount || "Unknown"}</td>
                         </tr>
+                        <tr>
+                            <td>Last updated</td>
+                            <td>{moment(lastUpdated + "Z").fromNow() || "Unknown"}</td>
+                        </tr>
                     </tbody>
                 </HTMLTable>
                 <Divider />
@@ -103,7 +109,7 @@ class SidebarImpl extends React.Component<ISidebarProps> {
 
     private renderPeers = () => {
         const peers = this.props.instanceDetails!.peers;
-        if (!peers) {
+        if (!peers || peers.length === 0) {
             return;
         }
         const peerRows = peers.map(instance => (
