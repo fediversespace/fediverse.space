@@ -22,7 +22,7 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
     public render() {
         return (
             <InstanceSelect
-                items={this.props.instances && this.props.instances.slice(50) || []}
+                items={this.props.instances || []}
                 itemRenderer={this.itemRenderer}
                 onItemSelect={this.onItemSelect}
                 itemPredicate={this.itemPredicate}

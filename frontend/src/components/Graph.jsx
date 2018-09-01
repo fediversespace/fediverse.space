@@ -13,11 +13,12 @@ const STYLE = {
 }
 const SETTINGS = {
     defaultEdgeColor: "#5C7080",
+    defaultLabelColor: "#F5F8FA",
     defaultNodeColor: "#CED9E0",
-    defaultNodeHoverColor: "#48AFF0",
     drawEdges: true,
     drawLabels: true,
     edgeColor: "default",
+    labelColor: "default",
 }
 
 class GraphImpl extends React.Component {
