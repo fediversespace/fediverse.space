@@ -1,20 +1,11 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 
 import { Alignment, Button, Icon, Navbar } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
-import { selectInstance } from '../redux/actions';
-import { IAppState, IInstance } from '../redux/types';
 import { InstanceSearch } from './InstanceSearch';
 
-interface INavProps {
-    instances?: IInstance[];
-    selectInstance: (instance: string) => void;
-}
-
-class NavImpl extends React.Component<INavProps> {
+export class Nav extends React.Component {
     public render() {
         return (
             <Navbar>
@@ -38,11 +29,3 @@ class NavImpl extends React.Component<INavProps> {
         )
     } 
 }
-
-const mapStateToProps = (state: IAppState) => ({
-    instances: state.data.instances,
-})
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-    selectInstance: (instanceName: string) => dispatch(selectInstance(instanceName)),
-})
-export const Nav = connect(mapStateToProps, mapDispatchToProps)(NavImpl)

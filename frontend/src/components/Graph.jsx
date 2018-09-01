@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { NodeShapes, RandomizeNodePositions, RelativeSize, Sigma, SigmaEnableWebGL, LoadGEXF, Filter } from 'react-sigma';
+import { RandomizeNodePositions, RelativeSize, Sigma, SigmaEnableWebGL, Filter } from 'react-sigma';
 
-import { selectInstance } from '../redux/actions';
+import { selectAndLoadInstance } from '../redux/actions';
 
 const STYLE = {
     bottom: "0",
@@ -14,6 +14,7 @@ const STYLE = {
 const SETTINGS = {
     defaultEdgeColor: "#5C7080",
     defaultNodeColor: "#CED9E0",
+    defaultNodeHoverColor: "#48AFF0",
     drawEdges: true,
     drawLabels: true,
     edgeColor: "default",
@@ -31,8 +32,8 @@ class GraphImpl extends React.Component {
                 renderer="webgl"
                 settings={SETTINGS}
                 style={STYLE}
-                onClickNode={(e) => this.props.selectInstance(e.data.node.label)}
-                onClickStage={(e) => this.props.selectInstance(null)}
+                onClickNode={(e) => this.props.selectAndLoadInstance(e.data.node.label)}
+                onClickStage={(e) => this.props.selectAndLoadInstance(null)}
             >
                 <RandomizeNodePositions />
                 <Filter neighborsOf={this.props.currentInstanceName} />
@@ -40,21 +41,13 @@ class GraphImpl extends React.Component {
             </Sigma>
         )
     }
-
-    // onClickNode = (e) => {
-    //     this.props.selectInstance(e.data.node.label);
-    // }
-
-    // zoomToNode = (camera, node) => {
-    //     s
-    // }
 }
 
 const mapStateToProps = (state) => ({
-    currentInstanceName: state.currentInstanceName,
+    currentInstanceName: state.currentInstance.currentInstanceName,
     graph: state.data.graph,
 })
 const mapDispatchToProps = (dispatch) => ({
-    selectInstance: (instanceName) => dispatch(selectInstance(instanceName)),
+    selectAndLoadInstance: (instanceName) => dispatch(selectAndLoadInstance(instanceName)),
 })
 export const Graph = connect(mapStateToProps, mapDispatchToProps)(GraphImpl)

@@ -6,13 +6,13 @@ import { Button, MenuItem } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 import { IItemRendererProps, ItemPredicate, Select } from '@blueprintjs/select';
 
-import { selectInstance } from '../redux/actions';
+import { selectAndLoadInstance } from '../redux/actions';
 import { IAppState, IInstance } from '../redux/types';
 
 interface IInstanceSearchProps {
     currentInstanceName: string | null;
     instances?: IInstance[];
-    selectInstance: (instanceName: string) => void;
+    selectAndLoadInstance: (instanceName: string) => void;
 }
 
 const InstanceSelect = Select.ofType<IInstance>();
@@ -75,15 +75,15 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
     }
 
     private onItemSelect = (item: IInstance, event?: React.SyntheticEvent<HTMLElement>) => {
-        this.props.selectInstance(item.name);
+        this.props.selectAndLoadInstance(item.name);
     }
 }
 
 const mapStateToProps = (state: IAppState) => ({
-    currentInstanceName: state.currentInstanceName,
+    currentInstanceName: state.currentInstance.currentInstanceName,
     instances: state.data.instances,
 })
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-    selectInstance: (instanceName: string) => dispatch(selectInstance(instanceName)),
+    selectAndLoadInstance: (instanceName: string) => dispatch(selectAndLoadInstance(instanceName) as any),
 })
 export const InstanceSearch = connect(mapStateToProps, mapDispatchToProps)(InstanceSearchImpl)

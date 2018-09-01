@@ -19,11 +19,27 @@ class InstanceListSerializer(serializers.ModelSerializer):
 
 
 class InstanceDetailSerializer(serializers.ModelSerializer):
+    userCount = serializers.SerializerMethodField()
+    statusCount = serializers.SerializerMethodField()
+    domainCount = serializers.SerializerMethodField()
+    lastUpdated = serializers.SerializerMethodField()
     peers = InstanceListSerializer(many=True, read_only=True)
+
+    def get_userCount(self, obj):
+        return obj.user_count
+
+    def get_statusCount(self, obj):
+        return obj.status_count
+
+    def get_domainCount(self, obj):
+        return obj.domain_count
+
+    def get_lastUpdated(self, obj):
+        return obj.last_updated
 
     class Meta:
         model = Instance
-        fields = '__all__'
+        fields = ('name', 'description', 'version', 'userCount', 'statusCount', 'domainCount', 'peers', 'lastUpdated')
 
 
 class EdgeSerializer(serializers.ModelSerializer):

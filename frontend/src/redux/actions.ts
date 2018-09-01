@@ -1,12 +1,18 @@
 import { Dispatch } from 'redux';
 
 import { getFromApi } from '../util';
-import { ActionType, IGraph, IInstance } from './types';
+import { ActionType, IGraph, IInstance, IInstanceDetails } from './types';
 
-export const selectInstance = (instanceName: string) => {
+// selectInstance and deselectInstance are not exported since we only call them from selectAndLoadInstance()
+const selectInstance = (instanceName: string) => {
     return {
         payload: instanceName,
         type: ActionType.SELECT_INSTANCE,
+    }
+}
+const deselectInstance = () => {
+    return {
+        type: ActionType.DESELECT_INSTANCE,
     }
 }
 
@@ -22,7 +28,6 @@ export const receiveInstances = (instances: IInstance[]) => {
         type: ActionType.RECEIVE_INSTANCES,
     }
 }
-
 export const requestGraph = () => {
     return {
         type: ActionType.REQUEST_GRAPH,
@@ -36,6 +41,14 @@ export const receiveGraph = (graph: IGraph) => {
     }
 }
 
+export const receiveInstanceDetails = (instanceDetails: IInstanceDetails) => {
+    return {
+        payload: instanceDetails,
+        type: ActionType.RECEIVE_INSTANCE_DETAILS,
+    }
+}
+
+
 /** Async actions: https://redux.js.org/advanced/asyncactions */
 
 export const fetchInstances = () => {
@@ -43,8 +56,20 @@ export const fetchInstances = () => {
     return (dispatch: Dispatch) => {
         dispatch(requestInstances());
         return getFromApi("instances")
-            .then(instances => dispatch(receiveInstances(instances))
-        );
+            .then(instances => dispatch(receiveInstances(instances)));
+    }
+}
+
+export const selectAndLoadInstance = (instanceName: string) => {
+    // TODO: handle errors
+    return (dispatch: Dispatch) => {
+        if (!instanceName) {
+            dispatch(deselectInstance());
+            return;
+        }
+        dispatch(selectInstance(instanceName));
+        return getFromApi("instances/" + instanceName)
+            .then(details => dispatch(receiveInstanceDetails(details)));
     }
 }
 
@@ -59,6 +84,6 @@ export const fetchGraph = () => {
                     nodes: responses[1],
                 };
             })
-            .then(graph => dispatch(receiveGraph(graph)))
+            .then(graph => dispatch(receiveGraph(graph)));
     }
 }

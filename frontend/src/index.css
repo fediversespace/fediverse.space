@@ -16,3 +16,19 @@ html, body {
   min-width: 300px;
   overflow-x: hidden;
 }
+
+.fediverse-sidebar {
+  position: fixed;
+  top: 50px;
+  bottom: 0;
+  right: 0;
+  min-width: 300px;
+  width: 25%;
+  z-index: 20;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.fediverse-sidebar-table {
+  width: 100%;
+}

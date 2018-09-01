@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { ActionType, IAction, IDataState } from './types';
+import { ActionType, IAction, ICurrentInstanceState, IDataState } from './types';
 
 const initialDataState = {
     isLoadingGraph: false,
@@ -36,16 +36,37 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
     }
 }
 
-const currentInstanceName = (state: string | null = null, action: IAction): string | null => {
+const initialCurrentInstanceState = {
+    currentInstanceDetails: null,
+    currentInstanceName: null,
+    isLoadingInstanceDetails: false
+};
+const currentInstance = (state = initialCurrentInstanceState , action: IAction): ICurrentInstanceState => {
     switch (action.type) {
         case ActionType.SELECT_INSTANCE:
-            return action.payload;
+            return {
+                ...state,
+                currentInstanceName: action.payload,
+                isLoadingInstanceDetails: true,
+            };
+        case ActionType.RECEIVE_INSTANCE_DETAILS:
+            return {
+                ...state,
+                currentInstanceDetails: action.payload,
+                isLoadingInstanceDetails: false,
+            }
+        case ActionType.DESELECT_INSTANCE:
+            return {
+                ...state,
+                currentInstanceDetails: null,
+                currentInstanceName: null,
+            }
         default:
             return state;
     }
 }
 
 export const rootReducer = combineReducers({
-    currentInstanceName,
+    currentInstance,
     data,
 })

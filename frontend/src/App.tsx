@@ -7,11 +7,11 @@ import { IconNames } from '@blueprintjs/icons';
 
 import { Graph } from './components/Graph';
 import { Nav } from './components/Nav';
+import { Sidebar } from './components/Sidebar';
 import { fetchGraph, fetchInstances } from './redux/actions';
 import { IAppState, IGraph, IInstance } from './redux/types';
 
 interface IAppProps {
-  currentInstanceName?: string | null;
   graph?: IGraph;
   instances?: IInstance[],
   isLoadingGraph: boolean;
@@ -27,7 +27,7 @@ class AppImpl extends React.Component<IAppProps> {
     } else if (this.props.isLoadingGraph) {
       body = this.loadingState("Loading graph...");
     } else if (!!this.props.graph) {
-      body = <Graph />;
+      body = this.graphState();
     }
     return (
       <div className="App bp3-dark">
@@ -39,6 +39,15 @@ class AppImpl extends React.Component<IAppProps> {
 
   public componentDidMount() {
     this.props.fetchInstances();
+  }
+
+  private graphState = () => {
+    return (
+      <div>
+        <Sidebar />
+        <Graph />
+      </div>
+    )
   }
 
   private welcomeState = () => {
@@ -67,7 +76,6 @@ class AppImpl extends React.Component<IAppProps> {
 }
 
 const mapStateToProps = (state: IAppState) => ({
-  currentInstanceName: state.currentInstanceName,
   graph: state.data.graph,
   instances: state.data.instances,
   isLoadingGraph: state.data.isLoadingGraph,

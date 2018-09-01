@@ -20,7 +20,7 @@ class Instance(models.Model):
     status = models.CharField(max_length=100)
 
     # Foreign keys
-    following = models.ManyToManyField('self', symmetrical=False, through='PeerRelationship', related_name="followers")
+    peers = models.ManyToManyField('self', symmetrical=False, through='PeerRelationship')
 
     # Automatic fields
     first_seen = models.DateTimeField(auto_now_add=True)

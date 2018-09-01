@@ -4,6 +4,8 @@ export enum ActionType {
     RECEIVE_INSTANCES = 'RECEIVE_INSTANCES',
     REQUEST_GRAPH = 'REQUEST_GRAPH',
     RECEIVE_GRAPH = 'RECEIVE_GRAPH',
+    RECEIVE_INSTANCE_DETAILS = 'RECEIVE_INSTANCE_DETAILS',
+    DESELECT_INSTANCE = "DESELECT_INSTANCE",
 }
 
 export interface IAction {
@@ -14,6 +16,17 @@ export interface IAction {
 export interface IInstance {
     name: string,
     numUsers?: number,
+}
+
+export interface IInstanceDetails {
+    name: string;
+    peers?: IInstance[];
+    description?: string;
+    domainCount?: number;
+    statusCount?: number;
+    userCount?: number;
+    version?: string;
+    lastUpdated?: string;
 }
 
 interface IGraphNode {
@@ -36,6 +49,12 @@ export interface IGraph {
 
 // Redux state
 
+export interface ICurrentInstanceState {
+    currentInstanceDetails: IInstanceDetails | null,
+    currentInstanceName: string | null,
+    isLoadingInstanceDetails: boolean,
+}
+
 export interface IDataState {
     instances?: IInstance[],
     graph?: IGraph,
@@ -44,6 +63,6 @@ export interface IDataState {
 }
 
 export interface IAppState {
-    currentInstanceName: string | null,
+    currentInstance: ICurrentInstanceState;
     data: IDataState,
 }
