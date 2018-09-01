@@ -7,11 +7,11 @@ import json
 import multiprocessing
 import requests
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.core.management.base import BaseCommand
-from django.db import transaction
-from scraper.models import Instance
-from scraper.management.commands._util import require_lock, InvalidResponseError, get_key
+from django import db
+from scraper.models import Instance, PeerRelationship
+from scraper.management.commands._util import require_lock, InvalidResponseError, get_key, log, validate_int
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Because the script uses the Mastodon API other platforms like         #
@@ -27,7 +27,8 @@ from scraper.management.commands._util import require_lock, InvalidResponseError
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
 SEED = 'mastodon.social'
-TIMEOUT = 1
+TIMEOUT = 10
+NUM_THREADS = 4
 
 
 class Command(BaseCommand):
@@ -49,6 +50,8 @@ class Command(BaseCommand):
     @staticmethod
     def get_instance_peers(instance_name: str):
         """Collect connected instances"""
+        # The peers endpoint returns a "list of all domain names known to this instance"
+        # (https://github.com/tootsuite/mastodon/pull/6125)
         url = 'https://' + instance_name + '/api/v1/instance/peers'
         response = requests.get(url, timeout=TIMEOUT)
         json = response.json()
@@ -56,14 +59,14 @@ class Command(BaseCommand):
             raise InvalidResponseError("Could not get peers for {}".format(instance_name))
         return json
 
-    def process_instance(self, instance_name: str):
+    def process_instance(self, instance: Instance):
         """Given an instance, get all the data we're interested in"""
-        self.stdout.write("{} - Processing {}".format(datetime.now().isoformat(), instance_name))
         data = dict()
         try:
-            data['instance'] = instance_name
-            data['info'] = self.get_instance_info(instance_name)
-            data['peers'] = [peer for peer in self.get_instance_peers(instance_name) if peer]  # get rid of null peers
+            data['instance_name'] = instance.name
+            data['info'] = self.get_instance_info(instance.name)
+            # Get rid of peers that just say "null" and the instance itself
+            data['peers'] = [peer for peer in self.get_instance_peers(instance.name) if peer and peer != instance.name]
             if not data['info'] and not data['peers']:
                 # We got a response from the instance, but it didn't have any of the information we were expecting.
                 raise InvalidResponseError
@@ -72,60 +75,74 @@ class Command(BaseCommand):
         except (InvalidResponseError,
                 requests.exceptions.RequestException,
                 json.decoder.JSONDecodeError) as e:
-            data['instance'] = instance_name
+            data['instance_name'] = instance.name
             data['status'] = type(e).__name__
             return data
 
-    @transaction.atomic
+    @db.transaction.atomic
     @require_lock(Instance, 'ACCESS EXCLUSIVE')
-    def save_data(self, data):
+    def save_data(self, instance, data, queue):
         """Save data"""
-        defaults = dict()
-        defaults['domain_count'] = get_key(data, ['info', 'stats', 'domain_count']) or None
-        defaults['status_count'] = get_key(data, ['info', 'stats', 'status_count']) or None
-        defaults['user_count'] = get_key(data, ['info', 'stats', 'user_count']) or None
-        defaults['description'] = get_key(data, ['info', 'description'])
-        defaults['version'] = get_key(data, ['info', 'version'])
-        defaults['status'] = get_key(data, ['status'])
-        instance, _ = Instance.objects.update_or_create(
-            name=get_key(data, ['instance']),
-            defaults=defaults,
-        )
-        if defaults['status'] == 'success' and data['peers']:
-            # Save peers
-            # TODO: make this shared amongst threads so the database only needs to be queried once
+        # Validate the ints. Some servers that appear to be fake instances have e.g. negative numbers here.
+        # TODO: these always return 1!
+        instance.domain_count = validate_int(get_key(data, ['info', 'stats', 'domain_count']))
+        instance.status_count = validate_int(get_key(data, ['info', 'stats', 'status_count']))
+        instance.user_count = validate_int(get_key(data, ['info', 'stats', 'user_count']))
+        instance.description = get_key(data, ['info', 'description'])
+        instance.version = get_key(data, ['info', 'version'])
+        instance.status = get_key(data, ['status'])
+        instance.save()
+        if data['status'] == 'success' and data['peers']:
+            # TODO: handle a peer disappeer-ing
+            # Create instances for the peers we haven't seen before and add them to the queue
+            # TODO: share this among all threads so we only have to call it once at the start
             existing_instance_ids = Instance.objects.values_list('name', flat=True)
-            existing_peers = Instance.objects.filter(name__in=existing_instance_ids)
-            new_peer_ids = [peer for peer in data['peers'] if peer not in existing_instance_ids]
+            new_instance_ids = [peer_id for peer_id in data['peers'] if peer_id not in existing_instance_ids]
+            # bulk_create doesn't call save(), so the auto_now_add field won't get set automatically
+            new_instances = [Instance(name=id, first_seen=datetime.now(), last_updated=datetime.now())
+                             for id in new_instance_ids]
+            Instance.objects.bulk_create(new_instances)
+            for new_instance in new_instances:
+                queue.put(new_instance)
+
+            # Create relationships we haven't seen before
+            existing_peer_ids = PeerRelationship.objects.filter(source=instance).values_list('target', flat=True)
+            new_peer_ids = [peer_id for peer_id in data['peers'] if peer_id not in existing_peer_ids]
             if new_peer_ids:
-                new_peers = Instance.objects.bulk_create([Instance(name=peer) for peer in new_peer_ids])
-                instance.peers.set(new_peers)
-            instance.peers.set(existing_peers)
-        self.stdout.write("{} - Saved {}".format(datetime.now().isoformat(), data['instance']))
+                new_peers = Instance.objects.filter(name__in=new_peer_ids)
+                new_relationships = [PeerRelationship(source=instance, target=new_peer, first_seen=datetime.now())
+                                     for new_peer in new_peers]
+                PeerRelationship.objects.bulk_create(new_relationships)
+        self.stdout.write(log("Saved {}".format(data['instance_name'])))
 
     def worker(self, queue: multiprocessing.JoinableQueue):
         """The main worker that processes URLs"""
+        # https://stackoverflow.com/a/38356519/3697202
+        db.connections.close_all()
         while True:
-            # Get an item from the queue. Block if the queue is empty.
             instance = queue.get()
             if instance in self.done_bag:
-                print("Skipping {}, already done".format(instance))
+                self.stderr.write(log("Skipping {}, already done. This should not have been added to the queue!".format(instance)))
                 queue.task_done()
             else:
+                # Fetch data on instance
+                self.stdout.write(log("Processing {}".format(instance.name)))
                 data = self.process_instance(instance)
-                if 'peers' in data:
-                    for peer in [p for p in data['peers'] if p not in self.done_bag]:
-                        queue.put(peer)
-                self.save_data(data)
+                self.save_data(instance, data, queue)
                 self.done_bag.add(instance)
                 queue.task_done()
 
     def handle(self, *args, **options):
         start_time = time.time()
+        stale_instances = Instance.objects.filter(last_updated__lte=datetime.now()-timedelta(weeks=1))
         queue = multiprocessing.JoinableQueue()
-        queue.put(SEED)
-        # pool = multiprocessing.Pool(1, initializer=self.worker, initargs=(queue, ))  # Disable concurrency (debug)
-        pool = multiprocessing.Pool(initializer=self.worker, initargs=(queue, ))
+        if stale_instances:
+            queue.put(list(stale_instances))
+        elif not Instance.objects.exists():
+            instance, _ = Instance.objects.get_or_create(name=SEED)
+            queue.put(instance)
+
+        pool = multiprocessing.Pool(NUM_THREADS, initializer=self.worker, initargs=(queue, ))
         queue.join()
         end_time = time.time()
-        self.stdout.write(self.style.SUCCESS("Successfully scraped the fediverse in {:.0f}s".format(end_time-start_time)))
+        self.stdout.write(self.style.SUCCESS(log("Successfully scraped the fediverse in {:.0f}s".format(end_time-start_time))))

@@ -2,6 +2,7 @@
 .idea/
 config.json
 backend/static/
+*.gexf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

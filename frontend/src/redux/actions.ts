@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux';
 
 import { getFromApi } from '../util';
-import { ActionType, IInstance } from './types';
+import { ActionType, IGraph, IInstance } from './types';
 
 export const selectInstance = (instanceName: string) => {
     return {
@@ -23,6 +23,19 @@ export const receiveInstances = (instances: IInstance[]) => {
     }
 }
 
+export const requestGraph = () => {
+    return {
+        type: ActionType.REQUEST_GRAPH,
+    }
+}
+
+export const receiveGraph = (graph: IGraph) => {
+    return {
+        payload: graph,
+        type: ActionType.RECEIVE_GRAPH,
+    }
+}
+
 /** Async actions: https://redux.js.org/advanced/asyncactions */
 
 export const fetchInstances = () => {
@@ -30,10 +43,22 @@ export const fetchInstances = () => {
     return (dispatch: Dispatch) => {
         dispatch(requestInstances());
         return getFromApi("instances")
-            .then(response => {
-                return response.json();
-            })
             .then(instances => dispatch(receiveInstances(instances))
         );
+    }
+}
+
+export const fetchGraph = () => {
+    // TODO: handle errors
+    return (dispatch: Dispatch) => {
+        dispatch(requestGraph());
+        return Promise.all([getFromApi("graph/edges"), getFromApi("graph/nodes")])
+            .then(responses => {
+                return {
+                    edges: responses[0],
+                    nodes: responses[1],
+                };
+            })
+            .then(graph => dispatch(receiveGraph(graph)))
     }
 }

@@ -1,0 +1,47 @@
+buildscript {
+//    repositories {
+//        jcenter()
+//    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+plugins {
+    id "base"
+    id "java"
+    id "com.github.johnrengelman.shadow" version "2.0.4"
+}
+
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+//    mavenCentral()
+//    jcenter()
+//    google()
+//    maven {
+//        url "http://bits.netbeans.org/nexus/content/groups/netbeans/"
+//    }
+}
+
+dependencies {
+    compile group: 'org.gephi', name: 'gephi-toolkit', version: '0.9.2'
+}
+
+jar {
+    manifest {
+        attributes (
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'space.fediverse.graph.GraphBuilder'
+        )
+    }
+}
+
+shadowJar {
+    baseName = 'graphBuilder'
+    classifier = null
+    version = null
+}
+

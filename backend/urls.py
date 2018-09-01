@@ -28,10 +28,11 @@ class OptionalTrailingSlashRouter(routers.DefaultRouter):
 
 router = OptionalTrailingSlashRouter()
 router.register(r'instances', views.InstanceViewSet)
+router.register(r'graph/nodes', views.NodeView)
+router.register(r'graph/edges', views.EdgeView)
 
 urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('silk/', include('silk.urls', namespace='silk')),
     path('', TemplateView.as_view(template_name='index.html')),
 ]
-

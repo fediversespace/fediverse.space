@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from scraper.models import Instance
-from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer
+from scraper.models import Instance, PeerRelationship
+from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer, NodeSerializer, EdgeSerializer
 
 
 class InstanceViewSet(viewsets.ReadOnlyModelViewSet):
@@ -18,3 +18,20 @@ class InstanceViewSet(viewsets.ReadOnlyModelViewSet):
             if hasattr(self, 'detail_serializer_class'):
                 return self.detail_serializer_class
         return self.serializer_class
+
+
+class EdgeView(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint to get a list of the graph's edges in a SigmaJS-friendly format.
+    """
+    queryset = PeerRelationship.objects.all()[:1000]
+    serializer_class = EdgeSerializer
+
+
+class NodeView(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint to get a list of the graph's nodes in a SigmaJS-friendly format.
+    """
+    # queryset = Instance.objects.filter(status='success')
+    queryset = Instance.objects.all()
+    serializer_class = NodeSerializer

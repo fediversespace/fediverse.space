@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { ActionType, IAction, IDataState } from './types';
 
 const initialDataState = {
+    isLoadingGraph: false,
     isLoadingInstances: false,
 }
 const data = (state: IDataState = initialDataState, action: IAction) => {
@@ -18,6 +19,17 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
                 ...state,
                 instances: action.payload,
                 isLoadingInstances: false,
+            };
+        case ActionType.REQUEST_GRAPH:
+            return {
+                ...state,
+                isLoadingGraph: true,
+            };
+        case ActionType.RECEIVE_GRAPH:
+            return {
+                ...state,
+                graph: action.payload,
+                isLoadingGraph: false,
             };
         default:
             return state;

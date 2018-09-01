@@ -1,3 +1,5 @@
+from datetime import datetime
+
 LOCK_MODES = (
     'ACCESS SHARE',
     'ROW SHARE',
@@ -53,3 +55,11 @@ def get_key(data, keys: list):
         return val
     except KeyError:
         return ''
+
+
+def validate_int(integer):
+    return isinstance(integer, int) and 0 <= integer < 2147483647 or None
+
+
+def log(text):
+    return "{} - {}".format(datetime.now().isoformat(), text)

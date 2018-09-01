@@ -2,6 +2,12 @@ from django.db import models
 
 
 class Instance(models.Model):
+    """
+    The main model that saves details of an instance and links between them in the peers
+    property.
+
+    Don't change the schema without verifying that the gephi script can still read the data.
+    """
     # Primary key
     name = models.CharField(max_length=200, primary_key=True)
 
@@ -14,13 +20,16 @@ class Instance(models.Model):
     status = models.CharField(max_length=100)
 
     # Foreign keys
-    # The peers endpoint returns a "list of all domain names known to this instance"
-    # (https://github.com/tootsuite/mastodon/pull/6125)
-    # In other words, an asymmetrical relationship here doesn't make much sense. If we one day can get a list of
-    # instances that the instance actively follows (i.e. knows and not suspended), it's worth adding an
-    # asymmetrical relation.
-    peers = models.ManyToManyField('self', symmetrical=True)
+    following = models.ManyToManyField('self', symmetrical=False, through='PeerRelationship', related_name="followers")
 
     # Automatic fields
     first_seen = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+
+
+class PeerRelationship(models.Model):
+    source = models.ForeignKey(Instance, related_name="following_relationship", on_delete=models.CASCADE)
+    target = models.ForeignKey(Instance, related_name="follower_relationships", on_delete=models.CASCADE)
+
+    # Metadata
+    first_seen = models.DateTimeField(auto_now_add=True)
