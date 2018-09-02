@@ -42,8 +42,16 @@ def require_lock(model, lock):
     return require_lock_decorator
 
 
-class InvalidResponseError(Exception):
+class InvalidResponseException(Exception):
     """Used for all responses other than HTTP 200"""
+    pass
+
+
+class PersonalInstanceException(Exception):
+    """
+    Used for instances that we don't want to scrape because there are too few users.
+    We don't want information on individuals, but aggregate statistics on instances and how they interact.
+    """
     pass
 
 
