@@ -53,7 +53,7 @@ def get_key(data, keys: list):
         while keys:
             val = val[keys.pop(0)]
         return val
-    except KeyError:
+    except (KeyError, TypeError):
         return ''
 
 

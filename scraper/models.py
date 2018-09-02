@@ -31,5 +31,10 @@ class PeerRelationship(models.Model):
     source = models.ForeignKey(Instance, related_name="following_relationship", on_delete=models.CASCADE)
     target = models.ForeignKey(Instance, related_name="follower_relationships", on_delete=models.CASCADE)
 
+    # Interaction stats
+    mention_count = models.IntegerField(blank=True, null=True)
+    statuses_seen = models.IntegerField(blank=True, null=True)  # in case we want mention_count as a ratio
+
     # Metadata
     first_seen = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
