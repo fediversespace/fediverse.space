@@ -2,8 +2,7 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { Button, Intent, NonIdealState, Spinner } from '@blueprintjs/core';
-import { IconNames } from '@blueprintjs/icons';
+import { NonIdealState, Spinner } from '@blueprintjs/core';
 
 import { Graph } from './components/Graph';
 import { Nav } from './components/Nav';
@@ -21,11 +20,9 @@ interface IAppProps {
 }
 class AppImpl extends React.Component<IAppProps> {
   public render() {
-    let body = this.welcomeState();
-    if (this.props.isLoadingInstances) {
-      body = this.loadingState("Loading instances...");
-    } else if (this.props.isLoadingGraph) {
-      body = this.loadingState("Loading graph...");
+    let body = <div />;
+    if (this.props.isLoadingInstances || this.props.isLoadingGraph) {
+      body = this.loadingState("Loading...");
     } else if (!!this.props.graph) {
       body = this.graphState();
     }
@@ -38,7 +35,20 @@ class AppImpl extends React.Component<IAppProps> {
   }
 
   public componentDidMount() {
-    this.props.fetchInstances();
+    this.load();
+  }
+
+  public componentDidUpdate() {
+    this.load();
+  }
+
+  private load = () => {
+    if (!this.props.instances && !this.props.isLoadingInstances) {
+      this.props.fetchInstances();
+    }
+    if (!this.props.graph && !this.props.isLoadingGraph) {
+      this.props.fetchGraph();
+    }
   }
 
   private graphState = () => {
@@ -47,19 +57,6 @@ class AppImpl extends React.Component<IAppProps> {
         <Sidebar />
         <Graph />
       </div>
-    )
-  }
-
-  private welcomeState = () => {
-    const numInstances = this.props.instances ? this.props.instances.length : "lots of";
-    const description = `There are ${numInstances} known instances, so loading the graph might take a little while. Ready?`
-    return (
-        <NonIdealState
-          icon={IconNames.GLOBE_NETWORK}
-          title="Welcome to fediverse.space!"
-          description={description}
-          action={<Button intent={Intent.PRIMARY} text={"Let's go"} onClick={this.props.fetchGraph} />}
-        />
     )
   }
 

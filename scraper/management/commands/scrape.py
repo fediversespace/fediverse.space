@@ -31,7 +31,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 
 SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
-NUM_THREADS = 64  # roughly 40MB each
+NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with <= this many users won't be scraped
 STATUS_SCRAPE_LIMIT = 5000
 
