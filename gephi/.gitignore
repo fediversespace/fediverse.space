@@ -1,8 +1,9 @@
 .gradle/
-gradle/
 build/
 lib/*
 !lib/.gitkeep
+# 64MB file but I don't have much faith that it'll remain available...
+!lib/gephi-toolkit-0.9.2.jar
 
 .idea/
 
