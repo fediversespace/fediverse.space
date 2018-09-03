@@ -55,7 +55,6 @@ class AppImpl extends React.Component<IAppProps> {
     const description = `There are ${numInstances} known instances, so loading the graph might take a little while. Ready?`
     return (
         <NonIdealState
-          className="fediverse-welcome"
           icon={IconNames.GLOBE_NETWORK}
           title="Welcome to fediverse.space!"
           description={description}
@@ -67,7 +66,6 @@ class AppImpl extends React.Component<IAppProps> {
   private loadingState = (title?: string) => {
     return (
         <NonIdealState
-          className="fediverse-welcome"
           icon={<Spinner />}
           title={title || "Loading..."}
         />

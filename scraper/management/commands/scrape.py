@@ -30,7 +30,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
 SEED = 'mastodon.social'
-TIMEOUT = 10  # seconds
+TIMEOUT = 20  # seconds
 NUM_THREADS = 64
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with <= this many users won't be scraped
 
@@ -69,7 +69,7 @@ class Command(BaseCommand):
     def get_statuses(instance_name: str):
         """Collect all statuses that mention users on other instances"""
         mentions = []
-        datetime_threshold = datetime.now(timezone.utc) - timedelta(weeks=1)
+        datetime_threshold = datetime.now(timezone.utc) - timedelta(months=1)
         statuses_seen = 0
         # We'll ask for 1000 statuses, but Mastodon never returns more than 40. Some Pleroma instances will ignore
         # the limit and return 20.
