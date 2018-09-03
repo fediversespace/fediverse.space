@@ -5,6 +5,9 @@ from scraper.models import Instance, Edge
 
 
 class InstanceListSerializer(serializers.ModelSerializer):
+    """
+    Minimal instance details used in the full list of instances.
+    """
     class Meta:
         model = Instance
         fields = ('name', 'user_count')
@@ -20,6 +23,9 @@ class InstanceListSerializer(serializers.ModelSerializer):
 
 
 class InstanceDetailSerializer(serializers.ModelSerializer):
+    """
+    Detailed instance view.
+    """
     userCount = serializers.SerializerMethodField()
     statusCount = serializers.SerializerMethodField()
     domainCount = serializers.SerializerMethodField()
@@ -40,10 +46,15 @@ class InstanceDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Instance
-        fields = ('name', 'description', 'version', 'userCount', 'statusCount', 'domainCount', 'peers', 'lastUpdated', 'status')
+        fields = ('name', 'description', 'version', 'userCount',
+                  'statusCount', 'domainCount', 'peers', 'lastUpdated',
+                  'status')
 
 
 class EdgeSerializer(serializers.ModelSerializer):
+    """
+    Used for displaying the graph.
+    """
     id = serializers.SerializerMethodField('get_pk')
     size = serializers.SerializerMethodField('get_weight')
 
@@ -59,6 +70,9 @@ class EdgeSerializer(serializers.ModelSerializer):
 
 
 class NodeSerializer(serializers.ModelSerializer):
+    """
+    Used for displaying the graph.
+    """
     id = serializers.SerializerMethodField('get_name')
     label = serializers.SerializerMethodField('get_name')
     size = serializers.SerializerMethodField()

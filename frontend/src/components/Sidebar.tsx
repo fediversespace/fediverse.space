@@ -1,3 +1,4 @@
+import { orderBy } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { connect } from 'react-redux';
@@ -5,14 +6,16 @@ import { Dispatch } from 'redux';
 import * as sanitize from 'sanitize-html';
 
 import {
-    AnchorButton, Card, Classes, Divider, Elevation, HTMLTable, NonIdealState, Position, Tooltip
+    AnchorButton, Card, Classes, Divider, Elevation, HTMLTable, NonIdealState, Position, Tab, Tabs,
+    Tooltip
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
 import { selectAndLoadInstance } from '../redux/actions';
-import { IAppState, IInstanceDetails } from '../redux/types';
+import { IAppState, IGraph, IInstanceDetails } from '../redux/types';
 
 interface ISidebarProps {
+    graph?: IGraph,
     instanceName: string | null,
     instanceDetails: IInstanceDetails | null,
     isLoadingInstanceDetails: boolean;
@@ -40,12 +43,21 @@ class SidebarImpl extends React.Component<ISidebarProps> {
         return (
             <div>
                 {this.renderHeading()}
-                {this.renderDescription()}
-                {this.renderVersion()}
-                {this.renderCounts()}
-                {this.renderPeers()}
+                <Tabs>
+                    {this.props.instanceDetails.description &&
+                        <Tab id="description" title="Description" panel={this.renderDescription()} />}
+                    {this.shouldRenderStats() &&
+                        <Tab id="stats" title="Details" panel={this.renderVersionAndCounts()} />}
+                    <Tab id="neighbors" title="Neighbors" panel={this.renderNeighbors()} />
+                    <Tab id="peers" title="Known peers" panel={this.renderPeers()} />
+                </Tabs>
             </div>
         );
+    }
+
+    private shouldRenderStats = () => {
+        const details = this.props.instanceDetails;
+        return details && (details.version || details.userCount || details.statusCount || details.domainCount);
     }
 
     private renderHeading = () => {
@@ -80,41 +92,24 @@ class SidebarImpl extends React.Component<ISidebarProps> {
             return;
         }
         return (
-            <div>
-                <h4>Description</h4>
-                <div className={Classes.RUNNING_TEXT} dangerouslySetInnerHTML={{__html: sanitize(description)}} />
-                <Divider />
-            </div>
+            <p className={Classes.RUNNING_TEXT} dangerouslySetInnerHTML={{__html: sanitize(description)}} />
         )
     }
 
-    private renderVersion = () => {
+    private renderVersionAndCounts = () => {
         const version = this.props.instanceDetails!.version;
-        if (!version) {
-            return;
-        }
-        return (
-            <div>
-                <h4>Version</h4>
-                    <code className={Classes.CODE}>{version}</code>
-                <Divider />
-            </div>
-        )
-    }
-
-    private renderCounts = () => {
         const userCount = this.props.instanceDetails!.userCount;
         const statusCount = this.props.instanceDetails!.statusCount;
         const domainCount = this.props.instanceDetails!.domainCount;
         const lastUpdated = this.props.instanceDetails!.lastUpdated;
-        if (!userCount && !statusCount && !domainCount) {
-            return;
-        }
         return (
             <div>
-                <h4>Stats</h4>
                 <HTMLTable small={true} striped={true} className="fediverse-sidebar-table">
                     <tbody>
+                        <tr>
+                            <td>Version</td>
+                            <td>{<code>{version}</code> || "Unknown"}</td>
+                        </tr>
                         <tr>
                             <td>Users</td>
                             <td>{userCount || "Unknown"}</td>
@@ -133,9 +128,48 @@ class SidebarImpl extends React.Component<ISidebarProps> {
                         </tr>
                     </tbody>
                 </HTMLTable>
-                <Divider />
             </div>
         )
+    }
+
+    private renderNeighbors = () => {
+        if (!this.props.graph || !this.props.instanceName) {
+            return;
+        }
+        const edges = this.props.graph.edges.filter(e => [e.source, e.target].indexOf(this.props.instanceName!) > -1);
+        const neighbors: any[] = [];
+        edges.forEach(e => {
+            if (e.source === this.props.instanceName) {
+                neighbors.push({neighbor: e.target, weight: e.size});
+            } else {
+                neighbors.push({neighbor: e.source, weight: e.size});
+            }
+        })
+        const neighborRows = orderBy(neighbors, ['weight'], ['desc']).map((neighborDetails: any, idx: number) => (
+            <tr key={idx}>
+                <td><AnchorButton minimal={true} onClick={this.selectInstance}>{neighborDetails.neighbor}</AnchorButton></td>
+                <td>{neighborDetails.weight.toFixed(4)}</td>
+            </tr>
+        ));
+        return (
+            <div>
+                <p className={Classes.TEXT_MUTED}>
+                    The mention ratio is the average of how many times the two instances mention each other per status.
+                    A mention ratio of 1 would mean that every single status contained a mention of a user on the other instance.
+                </p>
+                <HTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
+                    <thead>
+                        <tr>
+                        <th>Instance</th>
+                        <th>Mention ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {neighborRows}
+                    </tbody>
+                </HTMLTable>
+            </div>
+        );
     }
 
     private renderPeers = () => {
@@ -145,13 +179,15 @@ class SidebarImpl extends React.Component<ISidebarProps> {
         }
         const peerRows = peers.map(instance => (
             <tr key={instance.name} onClick={this.selectInstance}>
-                <td>{instance.name}</td>
+                <td><AnchorButton minimal={true} onClick={this.selectInstance}>{instance.name}</AnchorButton></td>
             </tr>
         ));
         return (
             <div>
-                <h4>Known instances</h4>
-                <HTMLTable small={true} striped={true} interactive={true} className="fediverse-sidebar-table">
+                <p className={Classes.TEXT_MUTED}>
+                    All the instances, past and present, that {this.props.instanceName} knows about.
+                </p>
+                <HTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
                     <tbody>
                         {peerRows}
                     </tbody>
@@ -221,12 +257,13 @@ class SidebarImpl extends React.Component<ISidebarProps> {
         window.open("https://" + this.props.instanceName, "_blank");
     }
 
-    private selectInstance = (e: any)=> {
+    private selectInstance = (e: any) => {
         this.props.selectAndLoadInstance(e.target.innerText);
     }
 }
 
 const mapStateToProps = (state: IAppState) => ({
+    graph: state.data.graph,
     instanceDetails: state.currentInstance.currentInstanceDetails,
     instanceName: state.currentInstance.currentInstanceName,
     isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails,

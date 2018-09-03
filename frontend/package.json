@@ -8,6 +8,7 @@
     "@blueprintjs/select": "^3.1.0",
     "classnames": "^2.2.6",
     "cross-fetch": "^2.2.2",
+    "lodash": "^4.17.10",
     "moment": "^2.22.2",
     "normalize.css": "^8.0.0",
     "react": "^16.4.2",
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@types/classnames": "^2.2.6",
     "@types/jest": "^23.3.1",
+    "@types/lodash": "^4.14.116",
     "@types/node": "^10.9.2",
     "@types/react": "^16.4.12",
     "@types/react-dom": "^16.0.7",
