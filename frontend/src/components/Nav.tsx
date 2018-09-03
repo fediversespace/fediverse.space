@@ -79,7 +79,7 @@ export class Nav extends React.Component<{}, INavState> {
                     </p>
                     <h4>How do you calculate the strength of relationships between instances?</h4>
                     <p className={Classes.RUNNING_TEXT}>
-                        fediverse.space scrapes the last 2000 statuses from within the last month on the public
+                        fediverse.space scrapes the last 5000 statuses from within the last month on the public
                         timeline of each instance. It looks at the ratio of
                         <code>mentions of an instance / total statuses</code>.
                         It uses a ratio rather than an absolute number of mentions to reflect that smaller instances

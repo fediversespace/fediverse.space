@@ -23,4 +23,5 @@ requests==2.19.1
 six==1.10.0
 sqlparse==0.2.4
 tabulate==0.7.7
+tqdm==4.25.0
 urllib3==1.23

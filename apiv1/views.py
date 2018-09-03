@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from scraper.models import Instance, PeerRelationship
+from scraper.models import Instance, Edge
 from apiv1.serializers import InstanceListSerializer, InstanceDetailSerializer, NodeSerializer, EdgeSerializer
 
 
@@ -24,7 +24,7 @@ class EdgeView(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint to get a list of the graph's edges in a SigmaJS-friendly format.
     """
-    queryset = PeerRelationship.objects.filter(source__status='success', target__status='success')
+    queryset = Edge.objects.all()
     serializer_class = EdgeSerializer
 
 

@@ -32,6 +32,8 @@ export interface IInstanceDetails {
 interface IGraphNode {
     id: string;
     label: string;
+    x: number;
+    y: number;
     size?: number;
     color?: string;
 }

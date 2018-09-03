@@ -2,7 +2,10 @@ package space.fediverse.graph;
 
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.gephi.graph.api.UndirectedGraph;
 import org.gephi.io.database.drivers.PostgreSQLDriver;
+import org.gephi.io.database.drivers.SQLUtils;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.importer.api.Container;
 import org.gephi.io.importer.api.EdgeDirectionDefault;
@@ -20,6 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 
 public class GraphBuilder {
@@ -34,9 +41,9 @@ public class GraphBuilder {
 
     private static final String edgeQuery = String.join(""
             , "SELECT"
-            , " scraper_instance_peers.from_instance_id AS source,"
-            , " scraper_instance_peers.to_instance_id AS target"
-            , " FROM scraper_instance_peers"
+            , " scraper_edge.source_id AS source,"
+            , " scraper_edge.target_id AS target"
+            , " FROM scraper_edge"
     );
 
 
@@ -55,7 +62,6 @@ public class GraphBuilder {
         // AttributeModel?
 
         // Import from database
-
         EdgeListDatabaseImpl db = new EdgeListDatabaseImpl();
         db.setSQLDriver(new PostgreSQLDriver());
         db.setHost("localhost");
@@ -77,18 +83,57 @@ public class GraphBuilder {
         importController.process(container, new DefaultProcessor(), workspace);
 
         // Layout
-        AutoLayout autoLayout = new AutoLayout(2, TimeUnit.MINUTES);
+        AutoLayout autoLayout = new AutoLayout(1, TimeUnit.MINUTES);
         autoLayout.setGraphModel(graphModel);
 //        YifanHuLayout firstLayout = new YifanHuLayout(null, new StepDisplacement(1f));
-        ForceAtlas2 secondLayout = new ForceAtlas2(null);
-//        AutoLayout.DynamicProperty adjustBySizeProperty = AutoLayout.createDynamicProperty("forceAtlas.adjustSizes.name", Boolean.TRUE, 0.1f);
-//        AutoLayout.DynamicProperty repulsionProperty = AutoLayout.createDynamicProperty("forceAtlas.repulsionStrength.name", 500., 0f);
-//        autoLayout.addLayout(firstLayout, 0.5f);
-//        autoLayout.addLayout(secondLayout, 0.5f, new AutoLayout.DynamicProperty[]{adjustBySizeProperty, repulsionProperty});
-        autoLayout.addLayout(secondLayout, 1f);
+        ForceAtlas2 forceAtlas2Layout = new ForceAtlas2(null);
+        forceAtlas2Layout.setLinLogMode(true);
+        autoLayout.addLayout(forceAtlas2Layout, 1f);
         autoLayout.execute();
 
-        // Export
+        // Update coordinates in database
+        // First, connect
+        String dbUrl = SQLUtils.getUrl(db.getSQLDriver(), db.getHost(), db.getPort(), db.getDBName());
+        Connection conn = null;
+        try {
+            conn = db.getSQLDriver().getConnection(dbUrl, db.getUsername(), db.getPasswd());
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e2) {
+                    // Closing failed; ah well
+                }
+            }
+            throw new RuntimeException(e);
+        }
+        // Update
+        UndirectedGraph graph = graphModel.getUndirectedGraph();
+        for (Node node: graph.getNodes()) {
+            String id = node.getId().toString();
+            float x = node.x();
+            float y = node.y();
+
+            try {
+                PreparedStatement statement = conn.prepareStatement(
+                        "UPDATE scraper_instance SET x_coord=?, y_coord=? WHERE name=?");
+                statement.setFloat(1, x);
+                statement.setFloat(2, y);
+                statement.setString(3, id);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        // Close connection
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            // Closing failed; ah well
+        }
+
+
+        // Also export to gexf
         ExportController exportController = Lookup.getDefault().lookup(ExportController.class);
         try {
             exportController.exportFile(new File("fediverse.gexf"));
@@ -96,7 +141,7 @@ public class GraphBuilder {
             throw new RuntimeException(e);
         }
 
-        // Gephi doesn't seem to provide a good way to close the postgres connection, so we have to force close the
+        // Gephi doesn't seem to provide a good way to close its postgres connection, so we have to force close the
         // program. This'll leave a hanging connection for some period ¯\_(ツ)_/¯
         System.exit(0);
     }

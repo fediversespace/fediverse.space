@@ -19,7 +19,7 @@ interface ISidebarProps {
 class SidebarImpl extends React.Component<ISidebarProps> {
     public render() {
         return (
-            <Card className="fediverse-sidebar" elevation={Elevation.TWO}>
+            <Card className="fediverse-sidebar" elevation={Elevation.THREE}>
                 {this.renderSidebarContents()}
             </Card>
         )

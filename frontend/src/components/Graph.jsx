@@ -36,9 +36,7 @@ class GraphImpl extends React.Component {
                 onClickNode={(e) => this.props.selectAndLoadInstance(e.data.node.label)}
                 onClickStage={(e) => this.props.selectAndLoadInstance(null)}
             >
-                <RandomizeNodePositions />
                 <Filter neighborsOf={this.props.currentInstanceName} />
-                <RelativeSize initialSize={15} />
             </Sigma>
         )
     }

@@ -22,6 +22,10 @@ class Instance(models.Model):
     # Foreign keys
     peers = models.ManyToManyField('self', symmetrical=False, through='PeerRelationship')
 
+    # Graph
+    x_coord = models.FloatField(blank=True, null=True)
+    y_coord = models.FloatField(blank=True, null=True)
+
     # Automatic fields
     first_seen = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
@@ -38,3 +42,17 @@ class PeerRelationship(models.Model):
     # Metadata
     first_seen = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+
+
+class Edge(models.Model):
+    """
+    This class is automatically generated from PeerRelationship using the build_graph command.
+    It aggregates stats from the asymmetrical PeerRelationship to a symmetrical one that's suitable for serving
+    to the front-end.
+    """
+    source = models.ForeignKey(Instance, related_name='+', on_delete=models.CASCADE)
+    target = models.ForeignKey(Instance, related_name='+', on_delete=models.CASCADE)
+    weight = models.FloatField(blank=True, null=True)
+
+    # Metadata
+    last_updated = models.DateTimeField(blank=False, null=False)

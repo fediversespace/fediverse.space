@@ -57,16 +57,24 @@ class NodeSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField('get_name')
     label = serializers.SerializerMethodField('get_name')
     size = serializers.SerializerMethodField()
+    x = serializers.SerializerMethodField()
+    y = serializers.SerializerMethodField()
 
     class Meta:
         model = Instance
-        fields = ('id', 'label', 'size')
+        fields = ('id', 'label', 'size', 'x', 'y')
 
     def get_name(self, obj):
         return obj.name
 
     def get_size(self, obj):
         return obj.user_count or 1
+
+    def get_x(self, obj):
+        return obj.x_coord
+
+    def get_y(self, obj):
+        return obj.y_coord
 
     def to_representation(self, instance):
         """

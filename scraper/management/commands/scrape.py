@@ -33,6 +33,7 @@ SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 64
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with <= this many users won't be scraped
+STATUS_SCRAPE_LIMIT = 5000
 
 
 class Command(BaseCommand):
@@ -69,7 +70,7 @@ class Command(BaseCommand):
     def get_statuses(instance_name: str):
         """Collect all statuses that mention users on other instances"""
         mentions = []
-        datetime_threshold = datetime.now(timezone.utc) - timedelta(months=1)
+        datetime_threshold = datetime.now(timezone.utc) - timedelta(days=31)
         statuses_seen = 0
         # We'll ask for 1000 statuses, but Mastodon never returns more than 40. Some Pleroma instances will ignore
         # the limit and return 20.
@@ -91,7 +92,7 @@ class Command(BaseCommand):
             earliest_time_seen = datetime_parser(earliest_status['created_at'])
             statuses_seen += len(statuses)
             # Mastodon returns max 40 statuses; if we ever see less than that we know there aren't any more
-            if earliest_time_seen < datetime_threshold or statuses_seen >= 2000:
+            if earliest_time_seen < datetime_threshold or statuses_seen >= STATUS_SCRAPE_LIMIT:
                 break
             # Continuing, so get url for next page
             min_id = earliest_status['id']
