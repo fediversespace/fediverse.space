@@ -83,7 +83,7 @@ public class GraphBuilder {
         importController.process(container, new DefaultProcessor(), workspace);
 
         // Layout
-        AutoLayout autoLayout = new AutoLayout(1, TimeUnit.MINUTES);
+        AutoLayout autoLayout = new AutoLayout(2, TimeUnit.MINUTES);
         autoLayout.setGraphModel(graphModel);
 //        YifanHuLayout firstLayout = new YifanHuLayout(null, new StepDisplacement(1f));
         ForceAtlas2 forceAtlas2Layout = new ForceAtlas2(null);

@@ -1,6 +1,7 @@
 from rest_framework import serializers
+import math
 from collections import OrderedDict
-from scraper.models import Instance, PeerRelationship
+from scraper.models import Instance, Edge
 
 
 class InstanceListSerializer(serializers.ModelSerializer):
@@ -39,18 +40,22 @@ class InstanceDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Instance
-        fields = ('name', 'description', 'version', 'userCount', 'statusCount', 'domainCount', 'peers', 'lastUpdated')
+        fields = ('name', 'description', 'version', 'userCount', 'statusCount', 'domainCount', 'peers', 'lastUpdated', 'status')
 
 
 class EdgeSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField('get_pk')
+    size = serializers.SerializerMethodField('get_weight')
 
     class Meta:
-        model = PeerRelationship
-        fields = ('source', 'target', 'id')
+        model = Edge
+        fields = ('source', 'target', 'id', 'size')
 
     def get_pk(self, obj):
         return obj.pk
+
+    def get_weight(self, obj):
+        return obj.weight
 
 
 class NodeSerializer(serializers.ModelSerializer):
@@ -68,7 +73,7 @@ class NodeSerializer(serializers.ModelSerializer):
         return obj.name
 
     def get_size(self, obj):
-        return obj.user_count or 1
+        return math.log(obj.user_count) if obj.user_count else 1
 
     def get_x(self, obj):
         return obj.x_coord

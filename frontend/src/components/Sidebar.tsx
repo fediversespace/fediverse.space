@@ -4,7 +4,9 @@ import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 import * as sanitize from 'sanitize-html';
 
-import { Card, Classes, Divider, Elevation, HTMLTable, NonIdealState } from '@blueprintjs/core';
+import {
+    AnchorButton, Card, Classes, Divider, Elevation, HTMLTable, NonIdealState, Position, Tooltip
+} from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
 import { selectAndLoadInstance } from '../redux/actions';
@@ -30,15 +32,44 @@ class SidebarImpl extends React.Component<ISidebarProps> {
             return this.renderLoadingState();
         } else if (!this.props.instanceDetails) {
             return this.renderEmptyState();
+        } else if (this.props.instanceDetails.status.toLowerCase().indexOf('personalinstance') > -1) {
+            return this.renderPersonalInstanceErrorState();
+        } else if (this.props.instanceDetails.status !== 'success') {
+            return this.renderMissingDataState();
         }
         return (
             <div>
-                <h2>{this.props.instanceName || "No instance selected"}</h2>
-                <Divider />
+                {this.renderHeading()}
                 {this.renderDescription()}
                 {this.renderVersion()}
                 {this.renderCounts()}
                 {this.renderPeers()}
+            </div>
+        );
+    }
+
+    private renderHeading = () => {
+        let content: JSX.Element;
+        if (!this.props.instanceName) {
+            content = <span>{"No instance selected"}</span>;
+        } else {
+            content = (
+                <span>
+                    {this.props.instanceName + '  '}
+                    <Tooltip
+                        content="Open link in new tab"
+                        position={Position.TOP}
+                        className={Classes.DARK}
+                    >
+                        <AnchorButton icon={IconNames.LINK} minimal={true} onClick={this.openInstanceLink} />
+                    </Tooltip>
+                </span>
+            );
+        }
+        return (
+            <div>
+                <h2>{content}</h2>
+                <Divider />
             </div>
         );
     }
@@ -164,6 +195,30 @@ class SidebarImpl extends React.Component<ISidebarProps> {
                 </p>
             </div>
         );
+    }
+
+    private renderPersonalInstanceErrorState = () => {
+        return (
+            <NonIdealState
+                icon={IconNames.BLOCKED_PERSON}
+                title="No data"
+                description="This instance has fewer than 5 users and was not crawled."
+            />
+        )
+    }
+
+    private renderMissingDataState = () => {
+        return (
+            <NonIdealState
+                icon={IconNames.ERROR}
+                title="No data"
+                description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
+            />
+        )
+    }
+
+    private openInstanceLink = () => {
+        window.open("https://" + this.props.instanceName, "_blank");
     }
 
     private selectInstance = (e: any)=> {

@@ -27,6 +27,7 @@ export interface IInstanceDetails {
     userCount?: number;
     version?: string;
     lastUpdated?: string;
+    status: string;
 }
 
 interface IGraphNode {
@@ -42,6 +43,7 @@ interface IGraphEdge {
     source: string;
     target: string;
     id?: string;
+    size?: number;
 }
 
 export interface IGraph {

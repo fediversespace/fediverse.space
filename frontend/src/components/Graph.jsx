@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { RandomizeNodePositions, RelativeSize, Sigma, SigmaEnableWebGL, Filter } from 'react-sigma';
+import { Sigma, SigmaEnableWebGL, Filter, ForceAtlas2 } from 'react-sigma';
 
 import { selectAndLoadInstance } from '../redux/actions';
 
@@ -19,6 +19,9 @@ const SETTINGS = {
     drawLabels: true,
     edgeColor: "default",
     labelColor: "default",
+    labelThreshold: 10,
+    maxEdgeSize: 1,
+    minEdgeSize: 0.3,
 }
 
 class GraphImpl extends React.Component {
@@ -37,6 +40,7 @@ class GraphImpl extends React.Component {
                 onClickStage={(e) => this.props.selectAndLoadInstance(null)}
             >
                 <Filter neighborsOf={this.props.currentInstanceName} />
+                <ForceAtlas2 iterationsPerRender={1} timeout={6000}/>
             </Sigma>
         )
     }
