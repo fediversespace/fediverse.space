@@ -238,7 +238,9 @@ class SidebarImpl extends React.Component<ISidebarProps> {
             <NonIdealState
                 icon={IconNames.BLOCKED_PERSON}
                 title="No data"
-                description="This instance has fewer than 5 users and was not crawled."
+                description="This instance has fewer than 5 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
+                action={<AnchorButton icon={IconNames.CONFIRM} href="https://sunbeam.city/@tao" target="_blank">
+                            Message @tao to opt in</AnchorButton>}
             />
         )
     }

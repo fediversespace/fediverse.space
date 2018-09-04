@@ -7,12 +7,14 @@ import json
 import multiprocessing as mp
 import requests
 import time
+import os
 from dateutil.parser import parse as datetime_parser
 from datetime import datetime, timedelta, timezone
 from functional import seq
 from django_bulk_update.helper import bulk_update
 from django.core.management.base import BaseCommand
 from django import db
+from django.conf import settings
 from scraper.models import Instance, PeerRelationship
 from scraper.management.commands._util import require_lock, InvalidResponseException, get_key, log, validate_int, PersonalInstanceException
 
@@ -29,10 +31,10 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'mastodon.social'
+SEED = 'mastodon.ar.al'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
-PERSONAL_INSTANCE_THRESHOLD = 5  # instances with <= this many users won't be scraped
+PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be scraped
 STATUS_SCRAPE_LIMIT = 5000
 
 
@@ -42,6 +44,9 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.scraped_count = 0
+        f = open(os.path.join(settings.BASE_DIR, '../whitelist.txt'), 'r')
+        self.whitelist = seq(f.readlines()).map(lambda i: i.lower().strip()).to_list()
+        f.close()
 
     @staticmethod
     def get_instance_info(instance_name: str):
@@ -97,6 +102,7 @@ class Command(BaseCommand):
             # Continuing, so get url for next page
             min_id = earliest_status['id']
             url = 'https://' + instance_name + '/api/v1/timelines/public?local=true&limit=1000&max_id=' + min_id
+            time.sleep(1)  # Sleep to avoid overloading the instance
 
         mentions_seq = (seq(mentions)
                         .filter(lambda m: not m['acct'].endswith(instance_name) and '@' in m['acct'])
@@ -116,7 +122,11 @@ class Command(BaseCommand):
 
             # Check if this is a personal instance before continuing
             user_count = get_key(data, ['info', 'stats', 'user_count'])
-            if isinstance(user_count, int) and user_count < PERSONAL_INSTANCE_THRESHOLD:
+            print(self.whitelist)
+            print(instance.name)
+            if isinstance(user_count, int)\
+                    and user_count < PERSONAL_INSTANCE_THRESHOLD\
+                    and instance.name not in self.whitelist:
                 raise PersonalInstanceException
 
             data['peers'] = self.get_instance_peers(instance.name)
