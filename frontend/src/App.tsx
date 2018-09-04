@@ -2,11 +2,13 @@ import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { NonIdealState, Spinner } from '@blueprintjs/core';
+import { Button, Classes, Dialog, NonIdealState, Spinner } from '@blueprintjs/core';
+import { IconNames } from '@blueprintjs/icons';
 
 import { Graph } from './components/Graph';
 import { Nav } from './components/Nav';
 import { Sidebar } from './components/Sidebar';
+import { DESKTOP_WIDTH_THRESHOLD } from './constants';
 import { fetchGraph, fetchInstances } from './redux/actions';
 import { IAppState, IGraph, IInstance } from './redux/types';
 
@@ -18,7 +20,16 @@ interface IAppProps {
   fetchInstances: () => void;
   fetchGraph: () => void;
 }
-class AppImpl extends React.Component<IAppProps> {
+interface IAppLocalState {
+  mobileDialogOpen: boolean;
+}
+class AppImpl extends React.Component<IAppProps, IAppLocalState> {
+
+  constructor(props: IAppProps) {
+    super(props);
+    this.state = { mobileDialogOpen: false };
+  }
+
   public render() {
     let body = <div />;
     if (this.props.isLoadingInstances || this.props.isLoadingGraph) {
@@ -30,11 +41,15 @@ class AppImpl extends React.Component<IAppProps> {
       <div className="App bp3-dark">
         <Nav />
         {body}
+        {this.renderMobileDialog()}
       </div>
     );
   }
 
   public componentDidMount() {
+    if (window.innerWidth < DESKTOP_WIDTH_THRESHOLD) {
+      this.handleMobileDialogOpen();
+    }
     this.load();
   }
 
@@ -67,6 +82,42 @@ class AppImpl extends React.Component<IAppProps> {
           title={title || "Loading..."}
         />
     )
+  }
+
+  private renderMobileDialog = () => {
+    return (
+      <Dialog
+          icon={IconNames.DESKTOP}
+          title="Desktop-optimized site"
+          onClose={this.handleMobileDialogClose}
+          isOpen={this.state.mobileDialogOpen}
+          className={Classes.DARK + ' fediverse-about-dialog'}
+      >
+          <div className={Classes.DIALOG_BODY}>
+              <p className={Classes.RUNNING_TEXT}>
+                fediverse.space is optimized for desktop computers. Feel free to check it out on your phone
+                (ideally in landscape mode) but for best results, open it on a computer.
+              </p>
+          </div>
+          <div className={Classes.DIALOG_FOOTER}>
+              <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+                  <Button
+                      icon={IconNames.THUMBS_UP}
+                      text="OK!"
+                      onClick={this.handleMobileDialogClose}
+                  />
+              </div>
+          </div>
+      </Dialog>
+    );
+  }
+
+  private handleMobileDialogOpen = () => {
+    this.setState({ mobileDialogOpen: true });
+  }
+
+  private handleMobileDialogClose = () => {
+    this.setState({ mobileDialogOpen: false });
   }
 }
 
