@@ -14,7 +14,6 @@ import { FocusStyleManager } from '@blueprintjs/core';
 
 import { App } from './App';
 import { rootReducer } from './redux/reducers';
-import registerServiceWorker from './registerServiceWorker';
 
 // https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -32,4 +31,3 @@ ReactDOM.render(
   </Provider>,
   document.getElementById('root') as HTMLElement
 );
-registerServiceWorker();
