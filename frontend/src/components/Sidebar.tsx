@@ -6,8 +6,8 @@ import { Dispatch } from 'redux';
 import * as sanitize from 'sanitize-html';
 
 import {
-    AnchorButton, Card, Classes, Divider, Elevation, HTMLTable, NonIdealState, Position, Tab, Tabs,
-    Tooltip
+    AnchorButton, Button, Card, Classes, Divider, Elevation, HTMLTable, NonIdealState, Position,
+    Tab, Tabs, Tooltip
 } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
@@ -21,13 +21,38 @@ interface ISidebarProps {
     isLoadingInstanceDetails: boolean;
     selectAndLoadInstance: (instanceName: string) => void;
 }
-class SidebarImpl extends React.Component<ISidebarProps> {
+interface ISidebarState {
+    isOpen: boolean;
+}
+class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
+
+    constructor(props: ISidebarProps) {
+        super(props);
+        const isOpen = window.innerWidth >= 900 ? true : false;
+        this.state = { isOpen };
+    }
+
     public render() {
+        const closedClass = this.state.isOpen ? "" : " closed";
+        const buttonIcon = this.state.isOpen ? IconNames.DOUBLE_CHEVRON_RIGHT : IconNames.DOUBLE_CHEVRON_LEFT;
         return (
-            <Card className="fediverse-sidebar" elevation={Elevation.THREE}>
-                {this.renderSidebarContents()}
-            </Card>
+            <div>
+                <Button
+                    onClick={this.handleToggle}
+                    large={true}
+                    icon={buttonIcon}
+                    className={"fediverse-sidebar-toggle-button" + closedClass}
+                    minimal={true}
+                />
+                <Card className={"fediverse-sidebar" + closedClass} elevation={Elevation.THREE}>
+                    {this.renderSidebarContents()}
+                </Card>
+            </div>
         )
+    }
+
+    private handleToggle = () => {
+        this.setState({ isOpen: !this.state.isOpen });
     }
 
     private renderSidebarContents = () => {

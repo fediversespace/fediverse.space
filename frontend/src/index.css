@@ -27,13 +27,44 @@ html, body {
   top: 50px;
   bottom: 0;
   right: 0;
-  min-width: 300px;
+  min-width: 400px;
   width: 25%;
   z-index: 20;
   overflow: scroll;
   overflow-x: hidden;
+  transition-property: all;
+  transition-duration: .5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+.fediverse-sidebar.closed {
+  right: -400px;
+}
+
+.fediverse-sidebar-toggle-button {
+  position: absolute;
+  top: 50px;
+  right:400px;
+  z-index: 20;
+  transition-property: all;
+  transition-duration: .5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+
+.fediverse-sidebar-toggle-button.closed {
+  right: 0;
 }
 
 .fediverse-sidebar-table {
   width: 100%;
+}
+
+@media screen and (min-width: 1600px) {
+  .fediverse-sidebar.closed {
+    right: -25%;
+  }
+
+  .fediverse-sidebar-toggle-button {
+    right: 25%;
+  }
 }
