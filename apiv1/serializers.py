@@ -87,7 +87,7 @@ class NodeSerializer(serializers.ModelSerializer):
         return obj.name
 
     def get_size(self, obj):
-        return math.log(obj.user_count) if obj.user_count else 1
+        return math.log(obj.user_count) if (obj.user_count and (obj.user_count > 1)) else 1
 
     def get_x(self, obj):
         return obj.x_coord

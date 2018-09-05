@@ -27,12 +27,21 @@ const SETTINGS = {
 class GraphImpl extends React.Component {
 
     render() {
-        if (!this.props.graph) {
+        let graph = this.props.graph;
+        if (!graph) {
+            // TODO: error state
             return null;
+        }
+        // Check that all nodes have size & coordinates; otherwise the graph will look messed up
+        const lengthBeforeFilter = graph.nodes.length;
+        graph = {...graph, nodes: graph.nodes.filter(n => n.size && n.x && n.y)};
+        if (graph.nodes.length !== lengthBeforeFilter) {
+            // tslint:disable-next-line:no-console
+            console.error("Some nodes were missing details: " + this.props.graph.nodes.filter(n => !n.size || !n.x || !n.y).map(n => n.label));
         }
         return (
             <Sigma
-                graph={this.props.graph}
+                graph={graph}
                 renderer="webgl"
                 settings={SETTINGS}
                 style={STYLE}
