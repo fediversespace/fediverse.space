@@ -31,7 +31,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'mastodon.ar.al'
+SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be scraped
@@ -102,7 +102,7 @@ class Command(BaseCommand):
             # Continuing, so get url for next page
             min_id = earliest_status['id']
             url = 'https://' + instance_name + '/api/v1/timelines/public?local=true&limit=1000&max_id=' + min_id
-            time.sleep(1)  # Sleep to avoid overloading the instance
+            time.sleep(2)  # Sleep to avoid overloading the instance
 
         mentions_seq = (seq(mentions)
                         .filter(lambda m: not m['acct'].endswith(instance_name) and '@' in m['acct'])
@@ -122,8 +122,6 @@ class Command(BaseCommand):
 
             # Check if this is a personal instance before continuing
             user_count = get_key(data, ['info', 'stats', 'user_count'])
-            print(self.whitelist)
-            print(instance.name)
             if isinstance(user_count, int)\
                     and user_count < PERSONAL_INSTANCE_THRESHOLD\
                     and instance.name not in self.whitelist:
