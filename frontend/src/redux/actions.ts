@@ -41,6 +41,18 @@ export const receiveGraph = (graph: IGraph) => {
     }
 }
 
+const graphLoadFailed = () => {
+    return {
+        type: ActionType.GRAPH_LOAD_ERROR,
+    }
+}
+
+const instanceLoadFailed = () => {
+    return {
+        type: ActionType.INSTANCE_LOAD_ERROR,
+    }
+}
+
 export const receiveInstanceDetails = (instanceDetails: IInstanceDetails) => {
     return {
         payload: instanceDetails,
@@ -52,16 +64,15 @@ export const receiveInstanceDetails = (instanceDetails: IInstanceDetails) => {
 /** Async actions: https://redux.js.org/advanced/asyncactions */
 
 export const fetchInstances = () => {
-    // TODO: handle errors
     return (dispatch: Dispatch) => {
         dispatch(requestInstances());
         return getFromApi("instances")
-            .then(instances => dispatch(receiveInstances(instances)));
+            .then(instances => dispatch(receiveInstances(instances)))
+            .catch(e => dispatch(graphLoadFailed()));
     }
 }
 
 export const selectAndLoadInstance = (instanceName: string) => {
-    // TODO: handle errors
     return (dispatch: Dispatch) => {
         if (!instanceName) {
             dispatch(deselectInstance());
@@ -69,12 +80,12 @@ export const selectAndLoadInstance = (instanceName: string) => {
         }
         dispatch(selectInstance(instanceName));
         return getFromApi("instances/" + instanceName)
-            .then(details => dispatch(receiveInstanceDetails(details)));
+            .then(details => dispatch(receiveInstanceDetails(details)))
+            .catch(e => dispatch(instanceLoadFailed()));
     }
 }
 
 export const fetchGraph = () => {
-    // TODO: handle errors
     return (dispatch: Dispatch) => {
         dispatch(requestGraph());
         return Promise.all([getFromApi("graph/edges"), getFromApi("graph/nodes")])
@@ -84,6 +95,7 @@ export const fetchGraph = () => {
                     nodes: responses[1],
                 };
             })
-            .then(graph => dispatch(receiveGraph(graph)));
+            .then(graph => dispatch(receiveGraph(graph)))
+            .catch(e => dispatch(graphLoadFailed()));
     }
 }

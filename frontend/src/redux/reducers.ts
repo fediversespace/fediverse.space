@@ -3,6 +3,7 @@ import { combineReducers } from 'redux';
 import { ActionType, IAction, ICurrentInstanceState, IDataState } from './types';
 
 const initialDataState = {
+    error: false,
     isLoadingGraph: false,
     isLoadingInstances: false,
 }
@@ -31,6 +32,13 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
                 graph: action.payload,
                 isLoadingGraph: false,
             };
+        case ActionType.GRAPH_LOAD_ERROR:
+            return {
+                ...state,
+                error: true,
+                isLoadingGraph: false,
+                isLoadingInstances: false,
+            };
         default:
             return state;
     }
@@ -39,7 +47,8 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
 const initialCurrentInstanceState = {
     currentInstanceDetails: null,
     currentInstanceName: null,
-    isLoadingInstanceDetails: false
+    error: false,
+    isLoadingInstanceDetails: false,
 };
 const currentInstance = (state = initialCurrentInstanceState , action: IAction): ICurrentInstanceState => {
     switch (action.type) {
@@ -61,6 +70,12 @@ const currentInstance = (state = initialCurrentInstanceState , action: IAction):
                 currentInstanceDetails: null,
                 currentInstanceName: null,
             }
+        case ActionType.INSTANCE_LOAD_ERROR:
+            return {
+                ...state,
+                error: true,
+                isLoadingInstanceDetails: false,
+            };
         default:
             return state;
     }

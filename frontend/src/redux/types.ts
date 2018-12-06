@@ -5,7 +5,9 @@ export enum ActionType {
     REQUEST_GRAPH = 'REQUEST_GRAPH',
     RECEIVE_GRAPH = 'RECEIVE_GRAPH',
     RECEIVE_INSTANCE_DETAILS = 'RECEIVE_INSTANCE_DETAILS',
-    DESELECT_INSTANCE = "DESELECT_INSTANCE",
+    DESELECT_INSTANCE = 'DESELECT_INSTANCE',
+    GRAPH_LOAD_ERROR = 'GRAPH_LOAD_ERROR',
+    INSTANCE_LOAD_ERROR = 'INSTANCE_LOAD_ERROR'
 }
 
 export interface IAction {
@@ -57,6 +59,7 @@ export interface ICurrentInstanceState {
     currentInstanceDetails: IInstanceDetails | null,
     currentInstanceName: string | null,
     isLoadingInstanceDetails: boolean,
+    error: boolean,
 }
 
 export interface IDataState {
@@ -64,6 +67,7 @@ export interface IDataState {
     graph?: IGraph,
     isLoadingInstances: boolean,
     isLoadingGraph: boolean,
+    error: boolean,
 }
 
 export interface IAppState {

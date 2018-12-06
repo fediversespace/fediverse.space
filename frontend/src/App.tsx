@@ -5,6 +5,7 @@ import { Dispatch } from 'redux';
 import { Button, Classes, Dialog, NonIdealState, Spinner } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
 
+import ErrorState from './components/ErrorState';
 import { Graph } from './components/Graph';
 import { Nav } from './components/Nav';
 import { Sidebar } from './components/Sidebar';
@@ -17,6 +18,7 @@ interface IAppProps {
   instances?: IInstance[],
   isLoadingGraph: boolean;
   isLoadingInstances: boolean,
+  graphLoadError: boolean,
   fetchInstances: () => void;
   fetchGraph: () => void;
 }
@@ -34,7 +36,7 @@ class AppImpl extends React.Component<IAppProps, IAppLocalState> {
     let body = <div />;
     if (this.props.isLoadingInstances || this.props.isLoadingGraph) {
       body = this.loadingState("Loading...");
-    } else if (!!this.props.graph) {
+    } else {
       body = this.graphState();
     }
     return (
@@ -58,19 +60,20 @@ class AppImpl extends React.Component<IAppProps, IAppLocalState> {
   }
 
   private load = () => {
-    if (!this.props.instances && !this.props.isLoadingInstances) {
+    if (!this.props.instances && !this.props.isLoadingInstances && !this.props.graphLoadError) {
       this.props.fetchInstances();
     }
-    if (!this.props.graph && !this.props.isLoadingGraph) {
+    if (!this.props.graph && !this.props.isLoadingGraph && !this.props.graphLoadError) {
       this.props.fetchGraph();
     }
   }
 
   private graphState = () => {
+    const content = this.props.graphLoadError ? <ErrorState /> : <Graph />
     return (
       <div>
         <Sidebar />
-        <Graph />
+        {content}
       </div>
     )
   }
@@ -123,6 +126,7 @@ class AppImpl extends React.Component<IAppProps, IAppLocalState> {
 
 const mapStateToProps = (state: IAppState) => ({
   graph: state.data.graph,
+  graphLoadError: state.data.error,
   instances: state.data.instances,
   isLoadingGraph: state.data.isLoadingGraph,
   isLoadingInstances: state.data.isLoadingInstances,

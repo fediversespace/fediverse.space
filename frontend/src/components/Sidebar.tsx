@@ -13,10 +13,12 @@ import { IconNames } from '@blueprintjs/icons';
 
 import { selectAndLoadInstance } from '../redux/actions';
 import { IAppState, IGraph, IInstanceDetails } from '../redux/types';
+import ErrorState from './ErrorState';
 
 interface ISidebarProps {
     graph?: IGraph,
     instanceName: string | null,
+    instanceLoadError: boolean,
     instanceDetails: IInstanceDetails | null,
     isLoadingInstanceDetails: boolean;
     selectAndLoadInstance: (instanceName: string) => void;
@@ -64,6 +66,8 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
             return this.renderPersonalInstanceErrorState();
         } else if (this.props.instanceDetails.status !== 'success') {
             return this.renderMissingDataState();
+        } else if (this.props.instanceLoadError) {
+            return <ErrorState />;
         }
         return (
             <div>
@@ -292,6 +296,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
 const mapStateToProps = (state: IAppState) => ({
     graph: state.data.graph,
     instanceDetails: state.currentInstance.currentInstanceDetails,
+    instanceLoadError: state.currentInstance.error,
     instanceName: state.currentInstance.currentInstanceName,
     isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails,
 });
