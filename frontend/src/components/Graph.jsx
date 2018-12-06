@@ -46,12 +46,19 @@ class GraphImpl extends React.Component {
                 settings={SETTINGS}
                 style={STYLE}
                 onClickNode={(e) => this.props.selectAndLoadInstance(e.data.node.label)}
-                onClickStage={(e) => this.props.selectAndLoadInstance(null)}
+                onClickStage={this.onClickStage}
             >
                 <Filter neighborsOf={this.props.currentInstanceName} />
                 <ForceAtlas2 iterationsPerRender={1} timeout={6000}/>
             </Sigma>
         )
+    }
+
+    onClickStage = (e) => {
+        // Deselect the instance (unless this was a drag event)
+        if (!e.data.captor.isDragging) {
+            this.props.selectAndLoadInstance(null);
+        }
     }
 }
 
