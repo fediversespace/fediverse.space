@@ -1,12 +1,33 @@
 # fediverse.space
-fediverse.space is a tool to explore instances in the fediverse.
+fediverse.space is a tool to explore instances in the fediverse 🌐
+
+## Requirements
+- For everything:
+  - Docker
+  - Docker-compose
+- For the scraper + API:
+  - Python 3
+- For laying out the graph:
+  - Java
+- For the frontend:
+  - Yarn
 
 ## Running it
-* `cp config.json.template config.json` and enter your configuration details. I've used a postgres database for development.
-* Set the environment variable `FEDIVERSE_CONFIG` to point to the path of this file.
-* `pip install -r requirements.txt` 
-* `yarn install`
-* Make sure you have the Java 8 JRE (to run) or JDK (to develop) installed, and gradle
-* For development, run `python manage.py runserver --settings=backend.settings.dev`
-* In production, set the environment variable `DJANGO_SETTINGS_MODULE=backend.settings.production`
+### Backend
+- `cp example.env .env` and modify environment variables as required
+- `docker-compose build`
+- `docker-compose up -d`
+### Frontend
+- `cd frontend && yarn install`
+- `yarn start`
+
+## Commands
+### Backend
+- `python manage.py scrape` scrapes the entire fediverse
+- `python manage.py build_graph` uses this information to lay out a graph
+
+To run in production, use `docker-compose -f docker-compose.yml -f docker-compose.production.yml` instead of just `docker-compose`.
+
+### Frontend
+- `yarn build` to create an optimized build for deployment
 
