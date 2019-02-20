@@ -34,5 +34,4 @@ router.register(r'graph/edges', views.EdgeView, base_name='edge')
 urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('silk/', include('silk.urls', namespace='silk')),
-    path('', TemplateView.as_view(template_name='index.html')),
 ]
