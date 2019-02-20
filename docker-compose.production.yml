@@ -1,9 +1,43 @@
 version: '3'
 services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+    volumes:
+      - gunicorn-socket:/var/gunicorn  # to talk to Django
+      - /var/run/docker.sock:/tmp/docker.sock:ro # for nginx-proxy
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
+    networks:
+      - nginx_network
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    container_name: nginx-proxy-le
+    volumes:
+      - gunicorn-socket:/var/gunicorn
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - nginx_network
+    depends_on:
+      - nginx-proxy
   db:
     restart: always
     networks:
       - database_network
+    depends_on:
+      - letsencrypt
   web:
     restart: always
     volumes:
@@ -15,24 +49,18 @@ services:
     environment:
       - ENVIRONMENT=production
       - DJANGO_SETTINGS_MODULE=backend.settings.production
-  nginx:
-    image: nginx:1.14
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile.nginx
-    ports:
-      - "80:80"
-    volumes:
-      - gunicorn-socket:/var/gunicorn
-      - ./config/nginx/conf.d:/etc/nginx/conf.d
-    networks:
-      - nginx_network
-    depends_on:
-      - web
+      - VIRTUAL_HOST
+      - LETSENCRYPT_HOST
+      - LETSENCRYPT_EMAIL
 networks:
   database_network:
     driver: bridge
   nginx_network:
     driver: bridge
 volumes:
-  gunicorn-socket:
+    gunicorn-socket:
+    conf:
+    vhost:
+    html:
+    certs:
+
