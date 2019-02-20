@@ -18,17 +18,6 @@ from django.conf import settings
 from scraper.models import Instance, PeerRelationship
 from scraper.management.commands._util import require_lock, InvalidResponseException, get_key, log, validate_int, PersonalInstanceException
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Because the script uses the Mastodon API other platforms like         #
-# Pleroma, Peertube, Pixelfed, Funkwhale won't have outgoing peers.     #
-#                                                                       #
-# The script generates two files:                                       #
-# - nodes.csv                                                           #
-# - edges.csv                                                           #
-#                                                                       #
-# Change SEED to start from a different instance.                       #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
 SEED = 'mastodon.social'
@@ -188,7 +177,7 @@ class Command(BaseCommand):
                 relationship.last_updated = datetime.now()
             bulk_update(relationships, update_fields=['mention_count', 'statuses_seen', 'last_updated'])
 
-        self.stdout.write(log("Saved {}".format(data['instance_name'])))
+        self.stdout.write(log("Processed {}: {}".format(data['instance_name'], data['status'])))
 
     def worker(self, queue: mp.JoinableQueue, existing_instance_ids, scraped_ids):
         """The main worker that processes URLs"""
