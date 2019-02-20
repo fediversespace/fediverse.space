@@ -19,6 +19,7 @@ services:
       - nginx_network
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
     container_name: nginx-proxy-le
     volumes:
       - gunicorn-socket:/var/gunicorn
