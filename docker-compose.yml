@@ -19,6 +19,7 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_DB
       - DJANGO_SETTINGS_MODULE
+      - ENVIRONMENT=development
     build: ./backend/api
     command: bash scripts/docker-entrypoint.sh
     volumes:
