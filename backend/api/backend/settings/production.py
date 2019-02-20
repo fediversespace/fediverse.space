@@ -7,5 +7,5 @@ ALLOWED_HOSTS = ['api.fediverse.space']
 CORS_ORIGIN_WHITELIST = [
     'fediverse.space',
     'staging.fediverse.space',
-    '*fediverse-space.netlify.com'
 ]
+CORS_ORIGIN_REGEX_WHITELIST = (r'^(https?:\/\/)?(\w+\.)?(.*)?fediverse-space\.netlify\.com\/?$', )
