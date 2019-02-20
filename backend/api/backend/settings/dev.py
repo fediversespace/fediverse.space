@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 
-ALLOWED_HOSTS += ['localhost']
+ALLOWED_HOSTS = ['localhost']
 
 CORS_ORIGIN_WHITELIST = [
     'localhost:3000',

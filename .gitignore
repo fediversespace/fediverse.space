@@ -1,9 +1,9 @@
 *.csv
 .idea/
-config.json
-backend/static/
+backend/api/backend/static/
 *.gexf
-whitelist.txt
+backend/api/backend/whitelist.txt
+data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -90,6 +90,7 @@ celerybeat-schedule
 
 # Environments
 .env
+.env*
 .venv
 env/
 venv/

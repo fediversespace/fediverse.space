@@ -1,0 +1,38 @@
+version: '3'
+services:
+  db:
+    restart: always
+    networks:
+      - database_network
+  web:
+    restart: always
+    volumes:
+      - gunicorn-socket:/var/gunicorn
+      - ./config/gunicorn.conf.py:/config/gunicorn.conf.py
+    networks:
+      - database_network
+      - nginx_network
+    environment:
+      - ENVIRONMENT=production
+      - DJANGO_SETTINGS_MODULE=backend.settings.production
+  nginx:
+    image: nginx:1.14
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    volumes:
+      - gunicorn-socket:/var/gunicorn
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - nginx_network
+    depends_on:
+      - web
+networks:
+  database_network:
+    driver: bridge
+  nginx_network:
+    driver: bridge
+volumes:
+  gunicorn-socket:

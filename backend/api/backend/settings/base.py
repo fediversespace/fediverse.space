@@ -14,34 +14,10 @@ import os
 import json
 from django.core.exceptions import ImproperlyConfigured
 
-with open(os.environ.get('FEDIVERSE_CONFIG')) as f:
-    configs = json.loads(f.read())
-
-
-def get_config(setting):
-    try:
-        val = configs[setting]
-        if val == 'True':
-            val = True
-        elif val == 'False':
-            val = False
-        return val
-    except KeyError:
-        error_msg = "ImproperlyConfigured: Set {0} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
-
-
-SECRET_KEY = get_config("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -76,7 +52,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, '../frontend/build')],
+        'DIRS': [os.path.join(BASE_DIR, '../../frontend/build')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,10 +73,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': get_config("DATABASE_ENGINE"),
-        'NAME': get_config("DATABASE_NAME"),
-        'USER': get_config("DATABASE_USER"),
-        'PASSWORD': get_config("DATABASE_PASSWORD"),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv("POSTGRES_DB"),
+        'USER': os.getenv("POSTGRES_USER"),
+        'PASSWORD': os.getenv("POSTGRES_PASSWORD"),
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
@@ -143,7 +121,7 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, '../frontend/build/static')
+    os.path.join(BASE_DIR, '../../frontend/build/static')
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
