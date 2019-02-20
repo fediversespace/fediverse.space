@@ -64,9 +64,12 @@ class GraphImpl extends React.Component {
     }
 
     componentDidUpdate() {
-        const sigma = this.sigmaComponent.current.sigma;
-        sigma.graph.nodes().map(this.colorNodes);
-        sigma.refresh();
+        const sigma = this.sigmaComponent && this.sigmaComponent.current.sigma;
+        // Check if sigma exists s.t. nothing breaks if the graph didn't load (for whatever reason)
+        if (sigma) {
+            sigma.graph.nodes().map(this.colorNodes);
+            sigma.refresh();
+        }
     }
 
     onClickNode = (e) => {
