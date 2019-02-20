@@ -150,7 +150,7 @@ class Command(BaseCommand):
             # Create instances for the peers we haven't seen before and add them to the queue
             new_instance_ids = [peer_id for peer_id in data['peers'] if peer_id not in existing_instance_ids]
             # bulk_create doesn't call save(), so the auto_now_add field won't get set automatically
-            new_instances = [Instance(name=id, first_seen=datetime.now(), last_updated=datetime.now())
+            new_instances = [Instance(name=id, first_seen=datetime.now(), last_updated=datetime.utcfromtimestamp(0))
                              for id in new_instance_ids]
             existing_instance_ids.extend(new_instance_ids)
             Instance.objects.bulk_create(new_instances)
@@ -180,12 +180,12 @@ class Command(BaseCommand):
         self.stdout.write(log("Processed {}: {}".format(data['instance_name'], data['status'])))
 
     def worker(self, queue: mp.JoinableQueue, existing_instance_ids, scraped_ids):
-        """The main worker that processes URLs"""
-        # https://stackoverflow.com/a/38356519/3697202
-        db.connections.close_all()
+        """The main worker that processes instances"""
+        db.connections.close_all()  # https://stackoverflow.com/a/38356519/3697202
         while True:
             instance = queue.get()
             if instance.name in scraped_ids:
+                # If we hit this branch, it's indicative of a bug
                 self.stderr.write(log("Skipping {}, already done. This should not have been added to the queue!"
                                       .format(instance)))
                 queue.task_done()
