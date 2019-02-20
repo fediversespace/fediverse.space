@@ -1,5 +1,5 @@
-# fediverse.space
-fediverse.space is a tool to explore instances in the fediverse 🌐
+# fediverse.space 🌐
+The map of the fediverse that you always wanted.
 
 ## Requirements
 - For everything:
