@@ -1,6 +1,6 @@
 version: '3'
 services:
-  nginx-proxy:
+  nginx:
     image: jwilder/nginx-proxy:alpine
     restart: always
     ports:
@@ -20,7 +20,6 @@ services:
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
     restart: always
-    container_name: nginx-proxy-le
     volumes:
       - gunicorn-socket:/var/gunicorn
       - conf:/etc/nginx/conf.d
@@ -31,7 +30,7 @@ services:
     networks:
       - nginx_network
     depends_on:
-      - nginx-proxy
+      - nginx
   db:
     restart: always
     networks:
