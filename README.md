@@ -23,8 +23,11 @@ The map of the fediverse that you always wanted.
 
 ## Commands
 ### Backend
-- `python manage.py scrape` scrapes the entire fediverse
-- `python manage.py build_graph` uses this information to lay out a graph
+
+After running the backend in Docker:
+
+- `docker-compose exec web python manage.py scrape` scrapes the entire fediverse
+- `docker-compose exec web python manage.py build_graph` uses this information to lay out a graph
 
 To run in production, use `docker-compose -f docker-compose.yml -f docker-compose.production.yml` instead of just `docker-compose`.
 
