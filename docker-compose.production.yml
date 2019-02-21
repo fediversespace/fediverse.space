@@ -51,6 +51,9 @@ services:
       - VIRTUAL_HOST
       - LETSENCRYPT_HOST
       - LETSENCRYPT_EMAIL
+  gephi:
+    networks:
+      - database_network
 networks:
   database_network:
     driver: bridge
