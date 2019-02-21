@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class Instance(models.Model):
@@ -28,7 +29,7 @@ class Instance(models.Model):
 
     # Automatic fields
     first_seen = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(default=timezone.now)
 
 
 class PeerRelationship(models.Model):
@@ -41,7 +42,7 @@ class PeerRelationship(models.Model):
 
     # Metadata
     first_seen = models.DateTimeField(auto_now_add=True)
-    last_updated = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(default=timezone.now)
 
 
 class Edge(models.Model):
@@ -55,4 +56,4 @@ class Edge(models.Model):
     weight = models.FloatField(blank=True, null=True)
 
     # Metadata
-    last_updated = models.DateTimeField(blank=False, null=False)
+    last_updated = models.DateTimeField(default=timezone.now)

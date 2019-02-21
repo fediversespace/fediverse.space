@@ -15,6 +15,7 @@ from django_bulk_update.helper import bulk_update
 from django.core.management.base import BaseCommand
 from django import db
 from django.conf import settings
+from django.utils import timezone
 from scraper.models import Instance, PeerRelationship
 from scraper.management.commands._util import require_lock, InvalidResponseException, get_key, log, validate_int, PersonalInstanceException
 
@@ -24,7 +25,7 @@ SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be scraped
-STATUS_SCRAPE_LIMIT = 1000
+STATUS_SCRAPE_LIMIT = 100
 
 
 class Command(BaseCommand):
@@ -144,6 +145,7 @@ class Command(BaseCommand):
         instance.description = get_key(data, ['info', 'description'])
         instance.version = get_key(data, ['info', 'version'])
         instance.status = get_key(data, ['status'])
+        instance.last_updated = timezone.now()
         instance.save()
         if data['status'] == 'success' and data['peers']:
             # TODO: handle a peer disappeer-ing
