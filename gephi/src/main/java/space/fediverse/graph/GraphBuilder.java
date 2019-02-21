@@ -61,14 +61,23 @@ public class GraphBuilder {
         GraphModel graphModel = Lookup.getDefault().lookup(GraphController.class).getGraphModel();
         // AttributeModel?
 
+        // Get config variables
+        String postgresDb = System.getenv("POSTGRES_DB");
+        String postgresUser = System.getenv("POSTGRES_USER");
+        String postgresPassword = System.getenv("POSTGRES_PASSWORD");
+        if (postgresDb == null || postgresUser == null || postgresPassword == null) {
+            throw new RuntimeException(String.format("Incomplete config, canceling. DB: %s, user: %s, pass: %s",
+                                       postgresDb, postgresUser, postgresPassword));
+        }
+
         // Import from database
         EdgeListDatabaseImpl db = new EdgeListDatabaseImpl();
         db.setSQLDriver(new PostgreSQLDriver());
-        db.setHost("localhost");
+        db.setHost("db");
         db.setPort(5432);
-        db.setDBName(args[0]);
-        db.setUsername(args[1]);
-        db.setPasswd(args[2]);
+        db.setDBName(postgresDb);
+        db.setUsername(postgresUser);
+        db.setPasswd(postgresPassword);
         db.setNodeQuery(nodeQuery);
         db.setEdgeQuery(edgeQuery);
 

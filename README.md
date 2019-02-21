@@ -16,7 +16,8 @@ The map of the fediverse that you always wanted.
 ### Backend
 - `cp example.env .env` and modify environment variables as required
 - `docker-compose build`
-- `docker-compose up -d`
+- `docker-compose up -d django`
+  - if you don't specify `django`, it'll also start `gephi` which should only be run as a regular one-off job
 ### Frontend
 - `cd frontend && yarn install`
 - `yarn start`
@@ -27,7 +28,8 @@ The map of the fediverse that you always wanted.
 After running the backend in Docker:
 
 - `docker-compose exec web python manage.py scrape` scrapes the entire fediverse
-- `docker-compose exec web python manage.py build_graph` uses this information to lay out a graph
+- `docker-compose exec web python manage.py build_edges` aggregates this information into edges with weights
+- `docker-compose run gephi java -Xmx1g -jar build/libs/graphBuilder.jar` lays out the graph
 
 To run in production, use `docker-compose -f docker-compose.yml -f docker-compose.production.yml` instead of just `docker-compose`.
 

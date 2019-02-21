@@ -37,8 +37,8 @@ class PeerRelationship(models.Model):
     target = models.ForeignKey(Instance, related_name="follower_relationships", on_delete=models.CASCADE)
 
     # Interaction stats
-    mention_count = models.IntegerField(blank=True, null=True)
-    statuses_seen = models.IntegerField(blank=True, null=True)  # in case we want mention_count as a ratio
+    mention_count = models.IntegerField(default=0)
+    statuses_seen = models.IntegerField(default=0)  # because we want mention_count as a ratio
 
     # Metadata
     first_seen = models.DateTimeField(auto_now_add=True)
@@ -47,7 +47,7 @@ class PeerRelationship(models.Model):
 
 class Edge(models.Model):
     """
-    This class is automatically generated from PeerRelationship using the build_graph command.
+    This class is automatically generated from PeerRelationship using the build_edges command.
     It aggregates stats from the asymmetrical PeerRelationship to a symmetrical one that's suitable for serving
     to the front-end.
     """

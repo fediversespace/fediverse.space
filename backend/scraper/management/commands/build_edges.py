@@ -20,30 +20,19 @@ class Command(BaseCommand):
         edges = []
         while relationships:
             (source_id, target_id), outgoing = relationships.popitem()
-            total_statuses = outgoing.statuses_seen or 0
-            mention_count = outgoing.mention_count or 0
+            total_statuses = outgoing.statuses_seen
+            mention_count = outgoing.mention_count
             incoming = relationships.pop((target_id, source_id), None)
             oldest_data = outgoing.last_updated
             if incoming:
-                total_statuses += (incoming.statuses_seen or 0)
-                mention_count += (incoming.mention_count or 0)
+                total_statuses += (incoming.statuses_seen)
+                mention_count += (incoming.mention_count)
                 oldest_data = min(oldest_data, incoming.last_updated)
             if mention_count == 0 or total_statuses == 0:
+                # don't add edges with weight 0
                 continue
             ratio = float(mention_count)/total_statuses
             edges.append(Edge(source_id=source_id, target_id=target_id, weight=ratio, last_updated=oldest_data))
 
         Edge.objects.all().delete()
         Edge.objects.bulk_create(edges)
-
-        self.stdout.write("Creating layout...")
-        database_config = settings.DATABASES['default']
-        subprocess.call([
-            'java',
-            '-Xmx1g',
-            '-jar',
-            'gephi/build/libs/graphBuilder.jar',
-            database_config['NAME'],
-            database_config['USER'],
-            database_config['PASSWORD'],
-        ])
