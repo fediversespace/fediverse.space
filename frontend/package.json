@@ -22,7 +22,7 @@
     "sanitize-html": "^1.18.4"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
+    "start": "NODE_ENV=development react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
