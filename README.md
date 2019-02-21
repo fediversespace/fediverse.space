@@ -27,7 +27,9 @@ The map of the fediverse that you always wanted.
 
 After running the backend in Docker:
 
-- `docker-compose exec web python manage.py scrape` scrapes the entire fediverse
+- `docker-compose exec web python manage.py scrape` scrapes the fediverse
+  - It only scrapes instances that have not been scraped in the last 24 hours.
+  - By default, it'll only scrape 50 instances in one go. If you want to scrape everything, pass the `--all` flag.
 - `docker-compose exec web python manage.py build_edges` aggregates this information into edges with weights
 - `docker-compose run gephi java -Xmx1g -jar build/libs/graphBuilder.jar` lays out the graph
 
