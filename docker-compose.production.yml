@@ -37,7 +37,7 @@ services:
       - database_network
     depends_on:
       - letsencrypt
-  web:
+  django:
     restart: always
     volumes:
       - gunicorn-socket:/var/gunicorn

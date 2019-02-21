@@ -24,7 +24,7 @@ SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be scraped
-STATUS_SCRAPE_LIMIT = 5000
+STATUS_SCRAPE_LIMIT = 1000
 
 
 class Command(BaseCommand):
