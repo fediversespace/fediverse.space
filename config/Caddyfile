@@ -1,0 +1,11 @@
+backend.fediverse.space {
+  tls tao@btao.org
+  gzip
+
+  root /srv
+  proxy / django:8000 {
+    transparent
+    except /static
+  }
+}
+

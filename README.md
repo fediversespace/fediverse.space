@@ -18,6 +18,7 @@ The map of the fediverse that you always wanted.
 - `docker-compose build`
 - `docker-compose up -d django`
   - if you don't specify `django`, it'll also start `gephi` which should only be run as a regular one-off job
+  - to run in production, run `caddy` rather than `django`
 ### Frontend
 - `cd frontend && yarn install`
 - `yarn start`

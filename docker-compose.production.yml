@@ -1,68 +1,49 @@
 version: '3'
 services:
-  nginx:
-    image: jwilder/nginx-proxy:alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
-    volumes:
-      - gunicorn-socket:/var/gunicorn  # to talk to Django
-      - /var/run/docker.sock:/tmp/docker.sock:ro # for nginx-proxy
-      - conf:/etc/nginx/conf.d
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - certs:/etc/nginx/certs:ro
-    networks:
-      - nginx_network
-  letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: always
-    volumes:
-      - gunicorn-socket:/var/gunicorn
-      - conf:/etc/nginx/conf.d
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - certs:/etc/nginx/certs:rw
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - nginx_network
-    depends_on:
-      - nginx
   db:
     restart: always
     networks:
       - database_network
-    depends_on:
-      - letsencrypt
   django:
     restart: always
     volumes:
-      - gunicorn-socket:/var/gunicorn
       - ./config/gunicorn.conf.py:/config/gunicorn.conf.py
+      - gunicorn-socket:/var/gunicorn
+      - staticfiles:/code/backend/static
     networks:
       - database_network
-      - nginx_network
+      - server_network
     environment:
       - ENVIRONMENT=production
       - DJANGO_SETTINGS_MODULE=backend.settings.production
-      - VIRTUAL_HOST
-      - LETSENCRYPT_HOST
-      - LETSENCRYPT_EMAIL
+  caddy:
+    restart: always
+    image: abiosoft/caddy:0.11.4-no-stats
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/Caddyfile:/etc/Caddyfile
+      - staticfiles:/srv/static
+      - caddycerts:/etc/caddycerts
+    networks:
+      - server_network
+    depends_on:
+      - django
+    environment:
+      - ACME_AGREE
+      - CADDYPATH=/etc/caddycerts
   gephi:
     networks:
       - database_network
+    depends_on:
+      - db
 networks:
   database_network:
     driver: bridge
-  nginx_network:
+  server_network:
     driver: bridge
 volumes:
     gunicorn-socket:
-    conf:
-    vhost:
-    html:
-    certs:
-
+    caddycerts:
+    staticfiles:

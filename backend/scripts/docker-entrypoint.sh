@@ -13,8 +13,8 @@ do
 done
 >&2 echo "Postgres is up"
 
+python manage.py collectstatic --noinput
 python manage.py migrate --noinput
-
 
 if [[ $ENVIRONMENT == "development" ]]
 then

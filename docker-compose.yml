@@ -3,7 +3,6 @@ services:
   db:
     image: postgres
     environment:
-      # Set these in .env
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
@@ -13,7 +12,6 @@ services:
       - pgdata:/var/lib/postgresql/data
   django:
     environment:
-      # Set these in .env
       - SECRET_KEY
       - POSTGRES_USER
       - POSTGRES_PASSWORD

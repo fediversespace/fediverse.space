@@ -16,7 +16,7 @@
 #       range.
 #
 
-bind = ['unix:/var/gunicorn/.sock', ':8000']
+bind = [':8000']
 
 #
 # Worker processes
