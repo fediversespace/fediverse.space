@@ -1,6 +1,8 @@
 # fediverse.space 🌐 [![Netlify Status](https://api.netlify.com/api/v1/badges/ddc939c0-c12f-4e0e-8ca3-cf6abe8b9a5a/deploy-status)](https://app.netlify.com/sites/sharp-curran-4b66d3/deploys)
 The map of the fediverse that you always wanted.
 
+![A screenshot of fediverse.space](screenshot.png)
+
 ## Requirements
 - For everything:
   - Docker
