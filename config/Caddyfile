@@ -2,6 +2,8 @@ backend.fediverse.space {
   tls tao@btao.org
   gzip
 
+  cors
+
   root /srv
   proxy / django:8000 {
     transparent
