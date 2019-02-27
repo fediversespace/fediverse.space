@@ -106,7 +106,7 @@ export class Nav extends React.Component<{}, INavState> {
                             </li>
                         </ul>
                         The source code for fediverse.space is available on{' '}
-                            <a href="https://github.com/brortao/fediverse.space" target="_blank">GitHub</a>;{' '}
+                            <a href="https://gitlab.com/taobojlen/fediverse.space" target="_blank">GitLab</a>;{' '}
                         issues and pull requests are welcome!
                     </p>
                 </div>

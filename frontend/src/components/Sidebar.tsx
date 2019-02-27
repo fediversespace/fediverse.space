@@ -268,8 +268,8 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
                 icon={IconNames.BLOCKED_PERSON}
                 title="No data"
                 description="This instance has fewer than 5 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
-                action={<AnchorButton icon={IconNames.CONFIRM} href="https://github.com/brortao/fediverse.space/issues/new" target="_blank">
-                            Open a GitHub issue to opt in</AnchorButton>}
+                action={<AnchorButton icon={IconNames.CONFIRM} href="https://sunbeam.city/@tao" target="_blank">
+                            Message @tao to opt in</AnchorButton>}
             />
         )
     }
