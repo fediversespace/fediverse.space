@@ -1,8 +1,9 @@
 *.csv
 .idea/
 backend/backend/static/
+backend/static/
 *.gexf
-backend/backend/whitelist.txt
+backend/whitelist.txt
 data/
 
 # Byte-compiled / optimized / DLL files
