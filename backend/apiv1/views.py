@@ -32,5 +32,8 @@ class NodeView(viewsets.ReadOnlyModelViewSet):
     """
     Endpoint to get a list of the graph's nodes in a SigmaJS-friendly format.
     """
-    queryset = Instance.objects.filter(status='success')
+    queryset = Instance.objects.filter(status='success')\
+                               .filter(x_coord__isnull=False)\
+                               .filter(y_coord__isnull=False)\
+                               .filter(user_count__isnull=False)
     serializer_class = NodeSerializer
