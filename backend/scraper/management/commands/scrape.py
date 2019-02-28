@@ -24,12 +24,29 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
-PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be scraped
+PERSONAL_INSTANCE_THRESHOLD = 5  # instances with < this many users won't be crawled
+MAX_STATUSES_PER_PAGE = 100
 STATUS_SCRAPE_LIMIT = 5000
+INSTANCE_SCRAPE_LIMIT = 50  # note: this does not include newly discovered instances! they will always be crawled.
 
 
 class Command(BaseCommand):
     help = "Scrapes the entire fediverse"
+
+    def add_arguments(self, parser):
+        # Named (optional) arguments
+        parser.add_argument(
+            '--unlimited',
+            action='store_true',
+            dest='unlimited',
+            help="Crawl all stale instances rather than limiting to {}".format(INSTANCE_SCRAPE_LIMIT),
+        )
+        parser.add_argument(
+            '--all',
+            action='store_true',
+            dest='all',
+            help="Crawl all instances rather than limiting to stale ones"
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -67,9 +84,9 @@ class Command(BaseCommand):
         mentions = []
         datetime_threshold = datetime.now(timezone.utc) - timedelta(days=31)
         statuses_seen = 0
-        # We'll ask for 1000 statuses, but Mastodon never returns more than 40. Some Pleroma instances will ignore
+        # We'll ask for lots of statuses, but Mastodon never returns more than 40. Some Pleroma instances will ignore
         # the limit and return 20.
-        url = 'https://' + instance_name + '/api/v1/timelines/public?local=true&limit=1000'
+        url = 'https://{}/api/v1/timelines/public?local=true&limit={}/'.format(instance_name, MAX_STATUSES_PER_PAGE)
         while True:
             response = requests.get(url, timeout=TIMEOUT)
             statuses = response.json()
@@ -91,7 +108,7 @@ class Command(BaseCommand):
                 break
             # Continuing, so get url for next page
             min_id = earliest_status['id']
-            url = 'https://' + instance_name + '/api/v1/timelines/public?local=true&limit=1000&max_id=' + min_id
+            url = 'https://{}/api/v1/timelines/public?local=true&limit={}&max_id={}'.format(instance_name, MAX_STATUSES_PER_PAGE, min_id)
             time.sleep(2)  # Sleep to avoid overloading the instance
 
         mentions_seq = (seq(mentions)
@@ -201,7 +218,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = time.time()
-        stale_instances = Instance.objects.filter(last_updated__lte=datetime.now()-timedelta(days=1))
+        if options['all']:
+            stale_instances = Instance.objects.all()
+        else:
+            stale_instances = Instance.objects.filter(last_updated__lte=datetime.now()-timedelta(days=1))
+
+        if not options['unlimited']:
+            stale_instances = stale_instances[:INSTANCE_SCRAPE_LIMIT]
+
         with mp.Manager() as manager:
             # Share the list of existing instances amongst all threads (to avoid each thread having to query
             # for it on every instance it scrapes)
