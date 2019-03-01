@@ -76,8 +76,8 @@ class Command(BaseCommand):
         if response.status_code != 200 or not isinstance(peers, list) or get_key(peers, ['error']):
             raise InvalidResponseException("Could not get peers for {}".format(instance_name))
         # Get rid of peers that just say "null" and the instance itself
-        # Also make sure to lowercase all instance names; otherwise there'll be some duplicates
-        return [peer.lower() for peer in peers if peer and peer != instance_name]
+        # Also make sure to lowercase all instance names and remove duplicates
+        return list(set([peer.lower() for peer in peers if peer and peer != instance_name]))
 
     @staticmethod
     def get_statuses(instance_name: str):
