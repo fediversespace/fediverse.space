@@ -69,5 +69,11 @@ def validate_int(integer):
     return integer if (isinstance(integer, int) and 0 <= integer < 2147483647) else None
 
 
-def log(text):
-    return "{} - {}".format(datetime.now().isoformat(), text)
+def log(obj, text, success=False, error=False):
+    text = "{} - {}".format(datetime.now().isoformat(), text)
+    if success:
+        text = obj.style.SUCCESS(text)
+    if error:
+        obj.stderr.write(text)
+    else:
+        obj.stdout.write(text)
