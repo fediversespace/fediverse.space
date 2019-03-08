@@ -21,11 +21,11 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'mastodon.social'
+SEED = 'p.a3.pm'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 10  # instances with < this many users won't be crawled
-MAX_STATUSES_PER_PAGE = 100
+MAX_STATUSES_PER_PAGE = 40
 STATUS_SCRAPE_LIMIT = 5000
 INSTANCE_SCRAPE_LIMIT = 50  # note: this does not include newly discovered instances! they will always be crawled.
 
@@ -47,26 +47,38 @@ class Command(BaseCommand):
             dest='all',
             help="Crawl all instances rather than limiting to stale ones"
         )
+        parser.add_argument(
+            '--verbose',
+            action='store_true',
+            dest='verbose',
+            help="Verbose logging"
+        )
+        parser.add_argument(
+            '--instance',
+            dest='instance',
+            help="Crawl a single instance"
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.verbose = False
         self.scraped_count = 0
         f = open(os.path.join(settings.BASE_DIR, '../whitelist.txt'), 'r')
         self.whitelist = seq(f.readlines()).map(lambda i: i.lower().strip()).to_list()
         f.close()
 
-    @staticmethod
-    def get_instance_info(instance_name: str):
+    def get_instance_info(self, instance_name: str):
         """Collect info about instance"""
         url = 'https://' + instance_name + '/api/v1/instance'
         response = requests.get(url, timeout=TIMEOUT)
         json = response.json()
         if response.status_code != 200 or get_key(json, ['error']):
+            if self.verbose:
+                log(self, "Couldn't get instance info for {}: {}".format(instance_name, response), error=True)
             raise InvalidResponseException("Could not get info for {}".format(instance_name))
         return json
 
-    @staticmethod
-    def get_instance_peers(instance_name: str):
+    def get_instance_peers(self, instance_name: str):
         """Collect connected instances"""
         # The peers endpoint returns a "list of all domain names known to this instance"
         # (https://github.com/tootsuite/mastodon/pull/6125)
@@ -74,24 +86,29 @@ class Command(BaseCommand):
         response = requests.get(url, timeout=TIMEOUT)
         peers = response.json()
         if response.status_code != 200 or not isinstance(peers, list) or get_key(peers, ['error']):
+            if self.verbose:
+                log(self, "Couldn't get peers for {}: {}".format(instance_name, response), error=True)
             raise InvalidResponseException("Could not get peers for {}".format(instance_name))
         # Get rid of peers that just say "null" and the instance itself
         # Also make sure to lowercase all instance names and remove duplicates
         return list(set([peer.lower() for peer in peers if peer and peer != instance_name]))
 
-    @staticmethod
-    def get_statuses(instance_name: str):
+    def get_statuses(self, instance_name: str):
         """Collect all statuses that mention users on other instances"""
         mentions = []
         datetime_threshold = datetime.now(timezone.utc) - timedelta(days=31)
         statuses_seen = 0
         # We'll ask for lots of statuses, but Mastodon never returns more than 40. Some Pleroma instances will ignore
         # the limit and return 20.
-        url = 'https://{}/api/v1/timelines/public?local=true&limit={}/'.format(instance_name, MAX_STATUSES_PER_PAGE)
+        url = 'https://{}/api/v1/timelines/public?local=true&limit={}'.format(instance_name, MAX_STATUSES_PER_PAGE)
         while True:
+            if self.verbose:
+                log(self, "({} posts seen)\tGetting {}".format(statuses_seen, url))
             response = requests.get(url, timeout=TIMEOUT)
             statuses = response.json()
             if response.status_code != 200 or get_key(statuses, ['error']):
+                if self.verbose:
+                    log(self, "Couldn't get statuses for {}: {}".format(instance_name, response), error=True)
                 raise InvalidResponseException("Could not get statuses for {}".format(instance_name))
             elif len(statuses) == 0:
                 break
@@ -197,7 +214,7 @@ class Command(BaseCommand):
                 relationship.last_updated = datetime.now()
             bulk_update(relationships, update_fields=['mention_count', 'statuses_seen', 'last_updated'])
 
-        self.stdout.write(log("Processed {}: {}".format(data['instance_name'], data['status'])))
+        log(self, "Processed {}: {}".format(data['instance_name'], data['status']))
 
     def worker(self, queue: mp.JoinableQueue, existing_instance_ids, scraped_ids):
         """The main worker that processes instances"""
@@ -206,12 +223,12 @@ class Command(BaseCommand):
             instance = queue.get()
             if instance.name in scraped_ids:
                 # If we hit this branch, it's indicative of a bug
-                self.stderr.write(log("Skipping {}, already done. This should not have been added to the queue!"
-                                      .format(instance)))
+                log(self, "Skipping {}, already done. This should not have been added to the queue!".format(instance),
+                    error=True)
                 queue.task_done()
             else:
                 # Fetch data on instance
-                self.stdout.write(log("Processing {}".format(instance.name)))
+                log(self, "Processing {}".format(instance.name))
                 data = self.process_instance(instance)
                 self.save_data(instance, data, queue, existing_instance_ids)
                 scraped_ids[instance.name] = 1
@@ -219,7 +236,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_time = time.time()
-        if options['all']:
+
+        self.verbose = options['verbose']
+
+        if options['instance']:
+            stale_instance, _ = Instance.objects.get_or_create(name=options['instance'])
+            stale_instances = [stale_instance]
+        elif options['all']:
             stale_instances = Instance.objects.all()
         else:
             stale_instances = Instance.objects.filter(last_updated__lte=datetime.now()-timedelta(days=1))
@@ -246,5 +269,4 @@ class Command(BaseCommand):
             self.scraped_count = len(scraped_ids.keys())
 
         end_time = time.time()
-        self.stdout.write(self.style.SUCCESS(log("Scraped {} instances in {:.0f}s"
-                                                 .format(self.scraped_count, end_time - start_time))))
+        log(self, "Scraped {} instances in {:.0f}s".format(self.scraped_count, end_time - start_time), True)
