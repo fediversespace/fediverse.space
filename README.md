@@ -38,6 +38,17 @@ After running the backend in Docker:
 
 To run in production, use `docker-compose -f docker-compose.yml -f docker-compose.production.yml` instead of just `docker-compose`.
 
+An example crontab:
+```
+# crawl 50 stale instances (plus any newly discovered instances from them)
+# the -T flag is important; without it, docker-compose will allocate a tty to the process
+15,45 * * * * docker-compose -f docker-compose.yml -f docker-compose.production.yml exec -T django python manage.py scrape
+# build the edges based on how much users interact
+15 3 * * * docker-compose -f docker-compose.yml -f docker-compose.production.yml exec -T django python manage.py build_edges
+# layout the graph
+20 3 * * * docker-compose -f docker-compose.yml -f docker-compose.production.yml run gephi java -Xmx1g -jar build/libs/graphBuilder.jar
+```
+
 ### Frontend
 - `yarn build` to create an optimized build for deployment
 
