@@ -25,7 +25,7 @@ SEED = 'p.a3.pm'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 10  # instances with < this many users won't be crawled
-MAX_STATUSES_PER_PAGE = 100
+MAX_STATUSES_PER_PAGE = 40
 STATUS_SCRAPE_LIMIT = 5000
 INSTANCE_SCRAPE_LIMIT = 50  # note: this does not include newly discovered instances! they will always be crawled.
 
