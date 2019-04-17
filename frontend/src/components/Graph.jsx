@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Sigma, SigmaEnableWebGL, Filter, ForceAtlas2 } from 'react-sigma';
 
 import { selectAndLoadInstance } from '../redux/actions';
-import ErrorState from './ErrorState';
+import { ErrorState } from './ErrorState';
 
 const STYLE = {
     bottom: "0",
