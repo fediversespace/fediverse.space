@@ -12,7 +12,7 @@ import thunk from "redux-thunk";
 
 import { FocusStyleManager } from "@blueprintjs/core";
 
-import { App } from "./App";
+import { AppRouter } from "./AppRouter";
 import { rootReducer } from "./redux/reducers";
 
 // https://blueprintjs.com/docs/#core/accessibility.focus-management
@@ -25,7 +25,7 @@ const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)))
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <AppRouter />
   </Provider>,
   document.getElementById("root") as HTMLElement
 );

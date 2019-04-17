@@ -6,10 +6,11 @@ import { Button, MenuItem } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { IItemRendererProps, ItemPredicate, Select } from "@blueprintjs/select";
 
+import { RouteComponentProps, withRouter } from "react-router";
 import { selectAndLoadInstance } from "../redux/actions";
 import { IAppState, IInstance } from "../redux/types";
 
-interface IInstanceSearchProps {
+interface IInstanceSearchProps extends RouteComponentProps {
   currentInstanceName: string | null;
   instances?: IInstance[];
   selectAndLoadInstance: (instanceName: string) => void;
@@ -25,7 +26,7 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
         itemRenderer={this.itemRenderer}
         onItemSelect={this.onItemSelect}
         itemPredicate={this.itemPredicate}
-        disabled={!this.props.instances}
+        disabled={!this.props.instances || this.props.location.pathname !== "/"}
         initialContent={this.renderInitialContent()}
         noResults={this.renderNoResults()}
         popoverProps={{ popoverClassName: "fediverse-instance-search-popover" }}
@@ -76,7 +77,9 @@ const mapStateToProps = (state: IAppState) => ({
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   selectAndLoadInstance: (instanceName: string) => dispatch(selectAndLoadInstance(instanceName) as any)
 });
-export const InstanceSearch = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(InstanceSearchImpl);
+export const InstanceSearch = withRouter(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )(InstanceSearchImpl)
+);

@@ -5,5 +5,8 @@
     "tslint-react",
     "@blueprintjs/tslint-config/blueprint-rules",
     "tslint-config-prettier"
+  ],
+  "exclude": [
+    "**/*.css"
   ]
 }

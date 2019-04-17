@@ -17,15 +17,14 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{ts,tsx,json,css}": [
+    "src/**/*.{ts,tsx}": [
       "yarn pretty",
       "yarn lint:fix",
       "git add"
     ]
   },
   "prettier": {
-    "printWidth": 120,
-    "parser": "typescript"
+    "printWidth": 120
   },
   "dependencies": {
     "@blueprintjs/core": "^3.4.0",
@@ -39,12 +38,14 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-redux": "^7.0.2",
+    "react-router-dom": "^5.0.0",
     "react-scripts-ts": "3.1.0",
     "react-sigma": "^1.2.30",
     "react-virtualized": "^9.20.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "sanitize-html": "^1.18.4"
+    "sanitize-html": "^1.18.4",
+    "styled-components": "^4.2.0"
   },
   "devDependencies": {
     "@blueprintjs/tslint-config": "^1.8.0",
@@ -55,8 +56,10 @@
     "@types/react": "^16.4.12",
     "@types/react-dom": "^16.0.7",
     "@types/react-redux": "^7.0.6",
+    "@types/react-router-dom": "^4.3.2",
     "@types/react-virtualized": "^9.18.7",
     "@types/sanitize-html": "^1.18.0",
+    "@types/styled-components": "4.1.8",
     "husky": "^1.3.1",
     "lint-staged": "^8.1.5",
     "tslint-eslint-rules": "^5.4.0",
