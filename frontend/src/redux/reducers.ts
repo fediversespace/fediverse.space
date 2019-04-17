@@ -44,7 +44,7 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
   }
 };
 
-const initialCurrentInstanceState = {
+const initialCurrentInstanceState: ICurrentInstanceState = {
   currentInstanceDetails: null,
   currentInstanceName: null,
   error: false,

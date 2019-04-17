@@ -21,7 +21,7 @@ from scraper.management.commands._util import require_lock, InvalidResponseExcep
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
-SEED = 'p.a3.pm'
+SEED = 'mastodon.social'
 TIMEOUT = 20  # seconds
 NUM_THREADS = 16  # roughly 40MB each
 PERSONAL_INSTANCE_THRESHOLD = 10  # instances with < this many users won't be crawled

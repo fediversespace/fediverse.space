@@ -1,9 +1,9 @@
 import { orderBy } from "lodash";
-import * as moment from "moment";
+import moment from "moment";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
-import * as sanitize from "sanitize-html";
+import sanitize from "sanitize-html";
 
 import {
   AnchorButton,
