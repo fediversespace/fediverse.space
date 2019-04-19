@@ -80,6 +80,12 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
       return this.renderMissingDataState();
     } else if (this.props.instanceLoadError) {
       return <ErrorState />;
+    } else if (
+      this.props.graph &&
+      this.props.instanceName &&
+      this.props.graph.nodes.map(n => n.id).indexOf(this.props.instanceName) < 0
+    ) {
+      return this.renderQuietInstanceState();
     }
     return (
       <div>
@@ -295,6 +301,16 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         icon={IconNames.ERROR}
         title="No data"
         description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
+      />
+    );
+  };
+
+  private renderQuietInstanceState = () => {
+    return (
+      <NonIdealState
+        icon={IconNames.CLEAN}
+        title="No interactions"
+        description="Users on this instance have not publicly interacted with any other instances recently. "
       />
     );
   };

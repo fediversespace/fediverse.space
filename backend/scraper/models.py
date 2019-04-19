@@ -51,8 +51,8 @@ class Edge(models.Model):
     It aggregates stats from the asymmetrical PeerRelationship to a symmetrical one that's suitable for serving
     to the front-end.
     """
-    source = models.ForeignKey(Instance, related_name='+', on_delete=models.CASCADE)
-    target = models.ForeignKey(Instance, related_name='+', on_delete=models.CASCADE)
+    source = models.ForeignKey(Instance, related_name='targets', on_delete=models.CASCADE)
+    target = models.ForeignKey(Instance, related_name='sources', on_delete=models.CASCADE)
     weight = models.FloatField(blank=True, null=True)
 
     # Metadata
