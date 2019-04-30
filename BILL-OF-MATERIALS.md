@@ -9,9 +9,9 @@ I am currently in the process of migrating from a Python and Django-based
 backend to one written in Elixir. This list is what *will* be used in the near
 future.
 ### Crawler and API
-* [Elixir](https://elixir-lang.org/)
-* [Phoenix](https://phoenixframework.org/)
-* [HTTPoison](https://hexdocs.pm/httpoison/readme.html)
+* [Elixir](https://elixir-lang.org/) (the language)
+* [Phoenix](https://phoenixframework.org/) (the web framework)
+* [HTTPoison](https://hexdocs.pm/httpoison/readme.html) (for crawling servers)
 * See [/backend/mix.env](/backend/mix.env) for a complete overview of
   dependencies
 
@@ -19,8 +19,9 @@ future.
 * [Gephi toolkit](https://gephi.org/toolkit/)
 
 ## Frontend
-* [React](https://reactjs.org/)
-* [Blueprint](https://blueprintjs.com/)
+* [React](https://reactjs.org/) (the UI framework)
+* [Blueprint](https://blueprintjs.com/) (a collection of pre-existing UI components)
+* [Sigma.js](http://sigmajs.org/) (for graph visualization)
 * See [/frontend/package.json](/frontend/package.json) for a complete overview
   of dependencies
 
