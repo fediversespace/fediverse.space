@@ -54,6 +54,11 @@ class PersonalInstanceException(Exception):
     """
     pass
 
+class BlacklistedDomainException(Exception):
+    """
+    Used for instances whose domain is blacklisted.
+    """
+    pass
 
 def get_key(data, keys: list):
     try:

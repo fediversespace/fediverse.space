@@ -17,7 +17,7 @@ from django import db
 from django.conf import settings
 from django.utils import timezone
 from scraper.models import Instance, PeerRelationship
-from scraper.management.commands._util import require_lock, InvalidResponseException, get_key, log, validate_int, PersonalInstanceException
+from scraper.management.commands._util import require_lock, InvalidResponseException, get_key, log, validate_int, PersonalInstanceException, BlacklistedDomainException
 
 # TODO: use the /api/v1/server/followers and /api/v1/server/following endpoints in peertube instances
 
@@ -142,6 +142,9 @@ class Command(BaseCommand):
         """Given an instance, get all the data we're interested in"""
         data = dict()
         try:
+            if instance.name.endswith("gab.best"):
+                raise BlacklistedDomainException
+
             data['instance_name'] = instance.name
             data['info'] = self.get_instance_info(instance.name)
 
@@ -163,6 +166,7 @@ class Command(BaseCommand):
 
         except (InvalidResponseException,
                 PersonalInstanceException,
+                BlacklistedDomainException,
                 requests.exceptions.RequestException,
                 json.decoder.JSONDecodeError) as e:
             data['instance_name'] = instance.name
