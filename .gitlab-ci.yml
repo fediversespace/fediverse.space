@@ -8,7 +8,8 @@ test-frontend:
     - yarn install
     - yarn lint
   cache:
-    - frontend/node_modules/
-    - frontend/.yarn
+    paths:
+      - frontend/node_modules/
+      - frontend/.yarn
   except:
     - master
