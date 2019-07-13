@@ -1,0 +1,14 @@
+test-frontend:
+  image: node:lts-alpine
+  stage: test
+  before_script:
+    - cd frontend
+  stage: test
+  script:
+    - yarn install
+    - yarn lint
+  cache:
+    - frontend/node_modules/
+    - frontend/.yarn
+  except:
+    - master
