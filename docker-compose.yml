@@ -8,6 +8,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - database_network
   # This is for running the occasional graph layout task. It's in docker-compose.yml so that it's built at the same time
   # as everything else, but it should be run regularly with a cron job or similar.
   gephi:
@@ -18,6 +20,24 @@ services:
       - gradle-cache:/code/.gradle
     depends_on:
       - db
+    networks:
+      - database_network
+  phoenix:
+    build: ./backend
+    networks:
+      - database_network
+    depends_on:
+      - db
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - DATABASE_URL
+      - SECRET_KEY_BASE
+      - PORT
+      - BACKEND_HOSTNAME
 volumes:
   pgdata:
   gradle-cache:
+networks:
+  database_network:
+    driver: bridge
