@@ -1,93 +1,9 @@
 *.csv
 .idea/
-backend/backend/static/
-backend/static/
 *.gexf
 backend/whitelist.txt
 data/
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-./lib/
-./lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
+.vscode/
 
 # Environments
 .env
@@ -99,15 +15,84 @@ ENV/
 env.bak/
 venv.bak/
 
-# Spyder project settings
-.spyderproject
-.spyproject
+# The directory Mix will write compiled artifacts to.
+/backend/_build/
 
-# Rope project settings
-.ropeproject
+# If you run "mix test --cover", coverage assets end up here.
+/backend/cover/
 
-# mkdocs documentation
-/site
+# The directory Mix downloads your dependencies sources to.
+/backend/deps/
 
-# mypy
-.mypy_cache/
+# Where 3rd-party dependencies like ExDoc output generated docs.
+/backend/doc/
+
+# Ignore .fetch files in case you like to edit your project deps locally.
+/backend/.fetch
+
+# If the VM crashes, it generates a dump, let's ignore it too.
+erl_crash.dump
+
+# Also ignore archive artifacts (built via "mix archive.build").
+*.ez
+
+# Ignore package tarball (built via "mix hex.build").
+backend-*.tar
+
+# Since we are building assets from assets/,
+# we ignore priv/static. You may want to comment
+# this depending on your deployment strategy.
+/backend/priv/static/
+
+# Files matching config/*.secret.exs pattern contain sensitive
+# data and you should not commit them into version control.
+#
+# Alternatively, you may comment the line below and commit the
+# secrets files as long as you replace their contents by environment
+# variables.
+/backend/config/*.secret.exs
+
+/backend/.elixir_ls/
+
+*.pot
+*.po
+
+# dependencies
+/frontend/node_modules
+
+# testing
+/frontend/coverage
+
+# production
+/frontend/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+/gephi/.gradle/
+/gephi/build/
+/gephi/lib/*
+/gephi/!lib/.gitkeep
+# 64MB file but I don't have much faith that it'll remain available...
+!/gephi/lib/gephi-toolkit-0.9.2.jar
+
+*/.idea/
+
+# Ignore Gradle GUI config
+/gephi/gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!/gephi/gradle-wrapper.jar
+
+# Cache of project
+/gephi/.gradletasknamecache
+
+*.javac

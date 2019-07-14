@@ -87,13 +87,7 @@ export const selectAndLoadInstance = (instanceName: string) => {
 export const fetchGraph = () => {
   return (dispatch: Dispatch) => {
     dispatch(requestGraph());
-    return Promise.all([getFromApi("graph/edges"), getFromApi("graph/nodes")])
-      .then(responses => {
-        return {
-          edges: responses[0],
-          nodes: responses[1]
-        };
-      })
+    return getFromApi("graph")
       .then(graph => dispatch(receiveGraph(graph)))
       .catch(e => dispatch(graphLoadFailed()));
   };

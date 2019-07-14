@@ -58,7 +58,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
           className={"fediverse-sidebar-toggle-button" + closedClass}
           minimal={true}
         />
-        <Card className={"fediverse-sidebar" + closedClass} elevation={Elevation.THREE}>
+        <Card className={"fediverse-sidebar" + closedClass} elevation={Elevation.TWO}>
           {this.renderSidebarContents()}
         </Card>
       </div>

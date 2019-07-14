@@ -1,38 +1,23 @@
-version: '3'
+version: "3"
 services:
   db:
     restart: always
     networks:
       - database_network
-  django:
+  phoenix:
     restart: always
-    volumes:
-      - ./config/gunicorn.conf.py:/config/gunicorn.conf.py
-      - gunicorn-socket:/var/gunicorn
-      - staticfiles:/code/backend/static
+    build: ./backend
     networks:
       - database_network
-      - server_network
-    environment:
-      - ENVIRONMENT=production
-      - DJANGO_SETTINGS_MODULE=backend.settings.production
-  caddy:
-    restart: always
-    image: abiosoft/caddy:0.11.4-no-stats
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./config/Caddyfile:/etc/Caddyfile
-      - staticfiles:/srv/static
-      - caddycerts:/etc/caddycerts
-    networks:
-      - server_network
     depends_on:
-      - django
+      - db
+    ports:
+      - "${PORT}:${PORT}"
     environment:
-      - ACME_AGREE
-      - CADDYPATH=/etc/caddycerts
+      - DATABASE_URL
+      - SECRET_KEY_BASE
+      - PORT
+      - BACKEND_HOSTNAME
   gephi:
     networks:
       - database_network
@@ -41,9 +26,3 @@ services:
 networks:
   database_network:
     driver: bridge
-  server_network:
-    driver: bridge
-volumes:
-    gunicorn-socket:
-    caddycerts:
-    staticfiles:
