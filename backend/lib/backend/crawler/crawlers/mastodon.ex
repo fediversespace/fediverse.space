@@ -1,6 +1,7 @@
 defmodule Backend.Crawler.Crawlers.Mastodon do
   require Logger
   import Backend.Crawler.Util
+  import Backend.Util
   alias Backend.Crawler.ApiCrawler
 
   @behaviour ApiCrawler

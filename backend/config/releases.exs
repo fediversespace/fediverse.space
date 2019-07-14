@@ -3,17 +3,16 @@
 
 import Config
 
-# For production, don't forget to configure the url host
-# to something meaningful, Phoenix uses this information
-# when generating URLs.
+ssl =
+  case System.get_env("MIX_ENV") do
+    "prod" -> true
+    _ -> false
+  end
+
 config :backend, Backend.Repo,
-  # username: System.get_env("POSTGRES_USER"),
-  # password: System.get_env("POSTGRES_PASSWORD"),
-  # database: System.get_env("POSTGRES_DB"),
-  # hostname: System.get_env("POSTGRES_HOSTNAME"),
-  url: System.get_env("ecto://" <> "DATABASE_URL"),
+  url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
-  ssl: true
+  ssl: ssl
 
 # show_sensitive_data_on_connection_error: true
 
