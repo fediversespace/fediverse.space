@@ -1,38 +1,18 @@
-version: '3'
+version: "3"
 services:
   db:
     image: postgres
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+      - DATABASE_URL
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-  django:
-    environment:
-      - SECRET_KEY
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-      - DJANGO_SETTINGS_MODULE
-      - ENVIRONMENT=development
-    build: ./backend
-    command: bash scripts/docker-entrypoint.sh
-    volumes:
-      - ./backend:/code
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
   # This is for running the occasional graph layout task. It's in docker-compose.yml so that it's built at the same time
   # as everything else, but it should be run regularly with a cron job or similar.
   gephi:
     environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+      - DATABASE_URL
     build: ./gephi
     volumes:
       - gradle-cache:/code/.gradle
