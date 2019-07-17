@@ -44,6 +44,7 @@ WORKDIR /app
 ENV APP_NAME=backend
 
 COPY --from=build /app/_build/prod/rel/${APP_NAME} ./
+COPY Procfile ./
 RUN chown -R nobody: /app
 USER nobody
 
