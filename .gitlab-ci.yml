@@ -16,3 +16,23 @@ test-frontend:
   only:
     changes:
       - frontend/*
+deploy-backend-develop:
+  stage: deploy
+  image: ilyasemenov/gitlab-ci-git-push
+  only:
+    refs:
+      - develop
+    changes:
+      - backend/*
+  script:
+    - git-push ssh://dokku@api-develop.fediverse.space:phoenix
+deploy-gephi-develop:
+  stage: deploy
+  image: ilyasemenov/gitlab-ci-git-push
+  only:
+    refs:
+      - develop
+    changes:
+      - gephi/*
+  script:
+    - git-push ssh://dokku@api-develop.fediverse.space:gephi
