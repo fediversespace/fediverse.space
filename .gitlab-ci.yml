@@ -1,3 +1,6 @@
+include:
+  template: Dependency-Scanning.gitlab-ci.yml
+
 test-frontend:
   image: node:lts-alpine
   stage: test
