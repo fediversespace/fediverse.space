@@ -52,3 +52,8 @@ An example crontab:
 ### Frontend
 - `yarn build` to create an optimized build for deployment
 
+### Acknowledgements
+
+[![NLnet logo](https://i.imgur.com/huV3rvo.png)](https://nlnet.nl/project/fediverse_space/)
+
+Many thanks to [NLnet](https://nlnet.nl/project/fediverse_space/) for their support and guidance of this project.
