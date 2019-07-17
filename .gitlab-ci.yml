@@ -16,8 +16,31 @@ test-frontend:
   only:
     changes:
       - frontend/*
+
+backend-sobelow:
+  stage: test
+  image: elixir:1.9
+  only:
+    changes:
+      - backend/*
+  before_script:
+    - cd backend
+  script:
+    - mix local.hex --force
+    - mix local.rebar --force
+    - mix deps.get
+    - mix deps.compile
+    - mix sobelow --config
+  cache:
+    paths:
+      - backend/deps/
+      - backend/_build/
+
 deploy-backend-develop:
   stage: deploy
+  environment:
+    name: develop
+    url: https://phoenix.api-develop.fediverse.space
   image: ilyasemenov/gitlab-ci-git-push
   only:
     refs:
@@ -26,9 +49,12 @@ deploy-backend-develop:
       - backend/*
   script:
     - git-push ssh://dokku@api-develop.fediverse.space:phoenix
+
 deploy-gephi-develop:
   stage: deploy
   image: ilyasemenov/gitlab-ci-git-push
+  environment:
+    name: develop
   only:
     refs:
       - develop

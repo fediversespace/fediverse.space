@@ -45,7 +45,8 @@ defmodule Backend.MixProject do
       {:timex, "~> 3.5"},
       {:honeydew, "~> 1.4.3"},
       {:quantum, "~> 2.3"},
-      {:corsica, "~> 1.1.2"}
+      {:corsica, "~> 1.1.2"},
+      {:sobelow, "~> 0.8", only: :dev}
     ]
   end
 
