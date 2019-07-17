@@ -1,3 +1,11 @@
+# fediverse.space frontend
+
+The React frontend for [fediverse.space](https://fediverse.space). Written in Typescript.
+
+- Set the environment variable `REACT_APP_STAGING=true` when building to use the staging backend.
+
+# Default README
+
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
 Below you will find some information on how to perform common tasks.<br>

@@ -1,0 +1,9 @@
+[build]
+  base = "frontend/"
+  publish = "frontend/build/"
+
+[context.develop.environment]
+  REACT_APP_STAGING = "true"
+
+[context.branch-deploy.environment]
+  REACT_APP_STAGING = "true"

@@ -1,7 +1,11 @@
 import fetch from "cross-fetch";
 
-const API_ROOT =
-  process.env.NODE_ENV === "development" ? "http://localhost:4000/api/" : "https://backend.fediverse.space/api/";
+let API_ROOT = "http://localhost:4000/api/";
+if (["true", true, 1, "1"].indexOf(process.env.REACT_APP_STAGING || "") > -1) {
+  API_ROOT = "https://phoenix.api-develop.fediverse.space/api/";
+} else if (process.env.NODE_ENV === "production") {
+  API_ROOT = "https://phoenix.api.fediverse.space/api/";
+}
 
 export const getFromApi = (path: string): Promise<any> => {
   const domain = API_ROOT.endsWith("/") ? API_ROOT : API_ROOT + "/";
