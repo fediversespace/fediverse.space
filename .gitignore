@@ -1,9 +1,10 @@
 *.csv
 .idea/
 *.gexf
-backend/whitelist.txt
 data/
 .vscode/
+
+backend/.sobelow
 
 # Environments
 .env

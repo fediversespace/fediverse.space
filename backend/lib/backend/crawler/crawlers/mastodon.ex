@@ -15,6 +15,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   end
 
   @impl ApiCrawler
+  # sobelow_skip ["DOS.StringToAtom"]
   def crawl(domain) do
     instance = Jason.decode!(get!("https://#{domain}/api/v1/instance").body)
 
@@ -33,6 +34,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   end
 
   @spec crawl_large_instance(String.t(), any()) :: ApiCrawler.t()
+  # sobelow_skip ["DOS.StringToAtom"]
   defp crawl_large_instance(domain, instance) do
     # servers may not publish peers
     peers =
