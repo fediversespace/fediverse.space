@@ -34,7 +34,8 @@ config :backend, :crawler,
   crawl_interval_mins: 30,
   crawl_workers: 50,
   blacklist: [
-    "gab.best"
+    "gab.best",
+    "4chan.icu"
   ],
   user_agent: "fediverse.space crawler"
 
