@@ -48,7 +48,7 @@ deploy-backend-develop:
   only:
     - develop
   script:
-    - git-push ssh://dokku@api-develop.fediverse.space:phoenix develop
+    - git-push dokku@api-develop.fediverse.space:phoenix develop
 
 deploy-gephi-develop:
   stage: deploy
@@ -58,4 +58,4 @@ deploy-gephi-develop:
   only:
     - develop
   script:
-    - git-push ssh://dokku@api-develop.fediverse.space:gephi develop
+    - git-push dokku@api-develop.fediverse.space:gephi develop
