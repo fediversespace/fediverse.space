@@ -35,6 +35,7 @@ defmodule BackendWeb.InstanceView do
       description: instance.description,
       version: instance.version,
       userCount: instance.user_count,
+      insularity: instance.insularity,
       statusCount: instance.status_count,
       domainCount: length(instance.peers),
       peers: render_many(instance.peers, InstanceView, "instance.json"),

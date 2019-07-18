@@ -7,7 +7,7 @@ export const AboutScreen: React.FC = () => (
     <H1>About</H1>
     <p className={Classes.RUNNING_TEXT}>
       fediverse.space is a tool to visualize networks and communities on the{" "}
-      <a href="https://en.wikipedia.org/wiki/Fediverse" target="_blank">
+      <a href="https://en.wikipedia.org/wiki/Fediverse" target="_blank" rel="noopener noreferrer">
         fediverse
       </a>
       . It works by crawling every instance it can find and aggregating statistics on communication between these.
@@ -26,7 +26,7 @@ export const AboutScreen: React.FC = () => (
     </H4>
     <p className={Classes.RUNNING_TEXT}>
       Check out{" "}
-      <a href="https://gitlab.com/taobojlen/fediverse.space/issues/24" target="_blank">
+      <a href="https://gitlab.com/taobojlen/fediverse.space/issues/24" target="_blank" rel="noopener noreferrer">
         this GitLab issue
       </a>
       .
@@ -35,7 +35,7 @@ export const AboutScreen: React.FC = () => (
     <H4>How do I add my personal instance?</H4>
     <p className={Classes.RUNNING_TEXT}>
       Send a DM to{" "}
-      <a href="https://cursed.technology/@fediversespace" target="_blank">
+      <a href="https://cursed.technology/@fediversespace" target="_blank" rel="noopener noreferrer">
         @fediversespace
       </a>{" "}
       on Mastodon. Make sure to send it from the account that's listed as the instance admin.
@@ -54,27 +54,31 @@ export const AboutScreen: React.FC = () => (
       This site is inspired by several other sites in the same vein:
       <ul className={Classes.LIST}>
         <li>
-          <a href="https://the-federation.info/" target="_blank">
+          <a href="https://the-federation.info/" target="_blank" rel="noopener noreferrer">
             the-federation.info
           </a>
         </li>
         <li>
-          <a href="http://fediverse.network/" target="_blank">
+          <a href="http://fediverse.network/" target="_blank" rel="noopener noreferrer">
             fediverse.network
           </a>
         </li>
         <li>
-          <a href="https://lucahammer.at/vis/fediverse/2018-08-30-mastoverse_hashtags/" target="_blank">
+          <a
+            href="https://lucahammer.at/vis/fediverse/2018-08-30-mastoverse_hashtags/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Mastodon hashtag network
           </a>
           {" by "}
-          <a href="https://vis.social/web/statuses/100634284168959187" target="_blank">
+          <a href="https://vis.social/web/statuses/100634284168959187" target="_blank" rel="noopener noreferrer">
             @Luca@vis.social
           </a>
         </li>
       </ul>
       The source code for fediverse.space is available on{" "}
-      <a href="https://gitlab.com/taobojlen/fediverse.space" target="_blank">
+      <a href="https://gitlab.com/taobojlen/fediverse.space" target="_blank" rel="noopener noreferrer">
         GitLab
       </a>
       ; issues and pull requests are welcome!

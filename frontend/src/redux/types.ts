@@ -17,17 +17,17 @@ export interface IAction {
 
 export interface IInstance {
   name: string;
-  numUsers?: number;
 }
 
 export interface IInstanceDetails {
   name: string;
-  peers?: IInstance[];
   description?: string;
-  domainCount?: number;
-  statusCount?: number;
-  userCount?: number;
   version?: string;
+  userCount?: number;
+  insularity?: number;
+  statusCount?: number;
+  domainCount?: number;
+  peers?: IInstance[];
   lastUpdated?: string;
   status: string;
 }

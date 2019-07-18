@@ -44,7 +44,9 @@ config :backend, Backend.Scheduler,
     # At midnight every day
     {"@daily", {Backend.Scheduler, :prune_crawls, [1, "month"]}},
     # 00.15 daily
-    {"15 0 * * *", {Backend.Scheduler, :generate_edges, []}}
+    {"15 0 * * *", {Backend.Scheduler, :generate_edges, []}},
+    # 00.30 every night
+    {"30 0 * * *", {Backend.Scheduler, :generate_insularity_scores, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom
