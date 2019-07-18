@@ -5,10 +5,12 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import sanitize from "sanitize-html";
+import styled from "styled-components";
 
 import {
   AnchorButton,
   Button,
+  Callout,
   Card,
   Classes,
   Code,
@@ -40,12 +42,24 @@ interface ISidebarProps {
 }
 interface ISidebarState {
   isOpen: boolean;
+  neighbors?: string[];
+  isProcessingNeighbors: boolean;
 }
 class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   constructor(props: ISidebarProps) {
     super(props);
     const isOpen = window.innerWidth >= 900 ? true : false;
-    this.state = { isOpen };
+    this.state = { isOpen, isProcessingNeighbors: false };
+  }
+
+  public componentDidMount() {
+    this.processEdgesToFindNeighbors();
+  }
+
+  public componentDidUpdate(prevProps: ISidebarProps, prevState: ISidebarState) {
+    if (prevProps.instanceName !== this.props.instanceName) {
+      this.processEdgesToFindNeighbors();
+    }
   }
 
   public render() {
@@ -71,8 +85,26 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     this.setState({ isOpen: !this.state.isOpen });
   };
 
+  private processEdgesToFindNeighbors = () => {
+    const { graph, instanceName } = this.props;
+    if (!graph || !instanceName) {
+      return;
+    }
+    this.setState({ isProcessingNeighbors: true });
+    const edges = graph.edges.filter(e => [e.data.source, e.data.target].indexOf(instanceName!) > -1);
+    const neighbors: any[] = [];
+    edges.forEach(e => {
+      if (e.data.source === instanceName) {
+        neighbors.push({ neighbor: e.data.target, weight: e.data.weight });
+      } else {
+        neighbors.push({ neighbor: e.data.source, weight: e.data.weight });
+      }
+    });
+    this.setState({ neighbors, isProcessingNeighbors: false });
+  };
+
   private renderSidebarContents = () => {
-    if (this.props.isLoadingInstanceDetails) {
+    if (this.props.isLoadingInstanceDetails || this.state.isProcessingNeighbors) {
       return this.renderLoadingState();
     } else if (!this.props.instanceDetails) {
       return this.renderEmptyState();
@@ -82,12 +114,6 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
       return this.renderMissingDataState();
     } else if (this.props.instanceLoadError) {
       return <ErrorState />;
-    } else if (
-      this.props.graph &&
-      this.props.instanceName &&
-      this.props.graph.nodes.map(n => n.data.id).indexOf(this.props.instanceName) < 0
-    ) {
-      return this.renderQuietInstanceState();
     }
     return (
       <div>
@@ -123,9 +149,20 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         </span>
       );
     }
+
+    const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
+
+    const insularCallout = hasNeighbors ? (
+      undefined
+    ) : (
+      <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
+        <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
+      </Callout>
+    );
     return (
       <div>
         <H2>{content}</H2>
+        {insularCallout}
         <Divider />
       </div>
     );
@@ -318,22 +355,21 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   };
 
   private renderMissingDataState = () => {
+    const FillDiv = styled.div`
+      width: 100%;
+      height: 100%;
+    `;
     return (
-      <NonIdealState
-        icon={IconNames.ERROR}
-        title="No data"
-        description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
-      />
-    );
-  };
-
-  private renderQuietInstanceState = () => {
-    return (
-      <NonIdealState
-        icon={IconNames.CLEAN}
-        title="No interactions"
-        description="Users on this instance have not publicly interacted with any other instances recently. "
-      />
+      <FillDiv>
+        <NonIdealState
+          icon={IconNames.ERROR}
+          title="No data"
+          description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
+        />
+        <span className="sidebar-hidden-instance-status" style={{ display: "none" }}>
+          {this.props.instanceDetails && this.props.instanceDetails.status}
+        </span>
+      </FillDiv>
     );
   };
 
