@@ -83,7 +83,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     } else if (
       this.props.graph &&
       this.props.instanceName &&
-      this.props.graph.nodes.map(n => n.id).indexOf(this.props.instanceName) < 0
+      this.props.graph.nodes.map(n => n.data.id).indexOf(this.props.instanceName) < 0
     ) {
       return this.renderQuietInstanceState();
     }
@@ -177,13 +177,15 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     if (!this.props.graph || !this.props.instanceName) {
       return;
     }
-    const edges = this.props.graph.edges.filter(e => [e.source, e.target].indexOf(this.props.instanceName!) > -1);
+    const edges = this.props.graph.edges.filter(
+      e => [e.data.source, e.data.target].indexOf(this.props.instanceName!) > -1
+    );
     const neighbors: any[] = [];
     edges.forEach(e => {
-      if (e.source === this.props.instanceName) {
-        neighbors.push({ neighbor: e.target, weight: e.size });
+      if (e.data.source === this.props.instanceName) {
+        neighbors.push({ neighbor: e.data.target, weight: e.data.weight });
       } else {
-        neighbors.push({ neighbor: e.source, weight: e.size });
+        neighbors.push({ neighbor: e.data.source, weight: e.data.weight });
       }
     });
     const neighborRows = orderBy(neighbors, ["weight"], ["desc"]).map((neighborDetails: any, idx: number) => (

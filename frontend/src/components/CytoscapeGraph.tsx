@@ -69,11 +69,12 @@ class GraphImpl extends React.Component<IGraphProps, IGraphState> {
 
     // Check that all nodes have size & coordinates; otherwise the graph will look messed up
     const lengthBeforeFilter = graph.nodes.length;
-    graph = { ...graph, nodes: graph.nodes.filter(n => n.size && n.x && n.y) };
+    graph = { ...graph, nodes: graph.nodes.filter(n => n.data.size && n.position.x && n.position.y) };
     if (graph.nodes.length !== lengthBeforeFilter) {
       // tslint:disable-next-line:no-console
       console.error(
-        "Some nodes were missing details: " + graph.nodes.filter(n => !n.size || !n.x || !n.y).map(n => n.label)
+        "Some nodes were missing details: " +
+          graph.nodes.filter(n => !n.data.size || !n.position.x || !n.position.y).map(n => n.data.label)
       );
       this.setState({ didError: true });
     }
@@ -125,29 +126,9 @@ class GraphImpl extends React.Component<IGraphProps, IGraphState> {
       return;
     }
     this.cy = cytoscape({
-      autoungrabify: true,
+      autoungrabify: false,
       container: this.cytoscapeDiv.current,
-      elements: {
-        edges: graph.edges.map(edge => ({
-          data: {
-            id: edge.id || `${edge.source}${edge.target}`,
-            source: edge.source,
-            target: edge.target,
-            weight: edge.size
-          },
-          group: "edges" as "edges"
-        })),
-        nodes: graph.nodes.map(node => ({
-          data: {
-            id: node.id
-          },
-          group: "nodes" as "nodes",
-          position: {
-            x: node.x,
-            y: node.y
-          }
-        }))
-      },
+      elements: graph,
       layout: {
         name: "preset"
       },

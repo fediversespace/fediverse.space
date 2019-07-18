@@ -80,7 +80,7 @@ defmodule Backend.Crawler do
 
   # Save the state (after crawling) to the database.
   defp save(%Crawler{domain: domain, result: result, found_api?: true, error: nil}) do
-    now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
+    now = get_now()
 
     ## Update the instance we crawled ##
     Repo.insert!(

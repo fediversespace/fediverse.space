@@ -6,6 +6,8 @@ defmodule Backend.Repo.Migrations.CreateEdges do
       add :source_domain, references(:instances, column: :domain, type: :string), null: false
       add :target_domain, references(:instances, column: :domain, type: :string), null: false
 
+      add :weight, :float, null: false
+
       timestamps()
     end
 

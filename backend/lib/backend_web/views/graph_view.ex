@@ -16,21 +16,28 @@ defmodule BackendWeb.GraphView do
         false -> 1
       end
 
+    # This is the format that cytoscape.js expects.
     %{
-      id: node.domain,
-      label: node.domain,
-      size: size,
-      x: node.x,
-      y: node.y
+      data: %{
+        id: node.domain,
+        label: node.domain,
+        size: size
+      },
+      position: %{
+        x: node.x,
+        y: node.y
+      }
     }
   end
 
   def render("edge.json", %{graph: edge}) do
     %{
-      id: edge.id,
-      source: edge.source_domain,
-      target: edge.target_domain,
-      size: edge.weight
+      data: %{
+        id: edge.id,
+        source: edge.source_domain,
+        target: edge.target_domain,
+        weight: edge.weight
+      }
     }
   end
 end

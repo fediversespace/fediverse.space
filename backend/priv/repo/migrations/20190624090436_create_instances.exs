@@ -10,6 +10,9 @@ defmodule Backend.Repo.Migrations.CreateInstances do
       add :version, :string
       add :insularity, :float
 
+      add :x, :float
+      add :y, :float
+
       timestamps()
     end
 
@@ -18,8 +21,6 @@ defmodule Backend.Repo.Migrations.CreateInstances do
     create table(:instance_peers) do
       add :source_domain, references(:instances, column: :domain, type: :string)
       add :target_domain, references(:instances, column: :domain, type: :string)
-
-      add :weight, :float
 
       timestamps()
     end

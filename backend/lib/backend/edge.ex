@@ -13,6 +13,8 @@ defmodule Backend.Edge do
       type: :string,
       foreign_key: :target_domain
 
+    field :weight, :float
+
     timestamps()
   end
 

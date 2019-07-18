@@ -33,19 +33,24 @@ export interface IInstanceDetails {
 }
 
 interface IGraphNode {
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  size?: number;
-  color?: string;
+  data: {
+    id: string;
+    label: string;
+    size: number;
+  };
+  position: {
+    x: number;
+    y: number;
+  };
 }
 
 interface IGraphEdge {
-  source: string;
-  target: string;
-  id?: string;
-  size?: number;
+  data: {
+    source: string;
+    target: string;
+    id: string;
+    weight: number;
+  };
 }
 
 export interface IGraph {

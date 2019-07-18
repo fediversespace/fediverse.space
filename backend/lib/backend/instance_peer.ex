@@ -13,8 +13,6 @@ defmodule Backend.InstancePeer do
       type: :string,
       foreign_key: :target_domain
 
-    field :weight, :float, default: 0.0
-
     timestamps()
   end
 

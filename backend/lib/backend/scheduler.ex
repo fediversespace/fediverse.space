@@ -5,7 +5,8 @@ defmodule Backend.Scheduler do
 
   use Quantum.Scheduler, otp_app: :backend
 
-  alias Backend.{Crawl, Edge, Interaction, Instance, Repo}
+  alias Backend.{Crawl, Edge, CrawlInteraction, Instance, Repo}
+  import Backend.Util
   import Ecto.Query
   require Logger
 
@@ -30,87 +31,135 @@ defmodule Backend.Scheduler do
   end
 
   @doc """
+  Calculates every instance's "insularity score" -- that is, the percentage of mentions that are among users on the
+  instance, rather than at other instances.
+  """
+  def generate_insularity_scores() do
+    now = get_now()
+
+    crawls_subquery =
+      Crawl
+      |> select([c], %{
+        instance_domain: c.instance_domain,
+        interactions_seen: sum(c.interactions_seen)
+      })
+      |> where([c], is_nil(c.error))
+      |> group_by([c], c.instance_domain)
+
+    scores =
+      CrawlInteraction
+      |> join(:left, [ci], c in subquery(crawls_subquery),
+        on: ci.source_domain == c.instance_domain
+      )
+      |> where([ci], ci.source_domain == ci.target_domain)
+      |> group_by([ci], ci.source_domain)
+      |> select([ci, c], %{
+        domain: ci.source_domain,
+        mentions: sum(ci.mentions),
+        # we can take min() because every row is the same
+        interactions: min(c.interactions_seen)
+      })
+      |> Repo.all()
+      |> (fn o ->
+            Logger.info(inspect(o))
+            o
+          end).()
+      |> Enum.map(fn %{domain: domain, mentions: mentions, interactions: interactions} ->
+        %{
+          domain: domain,
+          insularity: mentions / interactions,
+          inserted_at: now,
+          updated_at: now
+        }
+      end)
+
+    Instance
+    |> Repo.insert_all(scores,
+      on_conflict: {:replace, [:insularity, :updated_at]},
+      conflict_target: :domain
+    )
+  end
+
+  @doc """
   This function aggregates statistics from the interactions in the database.
   It calculates the strength of edges between nodes.
-
-  TODO: generate edge weights. The weight of an edge between two instances will be
-  (number of mentions of each other) / (total number of statuses crawled).
-  This requires us to keep track of how many statuses we've seen.
   """
   def generate_edges() do
+    now = get_now()
+
+    crawls_subquery =
+      Crawl
+      |> select([c], %{
+        instance_domain: c.instance_domain,
+        statuses_seen: sum(c.statuses_seen)
+      })
+      |> where([c], is_nil(c.error))
+      |> group_by([c], c.instance_domain)
+
     interactions =
-      Interaction
-      |> select([inter], {inter.source_domain, inter.target_domain})
-      |> join(:left, [inter], i_source in Instance, on: inter.source_domain == i_source.domain)
-      |> join(:left, [inter], i_target in Instance, on: inter.target_domain == i_target.domain)
-      |> where(
-        [inter, i_source, i_target],
-        not is_nil(i_source.last_crawl_timestamp) and not is_nil(i_target.last_crawl_timestamp)
+      CrawlInteraction
+      |> join(:left, [ci], c_source in subquery(crawls_subquery),
+        on: ci.source_domain == c_source.instance_domain
       )
-      # Repo.all() returns a tuple like {"mastodon.social", "cursed.technology"}
+      |> join(:left, [ci], c_target in subquery(crawls_subquery),
+        on: ci.target_domain == c_target.instance_domain
+      )
+      |> group_by([ci], [ci.source_domain, ci.target_domain])
+      |> select([ci, c_source, c_target], %{
+        source_domain: ci.source_domain,
+        target_domain: ci.target_domain,
+        mentions: sum(ci.mentions),
+        # we can take min() because every row is the same
+        source_statuses_seen: min(c_source.statuses_seen),
+        target_statuses_seen: min(c_target.statuses_seen)
+      })
       |> Repo.all()
-      # Create a map of %{source_domain => [target_domains]}
-      |> Enum.group_by(fn tuple -> Kernel.elem(tuple, 0) end, fn tuple ->
-        Kernel.elem(tuple, 1)
-      end)
 
-    # Calculate insularity score
+    # Get edges and their weights
     Repo.transaction(fn ->
-      interactions
-      |> Enum.each(fn {source, targets} ->
-        total_mentions = length(targets)
-        self_mentions = Enum.count(targets, fn t -> t == source end)
-
-        insularity = self_mentions / total_mentions
-
-        Repo.insert!(
-          %Instance{
-            domain: source,
-            insularity: insularity
-          },
-          on_conflict: [set: [insularity: insularity]],
-          conflict_target: :domain
-        )
-      end)
-
-      # Get edges
-      edges = MapSet.new()
-
-      interactions
-      |> Enum.each(fn {source, targets} ->
-        targets
-        |> Enum.each(fn target ->
-          [key_a, key_b] = Enum.sort([source, target])
-
-          edge = %Edge{
-            source_domain: key_a,
-            target_domain: key_b
-          }
-
-          MapSet.put(edges, edge)
-          Logger.debug(inspect(edges))
-        end)
-      end)
-
-      Logger.debug(inspect(edges))
-
-      now = NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
-
-      Repo.delete_all(Edge)
+      Edge
+      |> Repo.delete_all()
 
       edges =
-        edges
-        |> MapSet.to_list()
-        |> Enum.map(fn %{source_domain: source_domain, target_domain: target_domain} ->
-          %Edge{
+        interactions
+        # Get a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
+        |> Enum.reduce(%{}, fn
+          %{
             source_domain: source_domain,
             target_domain: target_domain,
-            updated_at: now,
-            inserted_at: now
+            mentions: mentions,
+            source_statuses_seen: source_statuses_seen,
+            target_statuses_seen: target_statuses_seen
+          } = x,
+          acc ->
+            Logger.info(inspect(x))
+            key = get_interaction_key(source_domain, target_domain)
+
+            # target_statuses_seen might be nil if that instance was never crawled. default to 0.
+            target_statuses_seen =
+              case target_statuses_seen do
+                nil -> 0
+                _ -> target_statuses_seen
+              end
+
+            statuses_seen = source_statuses_seen + target_statuses_seen
+
+            Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
+              {curr_mentions + mentions, curr_statuses_seen}
+            end)
+        end)
+        |> Enum.map(fn {{source_domain, target_domain}, {mention_count, statuses_seen}} ->
+          %{
+            source_domain: source_domain,
+            target_domain: target_domain,
+            weight: mention_count / statuses_seen,
+            inserted_at: now,
+            updated_at: now
           }
         end)
 
-      Repo.insert_all(Edge, edges)
+      Edge
+      |> Repo.insert_all(edges)
     end)
   end
 end
