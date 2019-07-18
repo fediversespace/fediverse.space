@@ -46,10 +46,7 @@ deploy-backend-develop:
     url: https://phoenix.api-develop.fediverse.space
   image: ilyasemenov/gitlab-ci-git-push
   only:
-    refs:
-      - develop
-    changes:
-      - backend/*
+    - develop
   script:
     - git-push ssh://dokku@api-develop.fediverse.space:22/phoenix
 
@@ -59,9 +56,6 @@ deploy-gephi-develop:
   environment:
     name: develop
   only:
-    refs:
-      - develop
-    changes:
-      - gephi/*
+    - develop
   script:
     - git-push ssh://dokku@api-develop.fediverse.space:22/gephi
