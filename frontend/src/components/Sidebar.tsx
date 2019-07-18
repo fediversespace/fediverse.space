@@ -1,5 +1,6 @@
 import { orderBy } from "lodash";
 import moment from "moment";
+import * as numeral from "numeral";
 import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
@@ -16,6 +17,7 @@ import {
   H2,
   H4,
   HTMLTable,
+  Icon,
   NonIdealState,
   Position,
   Tab,
@@ -138,11 +140,10 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   };
 
   private renderVersionAndCounts = () => {
-    const version = this.props.instanceDetails!.version;
-    const userCount = this.props.instanceDetails!.userCount;
-    const statusCount = this.props.instanceDetails!.statusCount;
-    const domainCount = this.props.instanceDetails!.domainCount;
-    const lastUpdated = this.props.instanceDetails!.lastUpdated;
+    if (!this.props.instanceDetails) {
+      throw new Error("Did not receive instance details as expected!");
+    }
+    const { version, userCount, statusCount, domainCount, lastUpdated, insularity } = this.props.instanceDetails;
     return (
       <div>
         <HTMLTable small={true} striped={true} className="fediverse-sidebar-table">
@@ -153,15 +154,34 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
             </tr>
             <tr>
               <td>Users</td>
-              <td>{userCount || "Unknown"}</td>
+              <td>{(userCount && numeral.default(userCount).format("0,0")) || "Unknown"}</td>
             </tr>
             <tr>
               <td>Statuses</td>
-              <td>{statusCount || "Unknown"}</td>
+              <td>{(statusCount && numeral.default(statusCount).format("0,0")) || "Unknown"}</td>
+            </tr>
+            <tr>
+              <td>
+                Insularity{" "}
+                <Tooltip
+                  content={
+                    <span>
+                      The percentage of mentions that are directed
+                      <br />
+                      toward users on the same instance.
+                    </span>
+                  }
+                  position={Position.TOP}
+                  className={Classes.DARK}
+                >
+                  <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+                </Tooltip>
+              </td>
+              <td>{(insularity && numeral.default(insularity).format("0.0%")) || "Unknown"}</td>
             </tr>
             <tr>
               <td>Known peers</td>
-              <td>{domainCount || "Unknown"}</td>
+              <td>{(domainCount && numeral.default(domainCount).format("0,0")) || "Unknown"}</td>
             </tr>
             <tr>
               <td>Last updated</td>
