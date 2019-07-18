@@ -60,10 +60,6 @@ defmodule Backend.Scheduler do
         interactions: min(c.interactions_seen)
       })
       |> Repo.all()
-      |> (fn o ->
-            Logger.info(inspect(o))
-            o
-          end).()
       |> Enum.map(fn %{domain: domain, mentions: mentions, interactions: interactions} ->
         %{
           domain: domain,
@@ -82,7 +78,8 @@ defmodule Backend.Scheduler do
 
   @doc """
   This function aggregates statistics from the interactions in the database.
-  It calculates the strength of edges between nodes.
+  It calculates the strength of edges between nodes. Self-edges are not generated.
+  Edges are only generated if both instances have been succesfully crawled.
   """
   def generate_edges() do
     now = get_now()
@@ -98,12 +95,13 @@ defmodule Backend.Scheduler do
 
     interactions =
       CrawlInteraction
-      |> join(:left, [ci], c_source in subquery(crawls_subquery),
+      |> join(:inner, [ci], c_source in subquery(crawls_subquery),
         on: ci.source_domain == c_source.instance_domain
       )
-      |> join(:left, [ci], c_target in subquery(crawls_subquery),
+      |> join(:inner, [ci], c_target in subquery(crawls_subquery),
         on: ci.target_domain == c_target.instance_domain
       )
+      |> where([ci], ci.source_domain != ci.target_domain)
       |> group_by([ci], [ci.source_domain, ci.target_domain])
       |> select([ci, c_source, c_target], %{
         source_domain: ci.source_domain,
@@ -130,9 +128,8 @@ defmodule Backend.Scheduler do
             mentions: mentions,
             source_statuses_seen: source_statuses_seen,
             target_statuses_seen: target_statuses_seen
-          } = x,
+          },
           acc ->
-            Logger.info(inspect(x))
             key = get_interaction_key(source_domain, target_domain)
 
             # target_statuses_seen might be nil if that instance was never crawled. default to 0.

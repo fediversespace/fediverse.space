@@ -128,7 +128,23 @@ class GraphImpl extends React.Component<IGraphProps, IGraphState> {
     this.cy = cytoscape({
       autoungrabify: false,
       container: this.cytoscapeDiv.current,
-      elements: graph,
+      elements: {
+        edges: graph.edges.map(e => ({
+          ...e,
+          data: {
+            ...e.data,
+            weight: Math.min(Math.max(e.data.weight * 100, 2), 10)
+          },
+          selectable: false
+        })),
+        nodes: graph.nodes.map(n => ({
+          ...n,
+          data: {
+            ...n.data,
+            size: Math.min(Math.max(n.data.size * 10, 10), 80)
+          }
+        }))
+      },
       layout: {
         name: "preset"
       },
@@ -144,7 +160,22 @@ class GraphImpl extends React.Component<IGraphProps, IGraphState> {
         {
           selector: "node",
           style: {
-            "background-color": DEFAULT_NODE_COLOR
+            "background-color": DEFAULT_NODE_COLOR,
+            height: "data(size)",
+            label: "data(id)",
+            width: "data(size)"
+          }
+        },
+        {
+          selector: "edge",
+          style: {
+            width: "data(weight)"
+          }
+        },
+        {
+          selector: "label",
+          style: {
+            color: DEFAULT_NODE_COLOR
           }
         }
       ]

@@ -16,8 +16,6 @@ defmodule BackendWeb.InstanceView do
   end
 
   def render("instance_detail.json", %{instance: instance, crawl: crawl}) do
-    Logger.info("keys: #{inspect(instance)}")
-
     [status, last_updated] =
       case crawl do
         nil ->

@@ -27,18 +27,16 @@ import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 public class GraphBuilder {
+    private static final String nodeQuery = new StringBuilder().append("SELECT i.domain as id, i.domain as label")
+            .append(" FROM instances i INNER JOIN edges e ON i.domain = e.source_domain OR i.domain = e.target_domain")
+            .append(" WHERE i.user_count IS NOT NULL").toString();
 
-    private static final String nodeQuery = String.join("", "WITH successful_crawls AS (", " SELECT",
-            "   c.instance_domain AS instance_domain,", "   COUNT(c.id) AS crawl_count",
-            " FROM crawls c WHERE c.error IS NULL", " GROUP BY c.instance_domain)", " SELECT", "   i.domain AS id,",
-            "   i.domain AS label", " FROM instances i",
-            " INNER JOIN successful_crawls c ON i.domain = c.instance_domain",
-            " WHERE c.crawl_count > 0 AND i.user_count IS NOT NULL");
-
-    private static final String edgeQuery = String.join("", "SELECT", "   e.source_domain AS source,",
-            "   e.target_domain AS target,", "   e.weight AS weight", " FROM edges e");
+    private static final String edgeQuery = new StringBuilder().append("SELECT e.source_domain AS source,")
+            .append(" e.target_domain AS target, e.weight AS weight FROM edges e").toString();
 
     public static void main(String[] args) {
+        // System.out.println("Node query: " + nodeQuery);
+        // System.out.println("Edge query: " + edgeQuery);
 
         // Init project & workspace; required to do things w/ gephi
         ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
@@ -114,7 +112,14 @@ public class GraphBuilder {
             }
             throw new RuntimeException(e);
         }
-        // Update
+        // Remove all x and y
+        try {
+            PreparedStatement delStatement = conn.prepareStatement("UPDATE instances SET x=NULL, y=NULL");
+            delStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        // Update to new x's and y's
         UndirectedGraph graph = graphModel.getUndirectedGraph();
         for (Node node : graph.getNodes()) {
             String id = node.getId().toString();
