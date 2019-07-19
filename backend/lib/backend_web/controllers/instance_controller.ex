@@ -4,7 +4,7 @@ defmodule BackendWeb.InstanceController do
   import Backend.Util
   alias Backend.Api
 
-  action_fallback BackendWeb.FallbackController
+  action_fallback(BackendWeb.FallbackController)
 
   def index(conn, _params) do
     instances = Api.list_instances()
@@ -13,7 +13,7 @@ defmodule BackendWeb.InstanceController do
 
   def show(conn, %{"id" => domain}) do
     instance = Api.get_instance!(domain)
-    last_crawl = get_last_crawl(domain)
+    last_crawl = get_last_successful_crawl(domain)
     render(conn, "show.json", instance: instance, crawl: last_crawl)
   end
 
