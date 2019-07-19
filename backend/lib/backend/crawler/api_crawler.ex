@@ -38,6 +38,12 @@ defmodule Backend.Crawler.ApiCrawler do
   Check whether the instance at the given domain is of the type that this ApiCrawler implements.
   """
   @callback is_instance_type?(String.t()) :: boolean()
+
+  @doc """
+  Check whether the instance allows crawling according to its robots.txt or otherwise.
+  """
+  @callback allows_crawling?(String.t()) :: boolean()
+
   @doc """
   Crawl the instance at the given domain.
   """

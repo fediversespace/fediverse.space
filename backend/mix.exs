@@ -20,7 +20,7 @@ defmodule Backend.MixProject do
   def application do
     [
       mod: {Backend.Application, []},
-      extra_applications: [:logger, :runtime_tools, :mnesia]
+      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum]
     ]
   end
 
@@ -46,7 +46,8 @@ defmodule Backend.MixProject do
       {:honeydew, "~> 1.4.3"},
       {:quantum, "~> 2.3"},
       {:corsica, "~> 1.1.2"},
-      {:sobelow, "~> 0.8", only: :dev}
+      {:sobelow, "~> 0.8", only: :dev},
+      {:gollum, "~> 0.3.2"}
     ]
   end
 

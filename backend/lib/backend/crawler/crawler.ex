@@ -17,6 +17,7 @@ defmodule Backend.Crawler do
     # a list of ApiCrawlers that will be attempted
     :api_crawlers,
     :found_api?,
+    :allows_crawling?,
     :result,
     :error
   ]
@@ -25,6 +26,7 @@ defmodule Backend.Crawler do
           domain: String.t(),
           api_crawlers: [ApiCrawler.t()],
           found_api?: boolean,
+          allows_crawling?: boolean,
           result: ApiCrawler.t() | nil,
           error: String.t() | nil
         }
@@ -32,7 +34,15 @@ defmodule Backend.Crawler do
   def run(domain) do
     Logger.info("Crawling #{domain}...")
     HTTPoison.start()
-    state = %Crawler{domain: domain, api_crawlers: [], found_api?: false, result: nil, error: nil}
+
+    state = %Crawler{
+      domain: domain,
+      api_crawlers: [],
+      found_api?: false,
+      allows_crawling?: true,
+      result: nil,
+      error: nil
+    }
 
     state
     # register APICrawlers here
@@ -59,17 +69,22 @@ defmodule Backend.Crawler do
       Logger.debug("Found #{curr} instance")
       state = Map.put(state, :found_api?, true)
 
-      try do
-        %Crawler{state | result: curr.crawl(domain), api_crawlers: []}
-      rescue
-        e in HTTPoison.Error ->
-          Map.put(state, :error, "HTTPoison error: " <> HTTPoison.Error.message(e))
+      if curr.allows_crawling?(domain) do
+        try do
+          %Crawler{state | result: curr.crawl(domain), api_crawlers: []}
+        rescue
+          e in HTTPoison.Error ->
+            Map.put(state, :error, "HTTPoison error: " <> HTTPoison.Error.message(e))
 
-        e in Jason.DecodeError ->
-          Map.put(state, :error, "Jason DecodeError: " <> Jason.DecodeError.message(e))
+          e in Jason.DecodeError ->
+            Map.put(state, :error, "Jason DecodeError: " <> Jason.DecodeError.message(e))
 
-        e in _ ->
-          Map.put(state, :error, "Unknown error: " <> inspect(e))
+          e in _ ->
+            Map.put(state, :error, "Unknown error: " <> inspect(e))
+        end
+      else
+        Logger.debug("#{domain} does not allow crawling.")
+        Map.put(state, :allows_crawling?, false)
       end
     else
       # Nothing found so check the next APICrawler
@@ -79,7 +94,13 @@ defmodule Backend.Crawler do
   end
 
   # Save the state (after crawling) to the database.
-  defp save(%Crawler{domain: domain, result: result, found_api?: true, error: nil}) do
+  defp save(%Crawler{
+         domain: domain,
+         result: result,
+         found_api?: true,
+         error: nil,
+         allows_crawling?: true
+       }) do
     now = get_now()
 
     ## Update the instance we crawled ##
@@ -187,10 +208,13 @@ defmodule Backend.Crawler do
     |> Repo.insert_all(interactions)
   end
 
-  defp save(%{domain: domain, error: error}) do
-    if error == nil do
-      error = "no api found"
-    end
+  defp save(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
+    error =
+      cond do
+        not allows_crawling -> "robots.txt"
+        error == nil -> "no api found"
+        true -> "unknown error"
+      end
 
     Repo.insert!(%Crawl{
       instance_domain: domain,

@@ -15,6 +15,21 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   end
 
   @impl ApiCrawler
+  def allows_crawling?(domain) do
+    endpoints = [
+      "/api/v1/instance",
+      "/api/v1/instance/peers",
+      "/api/v1/timelines/public"
+    ]
+
+    user_agent = get_config(:user_agent)
+
+    endpoints
+    |> Enum.map(fn endpoint -> "https://#{domain}#{endpoint}" end)
+    |> Enum.all?(fn endpoint -> Gollum.crawlable?(user_agent, endpoint) != :uncrawlable end)
+  end
+
+  @impl ApiCrawler
   # sobelow_skip ["DOS.StringToAtom"]
   def crawl(domain) do
     instance = Jason.decode!(get!("https://#{domain}/api/v1/instance").body)
