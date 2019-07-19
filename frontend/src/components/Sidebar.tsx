@@ -5,7 +5,6 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import sanitize from "sanitize-html";
-import styled from "styled-components";
 
 import {
   AnchorButton,
@@ -30,6 +29,7 @@ import { IconNames } from "@blueprintjs/icons";
 
 import { selectAndLoadInstance } from "../redux/actions";
 import { IAppState, IGraph, IInstanceDetails } from "../redux/types";
+import FullDiv from "./atoms/FullDiv";
 import { ErrorState } from "./ErrorState";
 
 interface ISidebarProps {
@@ -104,22 +104,43 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   };
 
   private renderSidebarContents = () => {
+    let content;
     if (this.props.isLoadingInstanceDetails || this.state.isProcessingNeighbors) {
-      return this.renderLoadingState();
+      content = this.renderLoadingState();
     } else if (!this.props.instanceDetails) {
       return this.renderEmptyState();
-    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personalinstance") > -1) {
-      return this.renderPersonalInstanceErrorState();
+    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
+      content = this.renderPersonalInstanceErrorState();
     } else if (this.props.instanceDetails.status !== "success") {
-      return this.renderMissingDataState();
+      content = this.renderMissingDataState();
     } else if (this.props.instanceLoadError) {
-      return <ErrorState />;
+      return (content = <ErrorState />);
+    } else {
+      content = this.renderTabs();
     }
     return (
-      <div>
+      <FullDiv>
         {this.renderHeading()}
+        {content}
+      </FullDiv>
+    );
+  };
+
+  private renderTabs = () => {
+    const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
+
+    const insularCallout = hasNeighbors ? (
+      undefined
+    ) : (
+      <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
+        <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
+      </Callout>
+    );
+    return (
+      <div>
+        {insularCallout}
         <Tabs>
-          {this.props.instanceDetails.description && (
+          {this.props.instanceDetails!.description && (
             <Tab id="description" title="Description" panel={this.renderDescription()} />
           )}
           {this.shouldRenderStats() && <Tab id="stats" title="Details" panel={this.renderVersionAndCounts()} />}
@@ -138,7 +159,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   private renderHeading = () => {
     let content: JSX.Element;
     if (!this.props.instanceName) {
-      content = <span>{"No instance selected"}</span>;
+      return;
     } else {
       content = (
         <span>
@@ -150,19 +171,9 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
       );
     }
 
-    const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
-
-    const insularCallout = hasNeighbors ? (
-      undefined
-    ) : (
-      <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
-        <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
-      </Callout>
-    );
     return (
       <div>
         <H2>{content}</H2>
-        {insularCallout}
         <Divider />
       </div>
     );
@@ -346,8 +357,8 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         title="No data"
         description="This instance has fewer than 10 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
         action={
-          <AnchorButton icon={IconNames.CONFIRM} href="https://cursed.technology/@tao" target="_blank">
-            Message @tao to opt in
+          <AnchorButton icon={IconNames.CONFIRM} href="https://cursed.technology/@fediversespace" target="_blank">
+            Message @fediversespace to opt in
           </AnchorButton>
         }
       />
@@ -355,12 +366,8 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   };
 
   private renderMissingDataState = () => {
-    const FillDiv = styled.div`
-      width: 100%;
-      height: 100%;
-    `;
     return (
-      <FillDiv>
+      <FullDiv>
         <NonIdealState
           icon={IconNames.ERROR}
           title="No data"
@@ -369,7 +376,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         <span className="sidebar-hidden-instance-status" style={{ display: "none" }}>
           {this.props.instanceDetails && this.props.instanceDetails.status}
         </span>
-      </FillDiv>
+      </FullDiv>
     );
   };
 

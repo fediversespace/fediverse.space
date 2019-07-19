@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "jakebecker.elixir-ls",
+    "ms-vscode.vscode-typescript-tslint-plugin",
+    "kevinmcgowan.typescriptimport",
+    "msjsdiag.debugger-for-chrome"
+  ]
+}

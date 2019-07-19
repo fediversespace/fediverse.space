@@ -2,7 +2,7 @@
 .idea/
 *.gexf
 data/
-.vscode/
+*.class
 
 backend/.sobelow
 
@@ -80,6 +80,7 @@ yarn-error.log*
 
 /gephi/.gradle/
 /gephi/build/
+/gephi/bin/
 /gephi/lib/*
 /gephi/!lib/.gitkeep
 # 64MB file but I don't have much faith that it'll remain available...

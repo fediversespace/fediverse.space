@@ -6,8 +6,8 @@ import { NonIdealState, Spinner } from "@blueprintjs/core";
 
 import { fetchGraph, fetchInstances } from "../../redux/actions";
 import { IAppState, IGraph, IInstance } from "../../redux/types";
-import { CytoscapeGraph } from "../CytoscapeGraph";
 import { ErrorState } from "../ErrorState";
+import Graph from "../Graph";
 import { Sidebar } from "../Sidebar";
 
 interface IGraphScreenProps {
@@ -48,7 +48,7 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps> {
   };
 
   private graphState = () => {
-    const content = this.props.graphLoadError ? <ErrorState /> : <CytoscapeGraph />;
+    const content = this.props.graphLoadError ? <ErrorState /> : <Graph />;
     return (
       <div>
         <Sidebar />

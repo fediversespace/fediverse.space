@@ -4,7 +4,10 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
-    "lib": ["esnext", "dom"],
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": true,
@@ -20,11 +23,19 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
-    "typeRoots": ["./node_modules/@types", "./src/typings"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/typings"
+    ],
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true
   },
-  "exclude": ["node_modules", "build"],
-  "include": ["src"]
+  "exclude": [
+    "node_modules",
+    "build"
+  ],
+  "include": [
+    "src"
+  ]
 }

@@ -188,6 +188,10 @@ defmodule Backend.Crawler do
   end
 
   defp save(%{domain: domain, error: error}) do
+    if error == nil do
+      error = "no api found"
+    end
+
     Repo.insert!(%Crawl{
       instance_domain: domain,
       error: error

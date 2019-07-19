@@ -6,7 +6,15 @@ Read the latest updates on Mastodon: [@fediversespace](https://cursed.technology
 
 ![A screenshot of fediverse.space](screenshot.png)
 
+1. [Requirements](#requirements)
+2. [Running it](#running-it)
+3. [Commands](#commands)
+4. [Privacy](#privacy)
+5. [Acknowledgements](#acknowledgements)
+
 ## Requirements
+
+Though dockerized, backend development is easiest if you have the following installed.
 
 - For the scraper + API:
   - Elixir
@@ -16,8 +24,6 @@ Read the latest updates on Mastodon: [@fediversespace](https://cursed.technology
 - For the frontend:
   - Node.js
   - Yarn
-
-All of the above can also be run through Docker with `docker-compose`.
 
 ## Running it
 
@@ -37,17 +43,21 @@ All of the above can also be run through Docker with `docker-compose`.
 
 ### Backend
 
-After running the backend in Docker:
-
-- `docker-compose run gephi java -Xmx1g -jar build/libs/graphBuilder.jar` lays out the graph
-
 `./gradlew shadowJar` compiles the graph layout program. `java -Xmx1g -jar build/libs/graphBuilder.jar` runs it.
+If running in docker, this means you run
+
+- `docker-compose build gephi`
+- `docker-compose run gephi java -Xmx1g -jar build/libs/graphBuilder.jar` lays out the graph
 
 ### Frontend
 
-- `yarn build` to create an optimized build for deployment
+- `yarn build` creates an optimized build for deployment
 
-### Acknowledgements
+## Privacy
+
+This project doesn't crawl personal instances: the goal is to understand communities, not individuals. The threshold for what makes an instance "personal" is defined in the [backend config](backend/config/config.exs) and the [graph builder SQL](gephi/src/main/java/space/fediverse/graph/GraphBuilder.java).
+
+## Acknowledgements
 
 [![NLnet logo](https://i.imgur.com/huV3rvo.png)](https://nlnet.nl/project/fediverse_space/)
 
