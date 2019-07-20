@@ -10,7 +10,8 @@ Read the latest updates on Mastodon: [@fediversespace](https://cursed.technology
 2. [Running it](#running-it)
 3. [Commands](#commands)
 4. [Privacy](#privacy)
-5. [Acknowledgements](#acknowledgements)
+5. [Deployment](#deployment)
+6. [Acknowledgements](#acknowledgements)
 
 ## Requirements
 
@@ -56,6 +57,28 @@ If running in docker, this means you run
 ## Privacy
 
 This project doesn't crawl personal instances: the goal is to understand communities, not individuals. The threshold for what makes an instance "personal" is defined in the [backend config](backend/config/config.exs) and the [graph builder SQL](gephi/src/main/java/space/fediverse/graph/GraphBuilder.java).
+
+## Deployment
+You don't have to follow these instructions, but it's one way to set up a continuous deployment pipeline. The following are for the backend; the frontend is just a static HTML/JS site that can be deployed anywhere.
+1. Install [Dokku](http://dokku.viewdocs.io/dokku/) on your web server.
+2. Install [dokku-postgres](https://github.com/dokku/dokku-postgres), [dokku-monorepo](https://github.com/notpushkin/dokku-monorepo), and [dokku-letsencrypt](https://github.com/dokku/dokku-letsencrypt).
+3. Create the apps
+  * `dokku apps:create phoenix`
+  * `dokku apps:create gephi`
+4. Create the backing database
+  * `dokku postgres:create fediversedb`
+  * `dokku postgres:link fediversedb phoenix`
+  * `dokku postgres:link fediversedb gephi`
+5. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
+6. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (from your local machine or CD pipeline)
+7. Set up SSL for the Phoenix app
+  * `dokku letsencrypt phoenix`
+  * `dokku letsencrypt:cron-job --add`
+8. Set up a cron job for the graph layout (use the `dokku` user). E.g.
+```
+SHELL=/bin/bash
+0 2 * * * /usr/bin/dokku run gephi java -Xmx1g -jar build/libs/graphBuilder.jar
+```
 
 ## Acknowledgements
 
