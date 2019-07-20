@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- It's now shown in the front-end if an instance wasn't crawled because of its robots.txt.
 ### Changed
 ### Deprecated
 ### Removed

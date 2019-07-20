@@ -111,6 +111,8 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
       return this.renderEmptyState();
     } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
       content = this.renderPersonalInstanceErrorState();
+    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("robots.txt") > -1) {
+      content = this.renderRobotsTxtState();
     } else if (this.props.instanceDetails.status !== "success") {
       content = this.renderMissingDataState();
     } else if (this.props.instanceLoadError) {
@@ -377,6 +379,16 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
           {this.props.instanceDetails && this.props.instanceDetails.status}
         </span>
       </FullDiv>
+    );
+  };
+
+  private renderRobotsTxtState = () => {
+    return (
+      <NonIdealState
+        icon={<span>🤖</span>}
+        title="No data"
+        description="This instance was not crawled because its robots.txt did not allow us to."
+      />
     );
   };
 

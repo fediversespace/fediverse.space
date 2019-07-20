@@ -70,7 +70,7 @@ You don't have to follow these instructions, but it's one way to set up a contin
   * `dokku postgres:link fediversedb phoenix`
   * `dokku postgres:link fediversedb gephi`
 5. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
-6. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (from your local machine or CD pipeline)
+6. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
 7. Set up SSL for the Phoenix app
   * `dokku letsencrypt phoenix`
   * `dokku letsencrypt:cron-job --add`
