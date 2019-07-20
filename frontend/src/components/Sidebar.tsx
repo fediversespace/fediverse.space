@@ -385,7 +385,11 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   private renderRobotsTxtState = () => {
     return (
       <NonIdealState
-        icon={<span>🤖</span>}
+        icon={
+          <span role="img" aria-label="robot">
+            🤖
+          </span>
+        }
         title="No data"
         description="This instance was not crawled because its robots.txt did not allow us to."
       />
