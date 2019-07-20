@@ -1,32 +1,31 @@
 # Software Bill of Materials
 
 This is an overview of the external software components (libraries, etc.) that
-are used in fediverse.space, or that are likely to be used.
+are used in fediverse.space.
 
 ## Backend
-
-I am currently in the process of migrating from a Python and Django-based
-backend to one written in Elixir. This list is what *will* be used in the near
-future.
 ### Crawler and API
 * [Elixir](https://elixir-lang.org/) (the language)
 * [Phoenix](https://phoenixframework.org/) (the web framework)
-* [HTTPoison](https://hexdocs.pm/httpoison/readme.html) (for crawling servers)
 * See [/backend/mix.env](/backend/mix.env) for a complete overview of
   dependencies
 
 ### Graph layout
+* Java (the language)
+* Gradle (to build)
 * [Gephi toolkit](https://gephi.org/toolkit/)
 
 ## Frontend
 * [React](https://reactjs.org/) (the UI framework)
 * [Blueprint](https://blueprintjs.com/) (a collection of pre-existing UI components)
-* [Sigma.js](http://sigmajs.org/) (for graph visualization)
+* [Cytoscape.js](http://js.cytoscape.org/) (for graph visualization)
 * See [/frontend/package.json](/frontend/package.json) for a complete overview
   of dependencies
 
 ## Other
 * [Docker](https://www.docker.com/) and
   [docker-compose](https://docs.docker.com/compose/overview/)
+* The backend is deployed using [Dokku](http://dokku.viewdocs.io/dokku/).
 * The frontend is hosted on [Netlify](https://www.netlify.com/)
+* [GitLab](https://gitlab.com/) and GitLab CI/CD are used for project management and CI/CD.
 

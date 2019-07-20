@@ -1,5 +1,5 @@
 defmodule Backend.Api do
-  alias Backend.{Crawl, Edge, Instance, Repo}
+  alias Backend.{Edge, Instance, Repo}
   import Backend.Util
   import Ecto.Query
 
