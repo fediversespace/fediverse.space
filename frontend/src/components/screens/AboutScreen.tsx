@@ -1,8 +1,8 @@
 import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
 import * as React from "react";
-import { Page } from "../Page";
+import { Page } from "../atoms/";
 
-export const AboutScreen: React.FC = () => (
+const AboutScreen: React.FC = () => (
   <Page>
     <H1>About</H1>
     <p className={Classes.RUNNING_TEXT}>
@@ -85,3 +85,4 @@ export const AboutScreen: React.FC = () => (
     </p>
   </Page>
 );
+export default AboutScreen;

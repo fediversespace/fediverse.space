@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - It's now shown in the front-end if an instance wasn't crawled because of its robots.txt.
+- You can now link directly to instances at e.g. /instance/mastodon.social.
+- Instance details now have a link to the corresponding fediverse.network page.
 ### Changed
 ### Deprecated
 ### Removed

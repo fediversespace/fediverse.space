@@ -3,11 +3,12 @@ import * as React from "react";
 import { Button, Classes, Dialog } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
-import { BrowserRouter, Route } from "react-router-dom";
-import { Nav } from "./components/Nav";
-import { AboutScreen } from "./components/screens/AboutScreen";
-import { GraphScreen } from "./components/screens/GraphScreen";
-import { DESKTOP_WIDTH_THRESHOLD } from "./constants";
+import { ConnectedRouter } from "connected-react-router";
+import { Route, RouteComponentProps } from "react-router-dom";
+import { Nav } from "./components/organisms/";
+import { AboutScreen, GraphScreen } from "./components/screens/";
+import { DESKTOP_WIDTH_THRESHOLD, IInstanceDomainPath, INSTANCE_DOMAIN_PATH } from "./constants";
+import { history } from "./index";
 
 interface IAppLocalState {
   mobileDialogOpen: boolean;
@@ -20,14 +21,19 @@ export class AppRouter extends React.Component<{}, IAppLocalState> {
 
   public render() {
     return (
-      <BrowserRouter>
+      <ConnectedRouter history={history}>
         <div className={`${Classes.DARK} App`}>
           <Nav />
-          <Route exact={true} path="/" component={GraphScreen} />
+          {/* We use `children={}` instead of `component={}` such that the graph is never unmounted */}
+          <Route exact={true} path="/">
+            <Route path={INSTANCE_DOMAIN_PATH}>
+              {(routeProps: RouteComponentProps<IInstanceDomainPath>) => <GraphScreen {...routeProps} />}
+            </Route>
+          </Route>
           <Route path="/about" component={AboutScreen} />
           {this.renderMobileDialog()}
         </div>
-      </BrowserRouter>
+      </ConnectedRouter>
     );
   }
 

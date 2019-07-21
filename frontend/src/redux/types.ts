@@ -1,5 +1,7 @@
+import { RouterState } from "connected-react-router";
+
 export enum ActionType {
-  SELECT_INSTANCE = "SELECT_INSTANCE",
+  REQUEST_INSTANCE_DETAILS = "REQUEST_INSTANCE_DETAILS",
   REQUEST_INSTANCES = "REQUEST_INSTANCES",
   RECEIVE_INSTANCES = "RECEIVE_INSTANCES",
   REQUEST_GRAPH = "REQUEST_GRAPH",
@@ -60,9 +62,9 @@ export interface IGraph {
 
 // Redux state
 
+// The current instance name is stored in the URL. See state -> router -> location
 export interface ICurrentInstanceState {
   currentInstanceDetails: IInstanceDetails | null;
-  currentInstanceName: string | null;
   isLoadingInstanceDetails: boolean;
   error: boolean;
 }
@@ -76,6 +78,7 @@ export interface IDataState {
 }
 
 export interface IAppState {
+  router: RouterState;
   currentInstance: ICurrentInstanceState;
   data: IDataState;
 }

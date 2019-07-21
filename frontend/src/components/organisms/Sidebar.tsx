@@ -3,7 +3,6 @@ import moment from "moment";
 import * as numeral from "numeral";
 import * as React from "react";
 import { connect } from "react-redux";
-import { Dispatch } from "redux";
 import sanitize from "sanitize-html";
 
 import {
@@ -27,10 +26,53 @@ import {
 } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
-import { selectAndLoadInstance } from "../redux/actions";
-import { IAppState, IGraph, IInstanceDetails } from "../redux/types";
-import FullDiv from "./atoms/FullDiv";
-import { ErrorState } from "./ErrorState";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { IAppState, IGraph, IInstanceDetails } from "../../redux/types";
+import { domainMatchSelector } from "../../util";
+import { ErrorState } from "../molecules/";
+import { FullDiv } from "../styled-components";
+
+interface IClosedProp {
+  closed?: boolean;
+}
+const SidebarContainer = styled.div<IClosedProp>`
+  position: fixed;
+  top: 50px;
+  bottom: 0;
+  right: ${props => (props.closed ? "-400px" : 0)};
+  min-width: 400px;
+  width: 25%;
+  z-index: 20;
+  overflow: scroll;
+  overflow-x: hidden;
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+  @media screen and (min-width: 1600px) {
+    right: ${props => (props.closed ? "-25%" : 0)};
+  }
+`;
+const StyledCard = styled(Card)`
+  min-height: 100%;
+  width: 100%;
+`;
+const StyledButton = styled(Button)`
+  position: absolute;
+  top: 0;
+  left: -40px;
+  z-index: 20;
+  transition-property: all;
+  transition-duration: 0.5s;
+  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+`;
+const StyledHTMLTable = styled(HTMLTable)`
+  width: 100%;
+`;
+const StyledLinkToFdNetwork = styled.div`
+  margin-top: 3em;
+  text-align: center;
+`;
 
 interface ISidebarProps {
   graph?: IGraph;
@@ -38,7 +80,6 @@ interface ISidebarProps {
   instanceLoadError: boolean;
   instanceDetails: IInstanceDetails | null;
   isLoadingInstanceDetails: boolean;
-  selectAndLoadInstance: (instanceName: string) => void;
 }
 interface ISidebarState {
   isOpen: boolean;
@@ -63,21 +104,12 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   }
 
   public render() {
-    const closedClass = this.state.isOpen ? "" : " closed";
     const buttonIcon = this.state.isOpen ? IconNames.DOUBLE_CHEVRON_RIGHT : IconNames.DOUBLE_CHEVRON_LEFT;
     return (
-      <div>
-        <Button
-          onClick={this.handleToggle}
-          large={true}
-          icon={buttonIcon}
-          className={"fediverse-sidebar-toggle-button" + closedClass}
-          minimal={true}
-        />
-        <Card className={"fediverse-sidebar" + closedClass} elevation={Elevation.TWO}>
-          {this.renderSidebarContents()}
-        </Card>
-      </div>
+      <SidebarContainer closed={!this.state.isOpen}>
+        <StyledButton onClick={this.handleToggle} large={true} icon={buttonIcon} minimal={true} />
+        <StyledCard elevation={Elevation.TWO}>{this.renderSidebarContents()}</StyledCard>
+      </SidebarContainer>
     );
   }
 
@@ -149,6 +181,16 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
           <Tab id="neighbors" title="Neighbors" panel={this.renderNeighbors()} />
           <Tab id="peers" title="Known peers" panel={this.renderPeers()} />
         </Tabs>
+        <StyledLinkToFdNetwork>
+          <a
+            href={`https://fediverse.network/${this.props.instanceName}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${Classes.BUTTON} bp3-icon-${IconNames.LINK}`}
+          >
+            See more statistics at fediverse.network
+          </a>
+        </StyledLinkToFdNetwork>
       </div>
     );
   };
@@ -196,7 +238,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     const { version, userCount, statusCount, domainCount, lastUpdated, insularity } = this.props.instanceDetails;
     return (
       <div>
-        <HTMLTable small={true} striped={true} className="fediverse-sidebar-table">
+        <StyledHTMLTable small={true} striped={true}>
           <tbody>
             <tr>
               <td>Version</td>
@@ -238,7 +280,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
               <td>{moment(lastUpdated + "Z").fromNow() || "Unknown"}</td>
             </tr>
           </tbody>
-        </HTMLTable>
+        </StyledHTMLTable>
       </div>
     );
   };
@@ -261,9 +303,13 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     const neighborRows = orderBy(neighbors, ["weight"], ["desc"]).map((neighborDetails: any, idx: number) => (
       <tr key={idx}>
         <td>
-          <AnchorButton minimal={true} onClick={this.selectInstance}>
+          <Link
+            to={`/instance/${neighborDetails.neighbor}`}
+            className={`${Classes.BUTTON} ${Classes.MINIMAL}`}
+            role="button"
+          >
             {neighborDetails.neighbor}
-          </AnchorButton>
+          </Link>
         </td>
         <td>{neighborDetails.weight.toFixed(4)}</td>
       </tr>
@@ -274,7 +320,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
           The mention ratio is the average of how many times the two instances mention each other per status. A mention
           ratio of 1 would mean that every single status contained a mention of a user on the other instance.
         </p>
-        <HTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
+        <StyledHTMLTable small={true} striped={true} interactive={false}>
           <thead>
             <tr>
               <th>Instance</th>
@@ -282,7 +328,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
             </tr>
           </thead>
           <tbody>{neighborRows}</tbody>
-        </HTMLTable>
+        </StyledHTMLTable>
       </div>
     );
   };
@@ -293,11 +339,11 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
       return;
     }
     const peerRows = peers.map(instance => (
-      <tr key={instance.name} onClick={this.selectInstance}>
+      <tr key={instance.name}>
         <td>
-          <AnchorButton minimal={true} onClick={this.selectInstance}>
+          <Link to={`/instance/${instance.name}`} className={`${Classes.BUTTON} ${Classes.MINIMAL}`} role="button">
             {instance.name}
-          </AnchorButton>
+          </Link>
         </td>
       </tr>
     ));
@@ -306,9 +352,9 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         <p className={Classes.TEXT_MUTED}>
           All the instances, past and present, that {this.props.instanceName} knows about.
         </p>
-        <HTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
+        <StyledHTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
           <tbody>{peerRows}</tbody>
-        </HTMLTable>
+        </StyledHTMLTable>
       </div>
     );
   };
@@ -399,23 +445,17 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
   private openInstanceLink = () => {
     window.open("https://" + this.props.instanceName, "_blank");
   };
-
-  private selectInstance = (e: any) => {
-    this.props.selectAndLoadInstance(e.target.innerText);
-  };
 }
 
-const mapStateToProps = (state: IAppState) => ({
-  graph: state.data.graph,
-  instanceDetails: state.currentInstance.currentInstanceDetails,
-  instanceLoadError: state.currentInstance.error,
-  instanceName: state.currentInstance.currentInstanceName,
-  isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails
-});
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-  selectAndLoadInstance: (instanceName: string) => dispatch(selectAndLoadInstance(instanceName) as any)
-});
-export const Sidebar = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SidebarImpl);
+const mapStateToProps = (state: IAppState) => {
+  const match = domainMatchSelector(state);
+  return {
+    graph: state.data.graph,
+    instanceDetails: state.currentInstance.currentInstanceDetails,
+    instanceLoadError: state.currentInstance.error,
+    instanceName: match && match.params.domain,
+    isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails
+  };
+};
+const Sidebar = connect(mapStateToProps)(SidebarImpl);
+export default Sidebar;

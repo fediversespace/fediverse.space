@@ -32,6 +32,7 @@
     "@blueprintjs/icons": "^3.9.1",
     "@blueprintjs/select": "^3.9.0",
     "classnames": "^2.2.6",
+    "connected-react-router": "^6.5.2",
     "cross-fetch": "^3.0.4",
     "cytoscape": "^3.8.1",
     "cytoscape-popper": "^1.0.4",

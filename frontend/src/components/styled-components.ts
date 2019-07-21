@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export default styled.div`
+export const FullDiv = styled.div`
   width: 100%;
   height: 100%;
 `;

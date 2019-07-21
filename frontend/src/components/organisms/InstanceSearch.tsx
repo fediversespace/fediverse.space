@@ -6,14 +6,15 @@ import { Button, MenuItem } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { IItemRendererProps, ItemPredicate, Select } from "@blueprintjs/select";
 
-import { RouteComponentProps, withRouter } from "react-router";
-import { selectAndLoadInstance } from "../redux/actions";
-import { IAppState, IInstance } from "../redux/types";
+import { push } from "connected-react-router";
+import { IAppState, IInstance } from "../../redux/types";
+import { domainMatchSelector } from "../../util";
 
-interface IInstanceSearchProps extends RouteComponentProps {
+interface IInstanceSearchProps {
   currentInstanceName: string | null;
+  pathname: string;
   instances?: IInstance[];
-  selectAndLoadInstance: (instanceName: string) => void;
+  selectInstance: (instanceName: string) => void;
 }
 
 const InstanceSelect = Select.ofType<IInstance>();
@@ -26,7 +27,9 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
         itemRenderer={this.itemRenderer}
         onItemSelect={this.onItemSelect}
         itemPredicate={this.itemPredicate}
-        disabled={!this.props.instances || this.props.location.pathname !== "/"}
+        disabled={
+          !this.props.instances || (!this.props.pathname.startsWith("/instance/") && this.props.pathname !== "/")
+        }
         initialContent={this.renderInitialContent()}
         noResults={this.renderNoResults()}
         popoverProps={{ popoverClassName: "fediverse-instance-search-popover" }}
@@ -66,20 +69,23 @@ class InstanceSearchImpl extends React.Component<IInstanceSearchProps> {
   };
 
   private onItemSelect = (item: IInstance, event?: React.SyntheticEvent<HTMLElement>) => {
-    this.props.selectAndLoadInstance(item.name);
+    this.props.selectInstance(item.name);
   };
 }
 
-const mapStateToProps = (state: IAppState) => ({
-  currentInstanceName: state.currentInstance.currentInstanceName,
-  instances: state.data.instances
-});
+const mapStateToProps = (state: IAppState) => {
+  const match = domainMatchSelector(state);
+  return {
+    currentInstanceName: match && match.params.domain,
+    instances: state.data.instances,
+    pathname: state.router.location.pathname
+  };
+};
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  selectAndLoadInstance: (instanceName: string) => dispatch(selectAndLoadInstance(instanceName) as any)
+  selectInstance: (domain: string) => dispatch(push(`/instance/${domain}`))
 });
-export const InstanceSearch = withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(InstanceSearchImpl)
-);
+const InstanceSearch = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InstanceSearchImpl);
+export default InstanceSearch;

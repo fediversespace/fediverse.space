@@ -68,6 +68,6 @@ config :backend, :crawler,
 
 config :backend, Backend.Scheduler,
   jobs: [
-    # Every 15 minutes
-    {"*/15 * * * *", {Backend.Scheduler, :prune_crawls, [12, "hour"]}}
+    # Every 5 minutes
+    {"*/5 * * * *", {Backend.Scheduler, :prune_crawls, [12, "month"]}}
   ]

@@ -1,13 +1,14 @@
 import { Dispatch } from "redux";
 
+import { push } from "connected-react-router";
 import { getFromApi } from "../util";
-import { ActionType, IGraph, IInstance, IInstanceDetails } from "./types";
+import { ActionType, IAppState, IGraph, IInstance, IInstanceDetails } from "./types";
 
-// selectInstance and deselectInstance are not exported since we only call them from selectAndLoadInstance()
-const selectInstance = (instanceName: string) => {
+// requestInstanceDetails and deselectInstance are not exported since we only call them from loadInstance()
+const requestInstanceDetails = (instanceName: string) => {
   return {
     payload: instanceName,
-    type: ActionType.SELECT_INSTANCE
+    type: ActionType.REQUEST_INSTANCE_DETAILS
   };
 };
 const deselectInstance = () => {
@@ -71,13 +72,16 @@ export const fetchInstances = () => {
   };
 };
 
-export const selectAndLoadInstance = (instanceName: string) => {
-  return (dispatch: Dispatch) => {
+export const loadInstance = (instanceName: string | null) => {
+  return (dispatch: Dispatch, getState: () => IAppState) => {
     if (!instanceName) {
       dispatch(deselectInstance());
+      if (getState().router.location.pathname.startsWith("/instance/")) {
+        dispatch(push("/"));
+      }
       return;
     }
-    dispatch(selectInstance(instanceName));
+    dispatch(requestInstanceDetails(instanceName));
     return getFromApi("instances/" + instanceName)
       .then(details => dispatch(receiveInstanceDetails(details)))
       .catch(e => dispatch(instanceLoadFailed()));

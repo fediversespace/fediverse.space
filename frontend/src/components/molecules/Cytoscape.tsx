@@ -1,30 +1,32 @@
 import cytoscape from "cytoscape";
-import popper from "cytoscape-popper";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import tippy, { Instance } from "tippy.js";
-import { DEFAULT_NODE_COLOR, SELECTED_NODE_COLOR } from "../constants";
+import { DEFAULT_NODE_COLOR, SELECTED_NODE_COLOR } from "../../constants";
 
-const EntireWindowDiv = styled.div`
-  position: absolute;
-  top: 50px;
-  bottom: 0;
-  right: 0;
-  left: 0;
+const CytoscapeContainer = styled.div`
+  width: 100%;
+  height: 100%;
 `;
 
 interface ICytoscapeProps {
+  currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
-  onInstanceSelect: (domain: string) => void;
-  onInstanceDeselect: () => void;
+  navigateToInstancePath: (domain: string) => void;
+  navigateToRoot: () => void;
 }
 class Cytoscape extends React.Component<ICytoscapeProps> {
-  public cy?: cytoscape.Core;
+  private cy?: cytoscape.Core;
+
+  public shouldComponentUpdate(prevProps: ICytoscapeProps) {
+    // We only want to update this component if the current instance selection changes.
+    // We know that the `elements` prop will never change so we skip the expensive computations here.
+    return prevProps.currentNodeId !== this.props.currentNodeId;
+  }
 
   public componentDidMount() {
     const container = ReactDOM.findDOMNode(this);
-    cytoscape.use(popper as any);
     this.cy = cytoscape({
       autoungrabify: true,
       container: container as any,
@@ -90,11 +92,11 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
         "font-size": 50,
         "min-zoomed-font-size": 16
       })
-      .selector(".hidden")
+      .selector(".hidden") // used to hide nodes not in the neighborhood of the selected
       .style({
         display: "none"
       })
-      .selector(".thickEdge")
+      .selector(".thickEdge") // when a node is selected, make edges thicker so you can actually see them
       .style({
         width: 2
       })
@@ -102,8 +104,8 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
 
     this.cy.nodes().on("select", e => {
       const instanceId = e.target.data("id");
-      if (instanceId) {
-        this.props.onInstanceSelect(instanceId);
+      if (instanceId && instanceId !== this.props.currentNodeId) {
+        this.props.navigateToInstancePath(instanceId);
       }
 
       const neighborhood = this.cy!.$id(instanceId).closedNeighborhood();
@@ -119,7 +121,6 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
       });
     });
     this.cy.nodes().on("unselect", e => {
-      this.props.onInstanceDeselect();
       this.cy!.batch(() => {
         this.cy!.nodes().removeClass("hidden");
         this.cy!.edges().removeClass("thickEdge");
@@ -128,14 +129,17 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
     this.cy.on("click", e => {
       // Clicking on the background should also deselect
       const target = e.target;
-      if (!target) {
-        this.props.onInstanceDeselect();
+      if (!target || target === this.cy || target.isEdge()) {
+        // Go to the URL "/"
+        this.props.navigateToRoot();
       }
-      this.cy!.batch(() => {
-        this.cy!.nodes().removeClass("hidden");
-        this.cy!.edges().removeClass("thickEdge");
-      });
     });
+
+    this.setNodeSelection();
+  }
+
+  public componentDidUpdate(prevProps: ICytoscapeProps) {
+    this.setNodeSelection(prevProps.currentNodeId);
   }
 
   public componentWillUnmount() {
@@ -145,8 +149,47 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
   }
 
   public render() {
-    return <EntireWindowDiv />;
+    return <CytoscapeContainer />;
   }
+
+  public resetGraphPosition() {
+    if (!this.cy) {
+      return;
+    }
+    const { currentNodeId } = this.props;
+    if (currentNodeId) {
+      this.cy.zoom({
+        level: 0.2,
+        position: this.cy.$id(currentNodeId).position()
+      });
+    } else {
+      this.cy.zoom({
+        level: 0.2,
+        position: { x: 0, y: 0 }
+      });
+    }
+  }
+
+  /**
+   * Updates cytoscape's internal state to match our props.
+   */
+  private setNodeSelection = (prevNodeId?: string | null) => {
+    if (!this.cy) {
+      return;
+    }
+    if (prevNodeId) {
+      this.cy.$id(prevNodeId).unselect();
+    }
+
+    const { currentNodeId } = this.props;
+    if (currentNodeId) {
+      // Select instance
+      this.cy.$id(currentNodeId).select();
+      // Center it
+      const selected = this.cy.$id(currentNodeId);
+      this.cy.center(selected);
+    }
+  };
 }
 
 export default Cytoscape;

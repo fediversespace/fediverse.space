@@ -1,5 +1,7 @@
+import { connectRouter } from "connected-react-router";
 import { combineReducers } from "redux";
 
+import { History } from "history";
 import { ActionType, IAction, ICurrentInstanceState, IDataState } from "./types";
 
 const initialDataState = {
@@ -46,29 +48,29 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
 
 const initialCurrentInstanceState: ICurrentInstanceState = {
   currentInstanceDetails: null,
-  currentInstanceName: null,
   error: false,
   isLoadingInstanceDetails: false
 };
 const currentInstance = (state = initialCurrentInstanceState, action: IAction): ICurrentInstanceState => {
   switch (action.type) {
-    case ActionType.SELECT_INSTANCE:
+    case ActionType.REQUEST_INSTANCE_DETAILS:
       return {
         ...state,
-        currentInstanceName: action.payload,
+        error: false,
         isLoadingInstanceDetails: true
       };
     case ActionType.RECEIVE_INSTANCE_DETAILS:
       return {
         ...state,
         currentInstanceDetails: action.payload,
+        error: false,
         isLoadingInstanceDetails: false
       };
     case ActionType.DESELECT_INSTANCE:
       return {
         ...state,
         currentInstanceDetails: null,
-        currentInstanceName: null
+        error: false
       };
     case ActionType.INSTANCE_LOAD_ERROR:
       return {
@@ -81,7 +83,10 @@ const currentInstance = (state = initialCurrentInstanceState, action: IAction): 
   }
 };
 
-export const rootReducer = combineReducers({
-  currentInstance,
-  data
-});
+export default (history: History) =>
+  combineReducers({
+    router: connectRouter(history),
+    // tslint:disable-next-line:object-literal-sort-keys
+    currentInstance,
+    data
+  });

@@ -3,6 +3,7 @@
 The React frontend for [fediverse.space](https://fediverse.space). Written in Typescript.
 
 - Set the environment variable `REACT_APP_STAGING=true` when building to use the staging backend.
+- React components are organized into atoms, molecules, organisms, and screens according to [Atomic Design](http://bradfrost.com/blog/post/atomic-web-design/).
 
 # Default README
 

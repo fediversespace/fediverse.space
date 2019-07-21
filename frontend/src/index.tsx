@@ -4,6 +4,8 @@ import "../node_modules/@blueprintjs/select/lib/css/blueprint-select.css";
 import "../node_modules/normalize.css/normalize.css";
 import "./index.css";
 
+import cytoscape from "cytoscape";
+import popper from "cytoscape-popper";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -12,16 +14,26 @@ import thunk from "redux-thunk";
 
 import { FocusStyleManager } from "@blueprintjs/core";
 
+import { routerMiddleware } from "connected-react-router";
+import { createBrowserHistory } from "history";
 import { AppRouter } from "./AppRouter";
-import { rootReducer } from "./redux/reducers";
+import createRootReducer from "./redux/reducers";
 
 // https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
 
+export const history = createBrowserHistory();
+
 // Initialize redux
 // @ts-ignore
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(rootReducer, composeEnhancers(applyMiddleware(thunk)));
+const store = createStore(
+  createRootReducer(history),
+  composeEnhancers(applyMiddleware(routerMiddleware(history), thunk))
+);
+
+// Initialize cytoscape plugins
+cytoscape.use(popper as any);
 
 ReactDOM.render(
   <Provider store={store}>
@@ -30,8 +42,8 @@ ReactDOM.render(
   document.getElementById("root") as HTMLElement
 );
 
-if (process.env.NODE_ENV !== "production") {
-  // tslint:disable-next-line:no-var-requires
-  const axe = require("react-axe");
-  axe(React, ReactDOM, 5000);
-}
+// if (process.env.NODE_ENV !== "production") {
+//   // tslint:disable-next-line:no-var-requires
+//   const axe = require("react-axe");
+//   axe(React, ReactDOM, 5000);
+// }
