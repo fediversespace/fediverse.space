@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed
 ### Fixed
+- Previously, direct links to /about would return a 404 on Netlify's infrastructure. Now it's fixed.
 ### Security
 
 ## [2.0.0] - 2019-07-20
