@@ -89,7 +89,7 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
       .selector("node[label]")
       .style({
         color: DEFAULT_NODE_COLOR,
-        "font-size": 50,
+        "font-size": "mapData(size, 1, 6, 10, 100)",
         "min-zoomed-font-size": 16
       })
       .selector(".hidden") // used to hide nodes not in the neighborhood of the selected

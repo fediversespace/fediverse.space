@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - You can now link directly to instances at e.g. /instance/mastodon.social.
 - Instance details now have a link to the corresponding fediverse.network page.
 ### Changed
+- You no longer have to zoom completely in to see labels.
+- Label size is now dependent on the instance size.
 ### Deprecated
 ### Removed
 ### Fixed
@@ -26,8 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - To improve performance, instances with no neighbors are no longer shown on the graph.
 ### Deprecated
 - The /api/v1 endpoint no longer exists; now there's a new /api.
-### Removed
-### Fixed
 ### Security
 - Spam domains can be blacklisted in the backend crawler's config.
 - Add basic automated security scanning (using [Sobelow](https://github.com/andmarti1424/sc-im.git) and Gitlab's dependency scanning).
