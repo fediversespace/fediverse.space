@@ -3,13 +3,13 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 
-import { NonIdealState, Spinner } from "@blueprintjs/core";
-
-import { fetchGraph, fetchInstances, loadInstance } from "../../redux/actions";
+import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
+import { InstanceScreen, SearchScreen } from ".";
+import { INSTANCE_DOMAIN_PATH } from "../../constants";
+import { loadInstance } from "../../redux/actions";
 import { IAppState } from "../../redux/types";
 import { domainMatchSelector } from "../../util";
-import { ErrorState } from "../molecules/";
-import { Graph, Sidebar } from "../organisms/";
+import { Graph, SidebarContainer } from "../organisms/";
 
 const GraphContainer = styled.div`
   display: flex;
@@ -24,39 +24,22 @@ const FullDiv = styled.div`
   right: 0;
 `;
 
-interface IGraphScreenProps {
+interface IGraphScreenProps extends RouteComponentProps {
   currentInstanceName: string | null;
   pathname: string;
-  isLoadingGraph: boolean;
-  isLoadingInstances: boolean;
   graphLoadError: boolean;
   loadInstance: (domain: string | null) => void;
-  fetchInstances: () => void;
-  fetchGraph: () => void;
 }
 /**
  * This component takes care of loading or deselecting the current instance when the URL path changes.
+ * It also handles changing and animating the screen shown in the sidebar.
  */
 class GraphScreenImpl extends React.Component<IGraphScreenProps> {
   public render() {
-    let content;
-    if (this.props.isLoadingInstances || this.props.isLoadingGraph) {
-      content = this.loadingState("Loading...");
-    } else if (!!this.props.graphLoadError) {
-      content = <ErrorState />;
-    } else {
-      content = (
-        <GraphContainer>
-          <Graph />
-          <Sidebar />
-        </GraphContainer>
-      );
-    }
-    return <FullDiv>{content}</FullDiv>;
+    return <Route render={this.renderRoutes} />;
   }
 
   public componentDidMount() {
-    this.loadInstancesAndGraph();
     this.loadCurrentInstance();
   }
 
@@ -64,23 +47,24 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps> {
     this.loadCurrentInstance(prevProps.currentInstanceName);
   }
 
-  private loadInstancesAndGraph = () => {
-    if (!this.props.isLoadingGraph && !this.props.graphLoadError) {
-      this.props.fetchGraph();
-    }
-    if (!this.props.isLoadingInstances && !this.props.graphLoadError) {
-      this.props.fetchInstances();
-    }
-  };
+  private renderRoutes = ({ location }: RouteComponentProps) => (
+    <FullDiv>
+      <GraphContainer>
+        <Graph />
+        <SidebarContainer>
+          <Switch>
+            <Route path={INSTANCE_DOMAIN_PATH} component={InstanceScreen} />
+            <Route exact={true} path="/" component={SearchScreen} />
+          </Switch>
+        </SidebarContainer>
+      </GraphContainer>
+    </FullDiv>
+  );
 
   private loadCurrentInstance = (prevInstanceName?: string | null) => {
     if (prevInstanceName !== this.props.currentInstanceName) {
       this.props.loadInstance(this.props.currentInstanceName);
     }
-  };
-
-  private loadingState = (title?: string) => {
-    return <NonIdealState icon={<Spinner />} title={title || "Loading..."} />;
   };
 }
 
@@ -88,21 +72,15 @@ const mapStateToProps = (state: IAppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
-    graph: state.data.graph,
     graphLoadError: state.data.error,
-    instances: state.data.instances,
-    isLoadingGraph: state.data.isLoadingGraph,
-    isLoadingInstances: state.data.isLoadingInstances,
     pathname: state.router.location.pathname
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  fetchGraph: () => dispatch(fetchGraph() as any),
-  fetchInstances: () => dispatch(fetchInstances() as any),
   loadInstance: (domain: string | null) => dispatch(loadInstance(domain) as any)
 });
 const GraphScreen = connect(
   mapStateToProps,
   mapDispatchToProps
 )(GraphScreenImpl);
-export default GraphScreen;
+export default withRouter(GraphScreen);

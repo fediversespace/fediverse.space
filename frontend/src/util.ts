@@ -12,8 +12,7 @@ if (["true", true, 1, "1"].indexOf(process.env.REACT_APP_STAGING || "") > -1) {
 
 export const getFromApi = (path: string): Promise<any> => {
   const domain = API_ROOT.endsWith("/") ? API_ROOT : API_ROOT + "/";
-  path = path.endsWith("/") ? path : path + "/";
-  return fetch(domain + path).then(response => response.json());
+  return fetch(encodeURI(domain + path)).then(response => response.json());
 };
 
 export const domainMatchSelector = createMatchSelector<IAppState, IInstanceDomainPath>(INSTANCE_DOMAIN_PATH);

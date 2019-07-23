@@ -3,6 +3,8 @@ defmodule Backend.Repo do
     otp_app: :backend,
     adapter: Ecto.Adapters.Postgres
 
+  use Paginator
+
   def init(_type, config) do
     {:ok, Keyword.put(config, :url, System.get_env("DATABASE_URL"))}
   end

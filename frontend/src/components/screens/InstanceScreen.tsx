@@ -1,7 +1,7 @@
 import { orderBy } from "lodash";
 import moment from "moment";
 import * as numeral from "numeral";
-import * as React from "react";
+import React from "react";
 import { connect } from "react-redux";
 import sanitize from "sanitize-html";
 
@@ -9,113 +9,121 @@ import {
   AnchorButton,
   Button,
   Callout,
-  Card,
   Classes,
   Code,
   Divider,
-  Elevation,
   H2,
-  H4,
   HTMLTable,
   Icon,
   NonIdealState,
   Position,
+  Spinner,
   Tab,
   Tabs,
   Tooltip
 } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
+import { push } from "connected-react-router";
 import { Link } from "react-router-dom";
+import { Dispatch } from "redux";
 import styled from "styled-components";
 import { IAppState, IGraph, IInstanceDetails } from "../../redux/types";
 import { domainMatchSelector } from "../../util";
 import { ErrorState } from "../molecules/";
-import { FullDiv } from "../styled-components";
 
-interface IClosedProp {
-  closed?: boolean;
-}
-const SidebarContainer = styled.div<IClosedProp>`
-  position: fixed;
-  top: 50px;
-  bottom: 0;
-  right: ${props => (props.closed ? "-400px" : 0)};
-  min-width: 400px;
-  width: 25%;
-  z-index: 20;
-  overflow: scroll;
-  overflow-x: hidden;
-  transition-property: all;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
-  @media screen and (min-width: 1600px) {
-    right: ${props => (props.closed ? "-25%" : 0)};
-  }
+const InstanceScreenContainer = styled.div`
+  margin-bottom: auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 `;
-const StyledCard = styled(Card)`
-  min-height: 100%;
+const HeadingContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   width: 100%;
 `;
-const StyledButton = styled(Button)`
-  position: absolute;
-  top: 0;
-  left: -40px;
-  z-index: 20;
-  transition-property: all;
-  transition-duration: 0.5s;
-  transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+const StyledHeadingH2 = styled(H2)`
+  margin: 0;
+`;
+const StyledCloseButton = styled(Button)`
+  justify-self: flex-end;
+`;
+const StyledHeadingTooltip = styled(Tooltip)`
+  margin-left: 5px;
+  flex-grow: 1;
 `;
 const StyledHTMLTable = styled(HTMLTable)`
   width: 100%;
 `;
 const StyledLinkToFdNetwork = styled.div`
-  margin-top: 3em;
   text-align: center;
+  margin-top: auto;
 `;
-
-interface ISidebarProps {
+const StyledTabs = styled(Tabs)`
+  width: 100%;
+`;
+interface IInstanceScreenProps {
   graph?: IGraph;
   instanceName: string | null;
   instanceLoadError: boolean;
   instanceDetails: IInstanceDetails | null;
   isLoadingInstanceDetails: boolean;
+  navigateToRoot: () => void;
 }
-interface ISidebarState {
-  isOpen: boolean;
+
+interface IInstanceScreenState {
   neighbors?: string[];
   isProcessingNeighbors: boolean;
 }
-class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
-  constructor(props: ISidebarProps) {
+class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInstanceScreenState> {
+  public constructor(props: IInstanceScreenProps) {
     super(props);
-    const isOpen = window.innerWidth >= 900 ? true : false;
-    this.state = { isOpen, isProcessingNeighbors: false };
+    this.state = { isProcessingNeighbors: false };
+  }
+
+  public render() {
+    let content;
+    if (this.props.isLoadingInstanceDetails || this.state.isProcessingNeighbors) {
+      content = this.renderLoadingState();
+    } else if (!this.props.instanceDetails) {
+      return this.renderEmptyState();
+    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
+      content = this.renderPersonalInstanceErrorState();
+    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("robots.txt") > -1) {
+      content = this.renderRobotsTxtState();
+    } else if (this.props.instanceDetails.status !== "success") {
+      content = this.renderMissingDataState();
+    } else if (this.props.instanceLoadError) {
+      return (content = <ErrorState />);
+    } else {
+      content = this.renderTabs();
+    }
+    return (
+      <InstanceScreenContainer>
+        <HeadingContainer>
+          <StyledHeadingH2>{this.props.instanceName}</StyledHeadingH2>
+          <StyledHeadingTooltip content="Open link in new tab" position={Position.TOP} className={Classes.DARK}>
+            <AnchorButton icon={IconNames.LINK} minimal={true} onClick={this.openInstanceLink} />
+          </StyledHeadingTooltip>
+          <StyledCloseButton icon={IconNames.CROSS} onClick={this.props.navigateToRoot} />
+        </HeadingContainer>
+        <Divider />
+        {content}
+      </InstanceScreenContainer>
+    );
   }
 
   public componentDidMount() {
     this.processEdgesToFindNeighbors();
   }
 
-  public componentDidUpdate(prevProps: ISidebarProps, prevState: ISidebarState) {
+  public componentDidUpdate(prevProps: IInstanceScreenProps, prevState: IInstanceScreenState) {
     if (prevProps.instanceName !== this.props.instanceName) {
       this.processEdgesToFindNeighbors();
     }
   }
-
-  public render() {
-    const buttonIcon = this.state.isOpen ? IconNames.DOUBLE_CHEVRON_RIGHT : IconNames.DOUBLE_CHEVRON_LEFT;
-    return (
-      <SidebarContainer closed={!this.state.isOpen}>
-        <StyledButton onClick={this.handleToggle} large={true} icon={buttonIcon} minimal={true} />
-        <StyledCard elevation={Elevation.TWO}>{this.renderSidebarContents()}</StyledCard>
-      </SidebarContainer>
-    );
-  }
-
-  private handleToggle = () => {
-    this.setState({ isOpen: !this.state.isOpen });
-  };
 
   private processEdgesToFindNeighbors = () => {
     const { graph, instanceName } = this.props;
@@ -135,92 +143,44 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     this.setState({ neighbors, isProcessingNeighbors: false });
   };
 
-  private renderSidebarContents = () => {
-    let content;
-    if (this.props.isLoadingInstanceDetails || this.state.isProcessingNeighbors) {
-      content = this.renderLoadingState();
-    } else if (!this.props.instanceDetails) {
-      return this.renderEmptyState();
-    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
-      content = this.renderPersonalInstanceErrorState();
-    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("robots.txt") > -1) {
-      content = this.renderRobotsTxtState();
-    } else if (this.props.instanceDetails.status !== "success") {
-      content = this.renderMissingDataState();
-    } else if (this.props.instanceLoadError) {
-      return (content = <ErrorState />);
-    } else {
-      content = this.renderTabs();
-    }
-    return (
-      <FullDiv>
-        {this.renderHeading()}
-        {content}
-      </FullDiv>
-    );
-  };
-
   private renderTabs = () => {
     const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
 
-    const insularCallout = hasNeighbors ? (
-      undefined
-    ) : (
-      <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
-        <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
-      </Callout>
-    );
+    const insularCallout =
+      this.props.graph && !this.state.isProcessingNeighbors && !hasNeighbors ? (
+        <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
+          <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
+        </Callout>
+      ) : (
+        undefined
+      );
     return (
-      <div>
+      <>
         {insularCallout}
-        <Tabs>
+        <StyledTabs>
           {this.props.instanceDetails!.description && (
             <Tab id="description" title="Description" panel={this.renderDescription()} />
           )}
           {this.shouldRenderStats() && <Tab id="stats" title="Details" panel={this.renderVersionAndCounts()} />}
           <Tab id="neighbors" title="Neighbors" panel={this.renderNeighbors()} />
           <Tab id="peers" title="Known peers" panel={this.renderPeers()} />
-        </Tabs>
+        </StyledTabs>
         <StyledLinkToFdNetwork>
-          <a
+          <AnchorButton
             href={`https://fediverse.network/${this.props.instanceName}`}
+            minimal={true}
+            rightIcon={IconNames.SHARE}
             target="_blank"
-            rel="noopener noreferrer"
-            className={`${Classes.BUTTON} bp3-icon-${IconNames.LINK}`}
-          >
-            See more statistics at fediverse.network
-          </a>
+            text="See more statistics at fediverse.network"
+          />
         </StyledLinkToFdNetwork>
-      </div>
+      </>
     );
   };
 
   private shouldRenderStats = () => {
     const details = this.props.instanceDetails;
     return details && (details.version || details.userCount || details.statusCount || details.domainCount);
-  };
-
-  private renderHeading = () => {
-    let content: JSX.Element;
-    if (!this.props.instanceName) {
-      return;
-    } else {
-      content = (
-        <span>
-          {this.props.instanceName + "  "}
-          <Tooltip content="Open link in new tab" position={Position.TOP} className={Classes.DARK}>
-            <AnchorButton icon={IconNames.LINK} minimal={true} onClick={this.openInstanceLink} />
-          </Tooltip>
-        </span>
-      );
-    }
-
-    return (
-      <div>
-        <H2>{content}</H2>
-        <Divider />
-      </div>
-    );
   };
 
   private renderDescription = () => {
@@ -237,51 +197,49 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     }
     const { version, userCount, statusCount, domainCount, lastUpdated, insularity } = this.props.instanceDetails;
     return (
-      <div>
-        <StyledHTMLTable small={true} striped={true}>
-          <tbody>
-            <tr>
-              <td>Version</td>
-              <td>{<Code>{version}</Code> || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td>Users</td>
-              <td>{(userCount && numeral.default(userCount).format("0,0")) || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td>Statuses</td>
-              <td>{(statusCount && numeral.default(statusCount).format("0,0")) || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td>
-                Insularity{" "}
-                <Tooltip
-                  content={
-                    <span>
-                      The percentage of mentions that are directed
-                      <br />
-                      toward users on the same instance.
-                    </span>
-                  }
-                  position={Position.TOP}
-                  className={Classes.DARK}
-                >
-                  <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
-                </Tooltip>
-              </td>
-              <td>{(insularity && numeral.default(insularity).format("0.0%")) || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td>Known peers</td>
-              <td>{(domainCount && numeral.default(domainCount).format("0,0")) || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td>Last updated</td>
-              <td>{moment(lastUpdated + "Z").fromNow() || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </StyledHTMLTable>
-      </div>
+      <StyledHTMLTable small={true} striped={true}>
+        <tbody>
+          <tr>
+            <td>Version</td>
+            <td>{<Code>{version}</Code> || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>Users</td>
+            <td>{(userCount && numeral.default(userCount).format("0,0")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>Statuses</td>
+            <td>{(statusCount && numeral.default(statusCount).format("0,0")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>
+              Insularity{" "}
+              <Tooltip
+                content={
+                  <span>
+                    The percentage of mentions that are directed
+                    <br />
+                    toward users on the same instance.
+                  </span>
+                }
+                position={Position.TOP}
+                className={Classes.DARK}
+              >
+                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+              </Tooltip>
+            </td>
+            <td>{(insularity && numeral.default(insularity).format("0.0%")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>Known peers</td>
+            <td>{(domainCount && numeral.default(domainCount).format("0,0")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>Last updated</td>
+            <td>{moment(lastUpdated + "Z").fromNow() || "Unknown"}</td>
+          </tr>
+        </tbody>
+      </StyledHTMLTable>
     );
   };
 
@@ -369,34 +327,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
     );
   };
 
-  private renderLoadingState = () => {
-    return (
-      <div>
-        <H4>
-          <span className={Classes.SKELETON}>Description</span>
-        </H4>
-        <p className={Classes.SKELETON}>
-          Eaque rerum sequi unde omnis voluptatibus non quia fugit. Dignissimos asperiores aut incidunt. Cupiditate sit
-          voluptates quia nulla et saepe id suscipit. Voluptas sed rerum placeat consectetur pariatur necessitatibus
-          tempora. Eaque rerum sequi unde omnis voluptatibus non quia fugit. Dignissimos asperiores aut incidunt.
-          Cupiditate sit voluptates quia nulla et saepe id suscipit. Voluptas sed rerum placeat consectetur pariatur
-          necessitatibus tempora.
-        </p>
-        <H4>
-          <span className={Classes.SKELETON}>Version</span>
-        </H4>
-        <p className={Classes.SKELETON}>Eaque rerum sequi unde omnis voluptatibus non quia fugit.</p>
-        <H4>
-          <span className={Classes.SKELETON}>Stats</span>
-        </H4>
-        <p className={Classes.SKELETON}>
-          Eaque rerum sequi unde omnis voluptatibus non quia fugit. Dignissimos asperiores aut incidunt. Cupiditate sit
-          voluptates quia nulla et saepe id suscipit. Eaque rerum sequi unde omnis voluptatibus non quia fugit.
-          Dignissimos asperiores aut incidunt. Cupiditate sit voluptates quia nulla et saepe id suscipit.
-        </p>
-      </div>
-    );
-  };
+  private renderLoadingState = () => <NonIdealState icon={<Spinner />} />;
 
   private renderPersonalInstanceErrorState = () => {
     return (
@@ -415,7 +346,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
 
   private renderMissingDataState = () => {
     return (
-      <FullDiv>
+      <>
         <NonIdealState
           icon={IconNames.ERROR}
           title="No data"
@@ -424,7 +355,7 @@ class SidebarImpl extends React.Component<ISidebarProps, ISidebarState> {
         <span className="sidebar-hidden-instance-status" style={{ display: "none" }}>
           {this.props.instanceDetails && this.props.instanceDetails.status}
         </span>
-      </FullDiv>
+      </>
     );
   };
 
@@ -457,5 +388,11 @@ const mapStateToProps = (state: IAppState) => {
     isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails
   };
 };
-const Sidebar = connect(mapStateToProps)(SidebarImpl);
-export default Sidebar;
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  navigateToRoot: () => dispatch(push("/"))
+});
+const InstanceScreen = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InstanceScreenImpl);
+export default InstanceScreen;

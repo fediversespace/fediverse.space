@@ -2,13 +2,14 @@ defmodule BackendWeb.Router do
   use BackendWeb, :router
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug(:accepts, ["json"])
   end
 
   scope "/api", BackendWeb do
-    pipe_through :api
+    pipe_through(:api)
 
-    resources "/instances", InstanceController, only: [:index, :show]
-    resources "/graph", GraphController, only: [:index]
+    resources("/instances", InstanceController, only: [:index, :show])
+    resources("/graph", GraphController, only: [:index])
+    resources("/search", SearchController, only: [:index])
   end
 end

@@ -5,7 +5,6 @@ import { IconNames } from "@blueprintjs/icons";
 
 import { Classes } from "@blueprintjs/core";
 import { match, NavLink } from "react-router-dom";
-import { InstanceSearch } from ".";
 import { IInstanceDomainPath } from "../../constants";
 
 interface INavState {
@@ -44,9 +43,6 @@ class Nav extends React.Component<{}, INavState> {
           >
             About
           </NavLink>
-        </Navbar.Group>
-        <Navbar.Group align={Alignment.RIGHT}>
-          <InstanceSearch />
         </Navbar.Group>
       </Navbar>
     );

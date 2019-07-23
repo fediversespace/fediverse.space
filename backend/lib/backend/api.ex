@@ -52,4 +52,16 @@ defmodule Backend.Api do
     )
     |> Repo.all()
   end
+
+  def search_instances(query, cursor_after \\ nil) do
+    ilike_query = "%#{query}%"
+
+    %{entries: instances, metadata: metadata} =
+      Instance
+      |> where([i], ilike(i.domain, ^ilike_query))
+      |> order_by(asc: :id)
+      |> Repo.paginate(after: cursor_after, cursor_fields: [:id], limit: 50)
+
+    %{instances: instances, next: metadata.after}
+  end
 end

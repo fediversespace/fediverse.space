@@ -7,7 +7,7 @@ interface IFloatingResetButtonProps {
 }
 const FloatingResetButton: React.FC<IFloatingResetButtonProps> = ({ onClick }) => (
   <FloatingCard>
-    <Button icon="compass" onClick={onClick} />
+    <Button icon="compass" title="Reset graph view" onClick={onClick} />
   </FloatingCard>
 );
 export default FloatingResetButton;

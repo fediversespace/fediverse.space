@@ -1,15 +1,23 @@
 import { RouterState } from "connected-react-router";
 
 export enum ActionType {
+  // Instance details
   REQUEST_INSTANCE_DETAILS = "REQUEST_INSTANCE_DETAILS",
-  REQUEST_INSTANCES = "REQUEST_INSTANCES",
-  RECEIVE_INSTANCES = "RECEIVE_INSTANCES",
+  RECEIVE_INSTANCE_DETAILS = "RECEIVE_INSTANCE_DETAILS",
+  INSTANCE_LOAD_ERROR = "INSTANCE_LOAD_ERROR",
+  // Graph
   REQUEST_GRAPH = "REQUEST_GRAPH",
   RECEIVE_GRAPH = "RECEIVE_GRAPH",
-  RECEIVE_INSTANCE_DETAILS = "RECEIVE_INSTANCE_DETAILS",
-  DESELECT_INSTANCE = "DESELECT_INSTANCE",
   GRAPH_LOAD_ERROR = "GRAPH_LOAD_ERROR",
-  INSTANCE_LOAD_ERROR = "INSTANCE_LOAD_ERROR"
+  // Nav
+  DESELECT_INSTANCE = "DESELECT_INSTANCE",
+  // Search
+  REQUEST_SEARCH_RESULTS = "REQUEST_SEARCH_RESULTS",
+  RECEIVE_SEARCH_RESULTS = "RECEIVE_SEARCH_RESULTS",
+  SEARCH_RESULTS_ERROR = "SEARCH_RESULTS_ERROR",
+  RESET_SEARCH = "RESET_SEARCH"
+  // REQUEST_INSTANCES = "REQUEST_INSTANCES",
+  // RECEIVE_INSTANCES = "RECEIVE_INSTANCES",
 }
 
 export interface IAction {
@@ -19,6 +27,12 @@ export interface IAction {
 
 export interface IInstance {
   name: string;
+}
+
+export interface ISearchResultInstance {
+  name: string;
+  description?: string;
+  userCount?: number;
 }
 
 export interface IInstanceDetails {
@@ -60,6 +74,11 @@ export interface IGraph {
   edges: IGraphEdge[];
 }
 
+export interface ISearchResponse {
+  results: ISearchResultInstance[];
+  next: string | null;
+}
+
 // Redux state
 
 // The current instance name is stored in the URL. See state -> router -> location
@@ -70,15 +89,22 @@ export interface ICurrentInstanceState {
 }
 
 export interface IDataState {
-  instances?: IInstance[];
   graph?: IGraph;
-  isLoadingInstances: boolean;
   isLoadingGraph: boolean;
   error: boolean;
+}
+
+export interface ISearchState {
+  error: boolean;
+  isLoadingResults: boolean;
+  next: string;
+  query: string;
+  results: ISearchResultInstance[];
 }
 
 export interface IAppState {
   router: RouterState;
   currentInstance: ICurrentInstanceState;
   data: IDataState;
+  search: ISearchState;
 }

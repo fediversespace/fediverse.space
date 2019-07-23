@@ -47,7 +47,8 @@ defmodule Backend.MixProject do
       {:quantum, "~> 2.3"},
       {:corsica, "~> 1.1.2"},
       {:sobelow, "~> 0.8", only: :dev},
-      {:gollum, "~> 0.3.2"}
+      {:gollum, "~> 0.3.2"},
+      {:paginator, "~> 0.6.0"}
     ]
   end
 

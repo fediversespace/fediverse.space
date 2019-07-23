@@ -154,7 +154,7 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
 
   public resetGraphPosition() {
     if (!this.cy) {
-      return;
+      throw new Error("Expected cytoscape, but there wasn't one!");
     }
     const { currentNodeId } = this.props;
     if (currentNodeId) {
@@ -175,7 +175,7 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
    */
   private setNodeSelection = (prevNodeId?: string | null) => {
     if (!this.cy) {
-      return;
+      throw new Error("Expected cytoscape, but there wasn't one!");
     }
     if (prevNodeId) {
       this.cy.$id(prevNodeId).unselect();

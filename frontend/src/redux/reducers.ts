@@ -2,27 +2,14 @@ import { connectRouter } from "connected-react-router";
 import { combineReducers } from "redux";
 
 import { History } from "history";
-import { ActionType, IAction, ICurrentInstanceState, IDataState } from "./types";
+import { ActionType, IAction, ICurrentInstanceState, IDataState, ISearchState } from "./types";
 
 const initialDataState = {
   error: false,
-  isLoadingGraph: false,
-  isLoadingInstances: false
+  isLoadingGraph: false
 };
 const data = (state: IDataState = initialDataState, action: IAction) => {
   switch (action.type) {
-    case ActionType.REQUEST_INSTANCES:
-      return {
-        ...state,
-        instances: [],
-        isLoadingInstances: true
-      };
-    case ActionType.RECEIVE_INSTANCES:
-      return {
-        ...state,
-        instances: action.payload,
-        isLoadingInstances: false
-      };
     case ActionType.REQUEST_GRAPH:
       return {
         ...state,
@@ -38,8 +25,7 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
       return {
         ...state,
         error: true,
-        isLoadingGraph: false,
-        isLoadingInstances: false
+        isLoadingGraph: false
       };
     default:
       return state;
@@ -83,10 +69,54 @@ const currentInstance = (state = initialCurrentInstanceState, action: IAction): 
   }
 };
 
+const initialSearchState: ISearchState = {
+  error: false,
+  isLoadingResults: false,
+  next: "",
+  query: "",
+  results: []
+};
+const search = (state = initialSearchState, action: IAction): ISearchState => {
+  switch (action.type) {
+    case ActionType.REQUEST_SEARCH_RESULTS:
+      const query = action.payload;
+      const isNewQuery = state.query !== query;
+      return {
+        ...state,
+        error: false,
+        isLoadingResults: true,
+        query,
+        results: isNewQuery ? [] : state.results
+      };
+    case ActionType.RECEIVE_SEARCH_RESULTS:
+      return {
+        ...state,
+        error: false,
+        isLoadingResults: false,
+        next: action.payload.next,
+        results: state.results.concat(action.payload.results)
+      };
+    case ActionType.SEARCH_RESULTS_ERROR:
+      return {
+        ...state,
+        error: true,
+        isLoadingResults: false,
+        next: "",
+        query: "",
+        results: []
+      };
+    case ActionType.RESET_SEARCH:
+      return initialSearchState;
+    default:
+      return state;
+  }
+};
+
 export default (history: History) =>
   combineReducers({
     router: connectRouter(history),
     // tslint:disable-next-line:object-literal-sort-keys
     currentInstance,
-    data
+    data,
+    search
   });
