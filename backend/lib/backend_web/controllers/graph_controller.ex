@@ -10,4 +10,10 @@ defmodule BackendWeb.GraphController do
     edges = Api.list_edges()
     render(conn, "index.json", nodes: nodes, edges: edges)
   end
+
+  def show(conn, %{"id" => domain}) do
+    nodes = Api.list_nodes(domain)
+    edges = Api.list_edges(domain)
+    render(conn, "index.json", nodes: nodes, edges: edges)
+  end
 end

@@ -13,6 +13,7 @@ const data = (state: IDataState = initialDataState, action: IAction) => {
     case ActionType.REQUEST_GRAPH:
       return {
         ...state,
+        graph: undefined,
         isLoadingGraph: true
       };
     case ActionType.RECEIVE_GRAPH:

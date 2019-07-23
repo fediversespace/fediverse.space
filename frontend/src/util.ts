@@ -1,6 +1,6 @@
 import { createMatchSelector } from "connected-react-router";
 import fetch from "cross-fetch";
-import { IInstanceDomainPath, INSTANCE_DOMAIN_PATH } from "./constants";
+import { DESKTOP_WIDTH_THRESHOLD, IInstanceDomainPath, INSTANCE_DOMAIN_PATH } from "./constants";
 import { IAppState } from "./redux/types";
 
 let API_ROOT = "http://localhost:4000/api/";
@@ -16,3 +16,5 @@ export const getFromApi = (path: string): Promise<any> => {
 };
 
 export const domainMatchSelector = createMatchSelector<IAppState, IInstanceDomainPath>(INSTANCE_DOMAIN_PATH);
+
+export const isSmallScreen = window.innerWidth < DESKTOP_WIDTH_THRESHOLD;

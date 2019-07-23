@@ -8,7 +8,7 @@ import { InstanceScreen, SearchScreen } from ".";
 import { INSTANCE_DOMAIN_PATH } from "../../constants";
 import { loadInstance } from "../../redux/actions";
 import { IAppState } from "../../redux/types";
-import { domainMatchSelector } from "../../util";
+import { domainMatchSelector, isSmallScreen } from "../../util";
 import { Graph, SidebarContainer } from "../organisms/";
 
 const GraphContainer = styled.div`
@@ -50,7 +50,8 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps> {
   private renderRoutes = ({ location }: RouteComponentProps) => (
     <FullDiv>
       <GraphContainer>
-        <Graph />
+        {/* Smaller screens never load the entire graph. Instead, `InstanceScreen` shows only the neighborhood. */}
+        {isSmallScreen || <Graph />}
         <SidebarContainer>
           <Switch>
             <Route path={INSTANCE_DOMAIN_PATH} component={InstanceScreen} />

@@ -13,8 +13,8 @@ const CytoscapeContainer = styled.div`
 interface ICytoscapeProps {
   currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
-  navigateToInstancePath: (domain: string) => void;
-  navigateToRoot: () => void;
+  navigateToInstancePath?: (domain: string) => void;
+  navigateToRoot?: () => void;
 }
 class Cytoscape extends React.Component<ICytoscapeProps> {
   private cy?: cytoscape.Core;
@@ -105,7 +105,9 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
     this.cy.nodes().on("select", e => {
       const instanceId = e.target.data("id");
       if (instanceId && instanceId !== this.props.currentNodeId) {
-        this.props.navigateToInstancePath(instanceId);
+        if (this.props.navigateToInstancePath) {
+          this.props.navigateToInstancePath(instanceId);
+        }
       }
 
       const neighborhood = this.cy!.$id(instanceId).closedNeighborhood();
@@ -130,8 +132,10 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
       // Clicking on the background should also deselect
       const target = e.target;
       if (!target || target === this.cy || target.isEdge()) {
-        // Go to the URL "/"
-        this.props.navigateToRoot();
+        if (this.props.navigateToRoot) {
+          // Go to the URL "/"
+          this.props.navigateToRoot();
+        }
       }
     });
 

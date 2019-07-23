@@ -16,7 +16,7 @@ import { FocusStyleManager } from "@blueprintjs/core";
 
 import { routerMiddleware } from "connected-react-router";
 import { createBrowserHistory } from "history";
-import { AppRouter } from "./AppRouter";
+import AppRouter from "./AppRouter";
 import createRootReducer from "./redux/reducers";
 
 // https://blueprintjs.com/docs/#core/accessibility.focus-management
