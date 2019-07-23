@@ -1,7 +1,7 @@
 defmodule BackendWeb.SearchView do
   use BackendWeb, :view
   alias BackendWeb.SearchView
-  require Logger
+  import Backend.Util
 
   def render("index.json", %{instances: instances, next: next}) do
     %{
@@ -11,9 +11,18 @@ defmodule BackendWeb.SearchView do
   end
 
   def render("instance.json", %{instance: instance}) do
+    threshold = get_config(:personal_instance_threshold)
+
+    description =
+      if instance.user_count != nil and instance.user_count < threshold do
+        nil
+      else
+        instance.description
+      end
+
     %{
       name: instance.domain,
-      description: instance.description,
+      description: description,
       userCount: instance.user_count
     }
   end

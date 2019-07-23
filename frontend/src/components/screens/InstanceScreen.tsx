@@ -72,7 +72,6 @@ interface IInstanceScreenProps {
   isLoadingInstanceDetails: boolean;
   navigateToRoot: () => void;
 }
-
 interface IInstanceScreenState {
   neighbors?: string[];
   isProcessingNeighbors: boolean;
@@ -119,8 +118,10 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     this.processEdgesToFindNeighbors();
   }
 
-  public componentDidUpdate(prevProps: IInstanceScreenProps, prevState: IInstanceScreenState) {
-    if (prevProps.instanceName !== this.props.instanceName) {
+  public componentDidUpdate(prevProps: IInstanceScreenProps) {
+    const isNewInstance = prevProps.instanceName !== this.props.instanceName;
+    const receivedNewEdges = !!this.props.graph && !this.state.isProcessingNeighbors && !this.state.neighbors;
+    if (isNewInstance || receivedNewEdges) {
       this.processEdgesToFindNeighbors();
     }
   }

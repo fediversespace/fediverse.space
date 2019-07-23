@@ -59,7 +59,7 @@ config :backend, Backend.Repo,
 config :backend, :crawler,
   status_age_limit_days: 28,
   status_count_limit: 100,
-  personal_instance_threshold: 1,
+  personal_instance_threshold: 5,
   crawl_interval_mins: 1,
   crawl_workers: 10,
   blacklist: [

@@ -90,7 +90,7 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
   };
 
   private handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && this.state.currentQuery !== this.props.query) {
       this.search();
     }
   };
