@@ -30,6 +30,7 @@ import { Dispatch } from "redux";
 import styled from "styled-components";
 import { IAppState, IGraph, IInstanceDetails } from "../../redux/types";
 import { domainMatchSelector, getFromApi, isSmallScreen } from "../../util";
+import { InstanceType } from "../atoms";
 import { Cytoscape, ErrorState } from "../molecules/";
 
 const InstanceScreenContainer = styled.div`
@@ -258,13 +259,17 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     if (!this.props.instanceDetails) {
       throw new Error("Did not receive instance details as expected!");
     }
-    const { version, userCount, statusCount, domainCount, lastUpdated, insularity } = this.props.instanceDetails;
+    const { version, userCount, statusCount, domainCount, lastUpdated, insularity, type } = this.props.instanceDetails;
     return (
       <StyledHTMLTable small={true} striped={true}>
         <tbody>
           <tr>
             <td>Version</td>
             <td>{<Code>{version}</Code> || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>Instance type</td>
+            <td>{(type && <InstanceType type={type} colorAfterName={true} />) || "Unknown"}</td>
           </tr>
           <tr>
             <td>Users</td>

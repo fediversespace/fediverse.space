@@ -1,14 +1,11 @@
-import { Card, Classes, Elevation, H4, Icon } from "@blueprintjs/core";
-import { IconNames } from "@blueprintjs/icons";
+import { Card, Classes, Elevation, H4 } from "@blueprintjs/core";
 import inflection from "inflection";
 import * as numeral from "numeral";
 import React from "react";
 import sanitize from "sanitize-html";
 import styled from "styled-components";
-import { QUALITATIVE_COLOR_SCHEME } from "../../constants";
 import { ISearchResultInstance } from "../../redux/types";
-import { typeColorScheme } from "../../types";
-import { capitalize } from "../../util";
+import { InstanceType } from "../atoms";
 
 const StyledCard = styled(Card)`
   width: 80%;
@@ -50,11 +47,9 @@ const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick }) => {
 
   let typeIcon;
   if (result.type) {
-    const idx = typeColorScheme.values.indexOf(result.type);
     typeIcon = (
       <StyledType className={Classes.TEXT_MUTED}>
-        <Icon icon={IconNames.SYMBOL_CIRCLE} color={QUALITATIVE_COLOR_SCHEME[idx]} />
-        {" " + capitalize(result.type)}
+        <InstanceType type={result.type} />
       </StyledType>
     );
   }

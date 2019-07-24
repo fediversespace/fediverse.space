@@ -47,6 +47,7 @@ export interface IInstanceDetails {
   peers?: IInstance[];
   lastUpdated?: string;
   status: string;
+  type?: string;
 }
 
 interface IGraphNode {

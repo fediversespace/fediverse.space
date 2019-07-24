@@ -1,20 +1,15 @@
-import { Button, Classes, H5, H6, Icon, MenuItem } from "@blueprintjs/core";
+import { Button, Classes, H5, H6, MenuItem } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { ItemRenderer, Select } from "@blueprintjs/select";
 import React from "react";
 import styled from "styled-components";
-import { FloatingCard } from ".";
-import { QUALITATIVE_COLOR_SCHEME } from "../../constants";
+import { FloatingCard, InstanceType } from ".";
 import { IColorSchemeType } from "../../types";
-import { capitalize } from "../../util";
 
 const ColorSchemeSelect = Select.ofType<IColorSchemeType>();
 
 const StyledLi = styled.li`
   margin-top: 2px;
-`;
-const StyledIcon = styled(Icon)`
-  margin-right: 5px;
 `;
 const StyledKeyContainer = styled.div`
   margin-top: 10px;
@@ -51,10 +46,9 @@ const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, onItemSelec
         <StyledKeyContainer>
           <H6>Key</H6>
           <ul className={Classes.LIST_UNSTYLED}>
-            {current.values.map((v, idx) => (
+            {current.values.map(v => (
               <StyledLi>
-                <StyledIcon icon={IconNames.FULL_CIRCLE} color={QUALITATIVE_COLOR_SCHEME[idx]} />
-                {capitalize(v)}
+                <InstanceType type={v} />
               </StyledLi>
             ))}
           </ul>

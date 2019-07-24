@@ -49,7 +49,8 @@ defmodule BackendWeb.InstanceView do
           domainCount: length(instance.peers),
           peers: render_many(instance.peers, InstanceView, "instance.json"),
           lastUpdated: last_updated,
-          status: status
+          status: status,
+          type: instance.type
         }
     end
   end
