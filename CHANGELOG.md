@@ -9,10 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [2.1.0 - 2019-07-24]
+
+### Added
+
 - It's now shown in the front-end if an instance wasn't crawled because of its robots.txt.
 - You can now link directly to instances at e.g. /instance/mastodon.social.
 - Instance details now have a link to the corresponding fediverse.network page.
-- The reset-graph-view button now explains what it's for when you hover over it.
 - The main graph is no longer displayed on mobile. Instead, a smaller neighborhood graph is shown.
 
 ### Changed
@@ -21,16 +34,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Label size is now dependent on the instance size.
 - The instance lookup field is now front-and-center. Is also uses the backend for faster lookups. This is to improve
   performance, and it lays the groundwork for full-text search over instance names and descriptions.
-
-### Deprecated
-
-### Removed
+- The reset-graph-view button now explains what it's for when you hover over it.
 
 ### Fixed
 
-- Previously, direct links to /about would return a 404 on Netlify's infrastructure. Now it's fixed.
-
-### Security
+- Previously, direct links to /about would return a 404 on Netlify's infrastructure. No longer.
 
 ## [2.0.0] - 2019-07-20
 
