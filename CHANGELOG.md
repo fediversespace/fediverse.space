@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- It is now possible to color code the graph by instance type (e.g. Mastodon, Pleroma, etc.)
-
 ### Changed
 
 ### Deprecated
@@ -20,6 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [2.2.0 - 2019-07-24]
+
+### Added
+
+- It is now possible to color code the graph by instance type (e.g. Mastodon, Pleroma, etc.)
 
 ## [2.1.0 - 2019-07-24]
 
