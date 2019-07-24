@@ -6,12 +6,14 @@ const RightDiv = styled.div`
   align-self: right;
   background-color: grey;
   flex: 1;
-  overflow: scroll;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
 `;
 const StyledCard = styled(Card)`
   min-height: 100%;
   width: 100%;
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;

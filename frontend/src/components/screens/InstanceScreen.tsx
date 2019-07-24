@@ -43,6 +43,7 @@ const HeadingContainer = styled.div`
   flex-direction: row;
   align-items: center;
   width: 100%;
+  padding: 0 20px;
 `;
 const StyledHeadingH2 = styled(H2)`
   margin: 0;
@@ -61,11 +62,18 @@ const StyledLinkToFdNetwork = styled.div`
   text-align: center;
   margin-top: auto;
 `;
+const StyledCallout = styled(Callout)`
+  margin: 10px 20px;
+  width: auto;
+`;
 const StyledTabs = styled(Tabs)`
   width: 100%;
+  padding: 0 20px;
 `;
 const StyledGraphContainer = styled.div`
-  height: 50%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
   margin-bottom: 10px;
 `;
 interface IInstanceScreenProps {
@@ -177,11 +185,13 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
   private renderTabs = () => {
     const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
 
+    const hasLocalGraph =
+      !!this.state.localGraph && this.state.localGraph.nodes.length > 0 && this.state.localGraph.edges.length > 0;
     const insularCallout =
-      this.props.graph && !this.state.isProcessingNeighbors && !hasNeighbors && !this.state.localGraph ? (
-        <Callout icon={IconNames.INFO_SIGN} title="Insular instance">
+      this.props.graph && !this.state.isProcessingNeighbors && !hasNeighbors && !hasLocalGraph ? (
+        <StyledCallout icon={IconNames.INFO_SIGN} title="Insular instance">
           <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
-        </Callout>
+        </StyledCallout>
       ) : (
         undefined
       );
@@ -211,13 +221,16 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
   };
 
   private maybeRenderLocalGraph = () => {
-    if (!this.state.localGraph) {
+    const { localGraph } = this.state;
+    const hasLocalGraph =
+      !!this.state.localGraph && this.state.localGraph.nodes.length > 0 && this.state.localGraph.edges.length > 0;
+    if (!hasLocalGraph) {
       return;
     }
     return (
       <StyledGraphContainer>
         <Cytoscape
-          elements={this.state.localGraph}
+          elements={localGraph!}
           currentNodeId={this.props.instanceName}
           navigateToInstancePath={this.props.navigateToInstance}
         />

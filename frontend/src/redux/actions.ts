@@ -91,6 +91,8 @@ export const loadInstance = (instanceName: string | null) => {
 
 export const updateSearch = (query: string) => {
   return (dispatch: Dispatch, getState: () => IAppState) => {
+    query = query.trim();
+
     if (!query) {
       dispatch(resetSearch());
       return;

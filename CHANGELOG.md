@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - You can now link directly to instances at e.g. /instance/mastodon.social.
 - Instance details now have a link to the corresponding fediverse.network page.
 - The reset-graph-view button now explains what it's for when you hover over it.
+- The main graph is no longer displayed on mobile. Instead, a smaller neighborhood graph is shown.
 
 ### Changed
 
