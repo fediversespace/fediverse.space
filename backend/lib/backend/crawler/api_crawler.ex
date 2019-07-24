@@ -14,6 +14,8 @@ defmodule Backend.Crawler.ApiCrawler do
   # {domain_mentioned, count}
   @type instance_interactions :: %{String.t() => integer}
 
+  @type instance_type :: :mastodon | :pleroma | :gab
+
   defstruct [
     :version,
     :description,
@@ -21,7 +23,8 @@ defmodule Backend.Crawler.ApiCrawler do
     :status_count,
     :peers,
     :interactions,
-    :statuses_seen
+    :statuses_seen,
+    :instance_type
   ]
 
   @type t() :: %__MODULE__{
@@ -31,7 +34,8 @@ defmodule Backend.Crawler.ApiCrawler do
           status_count: integer,
           peers: [String.t()],
           interactions: instance_interactions,
-          statuses_seen: integer
+          statuses_seen: integer,
+          instance_type: instance_type
         }
 
   @doc """

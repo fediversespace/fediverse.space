@@ -23,7 +23,8 @@ defmodule BackendWeb.SearchView do
     %{
       name: instance.domain,
       description: description,
-      userCount: instance.user_count
+      userCount: instance.user_count,
+      type: instance.type
     }
   end
 end

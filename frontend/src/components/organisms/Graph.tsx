@@ -7,8 +7,9 @@ import { Dispatch } from "redux";
 import styled from "styled-components";
 import { fetchGraph } from "../../redux/actions";
 import { IAppState, IGraph } from "../../redux/types";
+import { colorSchemes, IColorSchemeType } from "../../types";
 import { domainMatchSelector } from "../../util";
-import { Cytoscape, ErrorState, FloatingResetButton } from "../molecules/";
+import { Cytoscape, ErrorState, GraphTools } from "../molecules/";
 
 const GraphDiv = styled.div`
   flex: 2;
@@ -22,12 +23,16 @@ interface IGraphProps {
   isLoadingGraph: boolean;
   navigate: (path: string) => void;
 }
-class GraphImpl extends React.Component<IGraphProps> {
+interface IGraphState {
+  colorScheme?: IColorSchemeType;
+}
+class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
   private cytoscapeComponent: React.RefObject<Cytoscape>;
 
   public constructor(props: IGraphProps) {
     super(props);
     this.cytoscapeComponent = React.createRef();
+    this.state = { colorScheme: undefined };
   }
 
   public componentDidMount() {
@@ -44,13 +49,19 @@ class GraphImpl extends React.Component<IGraphProps> {
       content = (
         <>
           <Cytoscape
+            colorScheme={this.state.colorScheme}
             currentNodeId={this.props.currentInstanceName}
             elements={this.props.graph}
             navigateToInstancePath={this.navigateToInstancePath}
             navigateToRoot={this.navigateToRoot}
             ref={this.cytoscapeComponent}
           />
-          <FloatingResetButton onClick={this.resetGraphPosition} />
+          <GraphTools
+            onResetButtonClick={this.resetGraphPosition}
+            currentColorScheme={this.state.colorScheme}
+            colorSchemes={colorSchemes}
+            onColorSchemeSelect={this.setColorScheme}
+          />
         </>
       );
     }
@@ -68,6 +79,10 @@ class GraphImpl extends React.Component<IGraphProps> {
     if (this.cytoscapeComponent.current) {
       this.cytoscapeComponent.current.resetGraphPosition();
     }
+  };
+
+  private setColorScheme = (colorScheme?: IColorSchemeType) => {
+    this.setState({ colorScheme });
   };
 
   private navigateToInstancePath = (domain: string) => {

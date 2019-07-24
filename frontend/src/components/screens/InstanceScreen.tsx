@@ -144,6 +144,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
   }
 
   private processEdgesToFindNeighbors = () => {
+    // TODO: use cytoscape to replace this method
+    // simply cy.$id(nodeId).outgoers() (and/or incomers())
     const { graph, instanceName } = this.props;
     const { localGraph } = this.state;
     if ((!graph && !localGraph) || !instanceName) {

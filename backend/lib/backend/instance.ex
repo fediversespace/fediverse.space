@@ -9,6 +9,7 @@ defmodule Backend.Instance do
     field :status_count, :integer
     field :version, :string
     field :insularity, :float
+    field :type, :string
 
     many_to_many :peers, Backend.Instance,
       join_through: Backend.InstancePeer,
@@ -33,7 +34,8 @@ defmodule Backend.Instance do
       :status_count,
       :version,
       :insularity,
-      :updated_at
+      :updated_at,
+      :type
     ])
     |> validate_required([:domain])
     |> put_assoc(:peers, attrs.peers)

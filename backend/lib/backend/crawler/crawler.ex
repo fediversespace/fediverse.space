@@ -103,6 +103,12 @@ defmodule Backend.Crawler do
        }) do
     now = get_now()
 
+    instance_type =
+      case result.instance_type do
+        nil -> nil
+        not_nil_type -> Atom.to_string(not_nil_type)
+      end
+
     ## Update the instance we crawled ##
     Repo.insert!(
       %Instance{
@@ -110,7 +116,8 @@ defmodule Backend.Crawler do
         description: result.description,
         version: result.version,
         user_count: result.user_count,
-        status_count: result.status_count
+        status_count: result.status_count,
+        type: instance_type
       },
       on_conflict: [
         set: [
@@ -118,6 +125,7 @@ defmodule Backend.Crawler do
           version: result.version,
           user_count: result.user_count,
           status_count: result.status_count,
+          type: instance_type,
           updated_at: now
         ]
       ],
@@ -140,7 +148,7 @@ defmodule Backend.Crawler do
       result.interactions
       |> Map.keys()
       |> list_union(result.peers)
-      |> Enum.filter(fn domain -> not is_blacklisted?(domain) end)
+      |> Enum.filter(fn domain -> domain != nil and not is_blacklisted?(domain) end)
 
     peers =
       peers_domains

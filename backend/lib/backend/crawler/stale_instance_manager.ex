@@ -47,6 +47,7 @@ defmodule Backend.Crawler.StaleInstanceManager do
     Process.send_after(self(), :queue_stale_domains, 60_000)
   end
 
+  # TODO: crawl instances with a blocking robots.txt less often (daily?)
   defp queue_stale_domains() do
     interval = -1 * get_config(:crawl_interval_mins)
 

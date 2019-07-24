@@ -33,6 +33,7 @@ export interface ISearchResultInstance {
   name: string;
   description?: string;
   userCount?: number;
+  type?: string;
 }
 
 export interface IInstanceDetails {

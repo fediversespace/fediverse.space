@@ -38,12 +38,17 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
       crawl_large_instance(domain, instance)
     else
       Map.merge(
-        Map.merge(
-          Map.take(instance, ["version", "description"]),
-          Map.take(instance["stats"], ["user_count", "status_count"])
-        )
+        Map.take(instance["stats"], ["user_count"])
         |> Map.new(fn {k, v} -> {String.to_atom(k), v} end),
-        %{peers: [], interactions: %{}, statuses_seen: 0}
+        %{
+          peers: [],
+          interactions: %{},
+          statuses_seen: 0,
+          instance_type: nil,
+          description: nil,
+          version: nil,
+          status_count: nil
+        }
       )
     end
   end
@@ -68,13 +73,25 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
       } mentions in #{statuses_seen} statuses."
     )
 
+    instance_type =
+      cond do
+        Map.get(instance, "version") |> String.downcase() =~ "pleroma" -> :pleroma
+        is_gab?(instance) -> :gab
+        true -> :mastodon
+      end
+
     Map.merge(
       Map.merge(
         Map.take(instance, ["version", "description"]),
         Map.take(instance["stats"], ["user_count", "status_count"])
       )
       |> Map.new(fn {k, v} -> {String.to_atom(k), v} end),
-      %{peers: peers, interactions: interactions, statuses_seen: statuses_seen}
+      %{
+        peers: peers,
+        interactions: interactions,
+        statuses_seen: statuses_seen,
+        instance_type: instance_type
+      }
     )
   end
 
@@ -207,5 +224,19 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     |> Enum.reduce(%{}, fn map, acc ->
       Map.merge(acc, map)
     end)
+  end
+
+  defp is_gab?(instance) do
+    title_is_gab = Map.get(instance, "title") |> String.downcase() == "gab social"
+
+    contact_account = Map.get(instance, "contact_account")
+
+    if contact_account != nil do
+      gab_keys = ["is_pro", "is_verified", "is_donor", "is_investor"]
+      has_gab_keys = gab_keys |> Enum.any?(&Map.has_key?(contact_account, &1))
+      title_is_gab or has_gab_keys
+    else
+      title_is_gab
+    end
   end
 end

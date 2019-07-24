@@ -3,7 +3,8 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import tippy, { Instance } from "tippy.js";
-import { DEFAULT_NODE_COLOR, SELECTED_NODE_COLOR } from "../../constants";
+import { DEFAULT_NODE_COLOR, QUALITATIVE_COLOR_SCHEME, SELECTED_NODE_COLOR } from "../../constants";
+import { IColorSchemeType } from "../../types";
 
 const CytoscapeContainer = styled.div`
   width: 100%;
@@ -12,19 +13,14 @@ const CytoscapeContainer = styled.div`
 `;
 
 interface ICytoscapeProps {
+  colorScheme?: IColorSchemeType;
   currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
   navigateToInstancePath?: (domain: string) => void;
   navigateToRoot?: () => void;
 }
-class Cytoscape extends React.Component<ICytoscapeProps> {
+class Cytoscape extends React.PureComponent<ICytoscapeProps> {
   private cy?: cytoscape.Core;
-
-  public shouldComponentUpdate(prevProps: ICytoscapeProps) {
-    // We only want to update this component if the current instance selection changes.
-    // We know that the `elements` prop will never change so we skip the expensive computations here.
-    return prevProps.currentNodeId !== this.props.currentNodeId;
-  }
 
   public componentDidMount() {
     const container = ReactDOM.findDOMNode(this);
@@ -63,24 +59,8 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
     });
 
     const style = this.cy.style() as any;
-
     style
       .clear()
-      .selector("node")
-      .style({
-        "background-color": DEFAULT_NODE_COLOR,
-        // The size from the backend is log_10(userCount), which from 10 <= userCount <= 1,000,000 gives us the range
-        // 1-6. We map this to the range of sizes we want.
-        // TODO: I should probably check that that the backend is actually using log_10 and not log_e, but it look
-        // quite good as it is, so...
-        height: "mapData(size, 1, 6, 20, 200)",
-        label: "data(id)",
-        width: "mapData(size, 1, 6, 20, 200)"
-      })
-      .selector("node:selected")
-      .style({
-        "background-color": SELECTED_NODE_COLOR
-      })
       .selector("edge")
       .style({
         "curve-style": "haystack", // fast edges
@@ -100,8 +80,8 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
       .selector(".thickEdge") // when a node is selected, make edges thicker so you can actually see them
       .style({
         width: 2
-      })
-      .update();
+      });
+    this.resetNodeColorScheme(style); // this function also called `update()`
 
     this.cy.nodes().on("select", e => {
       const instanceId = e.target.data("id");
@@ -145,6 +125,9 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
 
   public componentDidUpdate(prevProps: ICytoscapeProps) {
     this.setNodeSelection(prevProps.currentNodeId);
+    if (prevProps.colorScheme !== this.props.colorScheme) {
+      this.updateColorScheme();
+    }
   }
 
   public componentWillUnmount() {
@@ -193,6 +176,54 @@ class Cytoscape extends React.Component<ICytoscapeProps> {
       // Center it
       const selected = this.cy.$id(currentNodeId);
       this.cy.center(selected);
+    }
+  };
+
+  /**
+   * Set the color scheme to the default. A style object can optionally be passed.
+   * This is used during initilization to avoid having to do multiple renderings of the graph.
+   */
+  private resetNodeColorScheme = (style?: any) => {
+    if (!style) {
+      style = this.cy!.style() as any;
+    }
+    style
+      .selector("node")
+      .style({
+        "background-color": DEFAULT_NODE_COLOR,
+        // The size from the backend is log_10(userCount), which from 10 <= userCount <= 1,000,000 gives us the range
+        // 1-6. We map this to the range of sizes we want.
+        // TODO: I should probably check that that the backend is actually using log_10 and not log_e, but it look
+        // quite good as it is, so...
+        height: "mapData(size, 1, 6, 20, 200)",
+        label: "data(id)",
+        width: "mapData(size, 1, 6, 20, 200)"
+      })
+      .selector("node:selected")
+      .style({
+        "background-color": SELECTED_NODE_COLOR
+      })
+      .update();
+  };
+
+  private updateColorScheme = () => {
+    if (!this.cy) {
+      throw new Error("Expected cytoscape, but there wasn't one!");
+    }
+    const { colorScheme } = this.props;
+    let style = this.cy.style() as any;
+    if (!colorScheme) {
+      this.resetNodeColorScheme();
+    } else {
+      colorScheme.values.forEach((v, idx) => {
+        style = style.selector(`node[${colorScheme.cytoscapeDataKey} = '${v}']`).style({
+          "background-color": QUALITATIVE_COLOR_SCHEME[idx]
+        });
+      });
+      style
+        .selector("node:selected")
+        .style({ "background-color": SELECTED_NODE_COLOR })
+        .update();
     }
   };
 }

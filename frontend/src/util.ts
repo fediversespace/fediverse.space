@@ -18,3 +18,5 @@ export const getFromApi = (path: string): Promise<any> => {
 export const domainMatchSelector = createMatchSelector<IAppState, IInstanceDomainPath>(INSTANCE_DOMAIN_PATH);
 
 export const isSmallScreen = window.innerWidth < DESKTOP_WIDTH_THRESHOLD;
+
+export const capitalize = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
