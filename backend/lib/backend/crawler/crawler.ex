@@ -117,18 +117,12 @@ defmodule Backend.Crawler do
         version: result.version,
         user_count: result.user_count,
         status_count: result.status_count,
-        type: instance_type
+        type: instance_type,
+        base_domain: get_base_domain(domain)
       },
-      on_conflict: [
-        set: [
-          description: result.description,
-          version: result.version,
-          user_count: result.user_count,
-          status_count: result.status_count,
-          type: instance_type,
-          updated_at: now
-        ]
-      ],
+      on_conflict:
+        {:replace,
+         [:description, :version, :user_count, :status_count, :type, :base_domain, :updated_at]},
       conflict_target: :domain
     )
 
@@ -224,9 +218,24 @@ defmodule Backend.Crawler do
         true -> "unknown error"
       end
 
-    Repo.insert!(%Crawl{
-      instance_domain: domain,
-      error: error
-    })
+    Repo.transaction(fn ->
+      Repo.insert!(
+        %Instance{
+          domain: domain,
+          base_domain: get_base_domain(domain)
+        },
+        on_conflict: {:replace, [:base_domain]},
+        conflict_target: :domain
+      )
+
+      Repo.insert!(%Crawl{
+        instance_domain: domain,
+        error: error
+      })
+    end)
+  end
+
+  defp get_base_domain(domain) do
+    PublicSuffix.registrable_domain(domain, ignore_private: true)
   end
 end

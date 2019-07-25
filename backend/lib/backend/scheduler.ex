@@ -159,4 +159,54 @@ defmodule Backend.Scheduler do
       |> Repo.insert_all(edges)
     end)
   end
+
+  @doc """
+  This function checks to see if a lot of instances on the same base domain have been created recently. If so,
+  notifies the server admin over SMS.
+  """
+  def check_for_spam_instances() do
+    hour_range = 6
+
+    count_subquery =
+      Instance
+      |> where(
+        [i],
+        i.inserted_at > datetime_add(^NaiveDateTime.utc_now(), -1 * ^hour_range, "hour")
+      )
+      |> group_by(:base_domain)
+      |> select([i], %{
+        count: count(i.id),
+        base_domain: i.base_domain
+      })
+
+    potential_spam_instances =
+      Instance
+      |> join(:inner, [i], c in subquery(count_subquery), on: i.domain == c.base_domain)
+      |> where([i, c], c.count > 2)
+      |> select([i, c], %{
+        base_domain: i.base_domain,
+        count: c.count
+      })
+      |> Repo.all()
+
+    if length(potential_spam_instances) > 0 do
+      message =
+        potential_spam_instances
+        |> Enum.map(fn %{count: count, base_domain: base_domain} ->
+          "* #{count} new at #{base_domain}"
+        end)
+        |> Enum.join("\n")
+        |> (fn lines ->
+              "fediverse.space detected the following potential spam domains from the last #{
+                hour_range
+              } hours:\n#{lines}"
+            end).()
+
+      Logger.info(message)
+      send_admin_sms(message)
+      Backend.Mailer.AdminEmail.send("Potential spam", message)
+    else
+      Logger.debug("Did not find potential spam instances.")
+    end
+  end
 end

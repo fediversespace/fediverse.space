@@ -27,6 +27,14 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :ex_twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token: System.get_env("TWILIO_AUTH_TOKEN")
+
+config :backend, Backend.Mailer,
+  adapter: Swoosh.Adapters.Sendgrid,
+  api_key: System.get_env("SENDGRID_API_KEY")
+
 config :backend, :crawler,
   status_age_limit_days: 28,
   status_count_limit: 5000,
@@ -37,7 +45,10 @@ config :backend, :crawler,
     "gab.best",
     "4chan.icu"
   ],
-  user_agent: "fediverse.space crawler"
+  user_agent: "fediverse.space crawler",
+  admin_phone: System.get_env("ADMIN_PHONE"),
+  twilio_phone: System.get_env("TWILIO_PHONE"),
+  admin_email: System.get_env("ADMIN_EMAIL")
 
 config :backend, Backend.Scheduler,
   jobs: [
@@ -46,7 +57,9 @@ config :backend, Backend.Scheduler,
     # 00.15 daily
     {"15 0 * * *", {Backend.Scheduler, :generate_edges, []}},
     # 00.30 every night
-    {"30 0 * * *", {Backend.Scheduler, :generate_insularity_scores, []}}
+    {"30 0 * * *", {Backend.Scheduler, :generate_insularity_scores, []}},
+    # Every 30 minutes
+    {"*/30 * * * *", {Backend.Scheduler, :check_for_spam_instances, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom

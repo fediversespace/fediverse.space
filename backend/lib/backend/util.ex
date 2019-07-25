@@ -1,5 +1,6 @@
 defmodule Backend.Util do
   import Ecto.Query
+  require Logger
   alias Backend.{Crawl, Repo}
 
   @doc """
@@ -125,5 +126,20 @@ defmodule Backend.Util do
     |> Enum.reduce(map2, fn {key, val}, acc ->
       Map.update(acc, key, val, &(&1 + val))
     end)
+  end
+
+  @doc """
+  Sends an SMS to the admin phone number if configured.
+  """
+  def send_admin_sms(body) do
+    if get_config(:admin_phone) != nil and get_config(:twilio_phone) != nil do
+      ExTwilio.Message.create(
+        to: get_config(:admin_phone),
+        from: get_config(:twilio_phone),
+        body: body
+      )
+    else
+      Logger.info("Could not send SMS to admin; not configured.")
+    end
   end
 end

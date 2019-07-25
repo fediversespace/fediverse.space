@@ -24,3 +24,16 @@ config :backend, BackendWeb.Endpoint,
   root: ".",
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   server: true
+
+config :ex_twilio,
+  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
+  auth_token: System.get_env("TWILIO_AUTH_TOKEN")
+
+config :backend, :crawler,
+  admin_phone: System.get_env("ADMIN_PHONE"),
+  twilio_phone: System.get_env("TWILIO_PHONE"),
+  admin_email: System.get_env("ADMIN_EMAIL")
+
+config :backend, Backend.Mailer,
+  adapter: Swoosh.Adapters.Sendgrid,
+  api_key: System.get_env("SENDGRID_API_KEY")

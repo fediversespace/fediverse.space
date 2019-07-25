@@ -63,11 +63,6 @@ config :backend, :crawler,
   crawl_interval_mins: 1,
   crawl_workers: 10,
   blacklist: [
-    "gab.best"
-  ]
-
-config :backend, Backend.Scheduler,
-  jobs: [
-    # Every 5 minutes
-    {"*/5 * * * *", {Backend.Scheduler, :prune_crawls, [12, "month"]}}
+    "gab.best",
+    "4chan.icu"
   ]

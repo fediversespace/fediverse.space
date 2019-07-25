@@ -20,7 +20,7 @@ defmodule Backend.MixProject do
   def application do
     [
       mod: {Backend.Application, []},
-      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum]
+      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum, :ex_twilio]
     ]
   end
 
@@ -48,7 +48,11 @@ defmodule Backend.MixProject do
       {:corsica, "~> 1.1.2"},
       {:sobelow, "~> 0.8", only: :dev},
       {:gollum, "~> 0.3.2"},
-      {:paginator, "~> 0.6.0"}
+      {:paginator, "~> 0.6.0"},
+      {:public_suffix, "~> 0.6.0"},
+      {:idna, "~> 5.1.2", override: true},
+      {:swoosh, "~> 0.23.3"},
+      {:ex_twilio, "~> 0.7.0"}
     ]
   end
 
