@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Instances are now crawled hourly instead of every 30 minutes.
+
 ### Deprecated
 
 ### Removed
@@ -18,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+- The server administrator can now be notified if there's a new potential spam domain.
 
 ## [2.2.0 - 2019-07-24]
 
