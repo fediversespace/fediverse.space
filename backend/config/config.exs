@@ -39,7 +39,7 @@ config :backend, :crawler,
   status_age_limit_days: 28,
   status_count_limit: 5000,
   personal_instance_threshold: 10,
-  crawl_interval_mins: 30,
+  crawl_interval_mins: 60,
   crawl_workers: 50,
   blacklist: [
     "gab.best",
