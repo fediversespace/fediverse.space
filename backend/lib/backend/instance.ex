@@ -11,6 +11,8 @@ defmodule Backend.Instance do
     field :insularity, :float
     field :type, :string
     field :base_domain, :string
+    field :opt_in, :boolean
+    field :opt_out, :boolean
 
     many_to_many :peers, Backend.Instance,
       join_through: Backend.InstancePeer,
@@ -37,7 +39,9 @@ defmodule Backend.Instance do
       :insularity,
       :updated_at,
       :type,
-      :base_domain
+      :base_domain,
+      :opt_in,
+      :opt_out
     ])
     |> validate_required([:domain])
     |> put_assoc(:peers, attrs.peers)

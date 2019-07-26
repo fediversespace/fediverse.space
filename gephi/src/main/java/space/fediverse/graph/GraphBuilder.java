@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 public class GraphBuilder {
     private static final String nodeQuery = new StringBuilder().append("SELECT i.domain as id, i.domain as label")
             .append(" FROM instances i INNER JOIN edges e ON i.domain = e.source_domain OR i.domain = e.target_domain")
-            .append(" WHERE i.user_count IS NOT NULL").toString();
+            .append(" WHERE i.user_count IS NOT NULL AND NOT i.opt_out").toString();
 
     private static final String edgeQuery = new StringBuilder().append("SELECT e.source_domain AS source,")
             .append(" e.target_domain AS target, e.weight AS weight FROM edges e").toString();

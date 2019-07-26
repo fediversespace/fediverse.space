@@ -48,7 +48,8 @@ config :backend, :crawler,
   user_agent: "fediverse.space crawler",
   admin_phone: System.get_env("ADMIN_PHONE"),
   twilio_phone: System.get_env("TWILIO_PHONE"),
-  admin_email: System.get_env("ADMIN_EMAIL")
+  admin_email: System.get_env("ADMIN_EMAIL"),
+  frontend_domain: "https://www.fediverse.space"
 
 config :backend, Backend.Scheduler,
   jobs: [

@@ -67,8 +67,8 @@ defmodule Backend.Crawler.StaleInstanceManager do
       |> join(:left, [i], c in subquery(crawls_subquery), on: i.domain == c.instance_domain)
       |> where(
         [i, c],
-        c.most_recent_crawl < datetime_add(^NaiveDateTime.utc_now(), ^interval, "minute") or
-          is_nil(c.crawl_count)
+        (c.most_recent_crawl < datetime_add(^NaiveDateTime.utc_now(), ^interval, "minute") or
+           is_nil(c.crawl_count)) and not i.opt_out
       )
       |> select([i], i.domain)
       |> Repo.all()

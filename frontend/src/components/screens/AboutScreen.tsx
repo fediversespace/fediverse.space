@@ -50,33 +50,33 @@ const AboutScreen: React.FC = () => (
     </p>
 
     <H2>Credits</H2>
-    <p className={Classes.RUNNING_TEXT}>
-      This site is inspired by several other sites in the same vein:
-      <ul className={Classes.LIST}>
-        <li>
-          <a href="https://the-federation.info/" target="_blank" rel="noopener noreferrer">
-            the-federation.info
-          </a>
-        </li>
-        <li>
-          <a href="http://fediverse.network/" target="_blank" rel="noopener noreferrer">
-            fediverse.network
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://lucahammer.at/vis/fediverse/2018-08-30-mastoverse_hashtags/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Mastodon hashtag network
-          </a>
-          {" by "}
-          <a href="https://vis.social/web/statuses/100634284168959187" target="_blank" rel="noopener noreferrer">
-            @Luca@vis.social
-          </a>
-        </li>
-      </ul>
+    <p className={Classes.RUNNING_TEXT}>This site is inspired by several other sites in the same vein:</p>
+    <ul className={Classes.LIST}>
+      <li>
+        <a href="https://the-federation.info/" target="_blank" rel="noopener noreferrer">
+          the-federation.info
+        </a>
+      </li>
+      <li>
+        <a href="http://fediverse.network/" target="_blank" rel="noopener noreferrer">
+          fediverse.network
+        </a>
+      </li>
+      <li>
+        <a
+          href="https://lucahammer.at/vis/fediverse/2018-08-30-mastoverse_hashtags/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Mastodon hashtag network
+        </a>
+        {" by "}
+        <a href="https://vis.social/web/statuses/100634284168959187" target="_blank" rel="noopener noreferrer">
+          @Luca@vis.social
+        </a>
+      </li>
+    </ul>
+    <p>
       The source code for fediverse.space is available on{" "}
       <a href="https://gitlab.com/taobojlen/fediverse.space" target="_blank" rel="noopener noreferrer">
         GitLab

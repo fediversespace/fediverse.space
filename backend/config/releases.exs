@@ -32,7 +32,8 @@ config :ex_twilio,
 config :backend, :crawler,
   admin_phone: System.get_env("ADMIN_PHONE"),
   twilio_phone: System.get_env("TWILIO_PHONE"),
-  admin_email: System.get_env("ADMIN_EMAIL")
+  admin_email: System.get_env("ADMIN_EMAIL"),
+  frontend_domain: System.get_env("FRONTEND_DOMAIN")
 
 config :backend, Backend.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,

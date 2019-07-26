@@ -6,7 +6,7 @@ defmodule Backend.Crawler.ApiCrawler do
   * You must adhere to the following configuration values:
     * `:status_age_limit_days` specifies that you must only crawl statuses from the most recent N days
     * `:status_count_limit` specifies the max number of statuses to crawl in one go
-    * `:personal_instance_threshold` specifies that instances with fewer than this number of users should not be crawled
+    * `:personal_instance_threshold` specifies that instances with fewer than this number of users should not be crawled (unless :opt_in is true)
   * profiles with the string "nobot" (case insensitive) in their profile must not be included in any stats
   * Make sure to check the most recent crawl of the instance so you don't re-crawl old statuses
   """

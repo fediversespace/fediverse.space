@@ -9,8 +9,6 @@ body {
     Icons16, sans-serif;
 }
 
-.fediverse-instance-search-popover {
-  max-height: 350px;
-  min-width: 300px;
-  overflow-x: hidden;
+.app-toaster {
+  z-index: 1000;
 }

@@ -142,4 +142,19 @@ defmodule Backend.Util do
       Logger.info("Could not send SMS to admin; not configured.")
     end
   end
+
+  def clean_domain(domain) do
+    domain
+    |> String.replace_prefix("https://", "")
+    |> String.trim_trailing("/")
+    |> String.downcase()
+  end
+
+  def get_account(username, domain) do
+    if username == nil or domain == nil do
+      nil
+    else
+      "#{String.downcase(username)}@#{clean_domain(domain)}"
+    end
+  end
 end

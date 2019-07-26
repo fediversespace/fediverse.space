@@ -12,4 +12,10 @@ defmodule BackendWeb.FallbackController do
     |> put_view(BackendWeb.ErrorView)
     |> render(:"404")
   end
+
+  def call(conn, {:error, _}) do
+    conn
+    |> put_status(500)
+    |> render(:"500")
+  end
 end

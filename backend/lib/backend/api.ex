@@ -3,17 +3,19 @@ defmodule Backend.Api do
   import Backend.Util
   import Ecto.Query
 
-  @spec list_instances() :: [Instance.t()]
-  def list_instances() do
-    Instance
-    |> Repo.all()
-  end
-
   @spec get_instance!(String.t()) :: Instance.t()
   def get_instance!(domain) do
     Instance
     |> preload(:peers)
     |> Repo.get_by!(domain: domain)
+  end
+
+  def update_instance(instance) do
+    Repo.insert(
+      instance,
+      on_conflict: {:replace, [:opt_in, :opt_out]},
+      conflict_target: :domain
+    )
   end
 
   @doc """
@@ -32,7 +34,7 @@ defmodule Backend.Api do
     |> where(
       [i],
       not is_nil(i.x) and not is_nil(i.y) and not is_nil(i.user_count) and
-        i.user_count >= ^user_threshold
+        i.user_count >= ^user_threshold and not i.opt_out
     )
     |> maybe_filter_nodes_to_neighborhood(domain)
     |> select([c], [:domain, :user_count, :x, :y, :type])
@@ -71,7 +73,8 @@ defmodule Backend.Api do
       [e, i1, i2],
       not is_nil(i1.x) and not is_nil(i1.y) and
         not is_nil(i2.x) and not is_nil(i2.y) and
-        i1.user_count >= ^user_threshold and i2.user_count >= ^user_threshold
+        i1.user_count >= ^user_threshold and i2.user_count >= ^user_threshold and
+        not i1.opt_out and not i2.opt_out
     )
     |> Repo.all()
   end
@@ -103,7 +106,7 @@ defmodule Backend.Api do
 
     %{entries: instances, metadata: metadata} =
       Instance
-      |> where([i], ilike(i.domain, ^ilike_query))
+      |> where([i], ilike(i.domain, ^ilike_query) and not i.opt_out)
       |> order_by(asc: :id)
       |> Repo.paginate(after: cursor_after, cursor_fields: [:id], limit: 50)
 

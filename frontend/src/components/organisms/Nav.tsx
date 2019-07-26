@@ -44,6 +44,15 @@ class Nav extends React.Component<{}, INavState> {
             About
           </NavLink>
         </Navbar.Group>
+        <Navbar.Group align={Alignment.RIGHT}>
+          <NavLink
+            to="/admin"
+            className={`${Classes.BUTTON} ${Classes.MINIMAL} bp3-icon-${IconNames.COG}`}
+            activeClassName={Classes.INTENT_PRIMARY}
+          >
+            Administration
+          </NavLink>
+        </Navbar.Group>
       </Navbar>
     );
   }

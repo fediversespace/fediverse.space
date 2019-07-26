@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Instance administrators can now log in to opt in or out of crawling.
+
 ### Changed
 
 - Instances are now crawled hourly instead of every 30 minutes.

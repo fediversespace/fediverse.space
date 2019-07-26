@@ -44,8 +44,10 @@ defmodule BackendWeb.Endpoint do
     signing_salt: "HJa1j4FI"
   )
 
-  # TODO
-  plug(Corsica, origins: "*")
+  plug(Corsica,
+    origins: ["http://localhost:3000", ~r{^https?://(.*\.?)fediverse\.space$}],
+    allow_headers: ["content-type", "token"]
+  )
 
   plug(BackendWeb.Router)
 end

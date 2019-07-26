@@ -2,7 +2,9 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   require Logger
   import Backend.Crawler.Util
   import Backend.Util
+  import Ecto.Query
   alias Backend.Crawler.ApiCrawler
+  alias Backend.{Instance, Repo}
 
   @behaviour ApiCrawler
 
@@ -34,7 +36,14 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   def crawl(domain) do
     instance = Jason.decode!(get!("https://#{domain}/api/v1/instance").body)
 
-    if get_in(instance, ["stats", "user_count"]) > get_config(:personal_instance_threshold) do
+    has_opted_in =
+      case Instance |> select([:opt_in]) |> Repo.get_by(domain: domain) do
+        %{opt_in: true} -> true
+        _ -> false
+      end
+
+    if get_in(instance, ["stats", "user_count"]) > get_config(:personal_instance_threshold) or
+         has_opted_in do
       crawl_large_instance(domain, instance)
     else
       Map.merge(

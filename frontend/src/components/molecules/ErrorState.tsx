@@ -2,6 +2,11 @@ import { NonIdealState } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import * as React from "react";
 
-const ErrorState: React.SFC = () => <NonIdealState icon={IconNames.ERROR} title={"Something went wrong."} />;
+interface IErrorStateProps {
+  description?: string;
+}
+const ErrorState: React.FC<IErrorStateProps> = ({ description }) => (
+  <NonIdealState icon={IconNames.ERROR} title={"Something went wrong."} description={description} />
+);
 
 export default ErrorState;

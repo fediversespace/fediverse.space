@@ -4,7 +4,6 @@ defmodule Backend.Application do
   @moduledoc false
 
   use Application
-  require Logger
   import Backend.Util
 
   def start(_type, _args) do
