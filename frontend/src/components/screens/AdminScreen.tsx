@@ -42,18 +42,20 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
 
   public componentDidMount() {
     // Load instance settings from server
-    getFromApi(`admin`, this.authToken!)
-      .then(response => {
-        this.setState({ settings: response });
-      })
-      .catch(() => {
-        AppToaster.show({
-          icon: IconNames.ERROR,
-          intent: Intent.DANGER,
-          message: "Failed to load settings.",
-          timeout: 0
+    if (!!this.authToken) {
+      getFromApi(`admin`, this.authToken!)
+        .then(response => {
+          this.setState({ settings: response });
+        })
+        .catch(() => {
+          AppToaster.show({
+            icon: IconNames.ERROR,
+            intent: Intent.DANGER,
+            message: "Failed to load settings.",
+            timeout: 0
+          });
         });
-      });
+    }
   }
 
   public render() {
@@ -71,7 +73,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
           <p>{`${settings.userCount} users with ${settings.statusCount || "(unknown)"} statuses.`}</p>
           <form onSubmit={this.updateSettings}>
             {settings.userCount < 10 && (
-              <FormGroup helperText="Check this if you'd like your personal instance to be crawled by fediverse.space.">
+              <FormGroup helperText="Check this if you'd like your personal instance to be crawled by fediverse.space. This takes up to 24 hours to take effect.">
                 <Switch
                   id="opt-in-switch"
                   checked={!!settings.optIn}
@@ -82,7 +84,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
                 />
               </FormGroup>
             )}
-            <FormGroup helperText="Check this if you don't want to your instance to be crawled. You won't appear on fediverse.space.">
+            <FormGroup helperText="Check this if you don't want to your instance to be crawled. You won't appear on fediverse.space. The change is immediate.">
               <Switch
                 id="opt-out-switch"
                 checked={!!settings.optOut}

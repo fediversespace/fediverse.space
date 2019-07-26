@@ -20,7 +20,9 @@ interface IGraphProps {
   fetchGraph: () => void;
   graph?: IGraph;
   graphLoadError: boolean;
+  hoveringOverResult?: string;
   isLoadingGraph: boolean;
+  searchResultDomains: string[];
   navigate: (path: string) => void;
 }
 interface IGraphState {
@@ -52,8 +54,10 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
             colorScheme={this.state.colorScheme}
             currentNodeId={this.props.currentInstanceName}
             elements={this.props.graph}
+            hoveringOver={this.props.hoveringOverResult}
             navigateToInstancePath={this.navigateToInstancePath}
             navigateToRoot={this.navigateToRoot}
+            searchResultIds={this.props.searchResultDomains}
             ref={this.cytoscapeComponent}
           />
           <GraphTools
@@ -99,7 +103,9 @@ const mapStateToProps = (state: IAppState) => {
     currentInstanceName: match && match.params.domain,
     graph: state.data.graph,
     graphLoadError: state.data.error,
-    isLoadingGraph: state.data.isLoadingGraph
+    hoveringOverResult: state.search.hoveringOverResult,
+    isLoadingGraph: state.data.isLoadingGraph,
+    searchResultDomains: state.search.results.map(r => r.name)
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => ({

@@ -47,7 +47,7 @@ const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, onItemSelec
           <H6>Key</H6>
           <ul className={Classes.LIST_UNSTYLED}>
             {current.values.map(v => (
-              <StyledLi>
+              <StyledLi key={v}>
                 <InstanceType type={v} />
               </StyledLi>
             ))}

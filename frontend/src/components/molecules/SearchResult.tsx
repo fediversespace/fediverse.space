@@ -35,8 +35,10 @@ const StyledDescription = styled.div`
 interface ISearchResultProps {
   result: ISearchResultInstance;
   onClick: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
-const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick }) => {
+const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick, onMouseEnter, onMouseLeave }) => {
   let shortenedDescription;
   if (result.description) {
     shortenedDescription = result.description && sanitize(result.description);
@@ -55,7 +57,14 @@ const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick }) => {
   }
 
   return (
-    <StyledCard elevation={Elevation.ONE} interactive={true} key={result.name} onClick={onClick}>
+    <StyledCard
+      elevation={Elevation.ONE}
+      interactive={true}
+      key={result.name}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <StyledHeadingContainer>
         <StyledH4>{result.name}</StyledH4>
         {typeIcon}

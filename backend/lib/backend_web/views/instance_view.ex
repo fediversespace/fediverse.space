@@ -20,7 +20,7 @@ defmodule BackendWeb.InstanceView do
       end
 
     cond do
-      instance.user_count < user_threshold ->
+      instance.user_count < user_threshold and not instance.opt_in ->
         %{
           name: instance.domain,
           status: "personal instance"

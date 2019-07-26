@@ -10,10 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Instance administrators can now log in to opt in or out of crawling.
+- Added ElasticSearch full-text search over instance domains and descriptions.
+- Search results are now highlighted on the graph.
+- When you hover a search result, it is now highlighted on the graph.
 
 ### Changed
 
 - Instances are now crawled hourly instead of every 30 minutes.
+- The colors for color coding have been made brighter (more visible against the dark background.
 
 ### Deprecated
 

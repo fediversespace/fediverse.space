@@ -71,6 +71,13 @@ const resetSearch = () => {
   };
 };
 
+export const setResultHover = (domain?: string) => {
+  return {
+    payload: domain,
+    type: ActionType.SET_SEARCH_RESULT_HOVER
+  };
+};
+
 /** Async actions: https://redux.js.org/advanced/asyncactions */
 
 export const loadInstance = (instanceName: string | null) => {
@@ -98,9 +105,11 @@ export const updateSearch = (query: string) => {
       return;
     }
 
+    const isNewQuery = getState().search.query !== query;
+
     const next = getState().search.next;
     let url = `search/?query=${query}`;
-    if (next) {
+    if (!isNewQuery && next) {
       url += `&after=${next}`;
     }
     dispatch(requestSearchResult(query));

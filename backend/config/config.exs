@@ -19,6 +19,20 @@ config :backend, BackendWeb.Endpoint,
 
 config :backend, Backend.Repo, queue_target: 5000
 
+config :backend, Backend.Elasticsearch.Cluster,
+  url: "http://localhost:9200",
+  api: Elasticsearch.API.HTTP,
+  json_library: Jason,
+  indexes: %{
+    instances: %{
+      settings: "priv/elasticsearch/instances.json",
+      store: Backend.Elasticsearch.Store,
+      sources: [Backend.Instance],
+      bulk_page_size: 1000,
+      bulk_wait_interval: 1_000
+    }
+  }
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

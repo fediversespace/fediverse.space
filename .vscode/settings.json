@@ -1,3 +1,4 @@
 {
-  "elixirLS.projectDir": "backend/"
+  "elixirLS.projectDir": "backend/",
+  "elixirLS.fetchDeps": false
 }

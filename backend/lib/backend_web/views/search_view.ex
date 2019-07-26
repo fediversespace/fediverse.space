@@ -3,28 +3,28 @@ defmodule BackendWeb.SearchView do
   alias BackendWeb.SearchView
   import Backend.Util
 
-  def render("index.json", %{instances: instances, next: next}) do
+  def render("index.json", %{hits: hits, next: next}) do
     %{
-      results: render_many(instances, SearchView, "instance.json", as: :instance),
+      results: render_many(hits, SearchView, "instance.json", as: :hit),
       next: next
     }
   end
 
-  def render("instance.json", %{instance: instance}) do
+  def render("instance.json", %{hit: hit}) do
     threshold = get_config(:personal_instance_threshold)
 
     description =
-      if instance.user_count != nil and instance.user_count < threshold do
+      if hit.user_count != nil and hit.user_count < threshold do
         nil
       else
-        instance.description
+        hit.description
       end
 
     %{
-      name: instance.domain,
+      name: hit.domain,
       description: description,
-      userCount: instance.user_count,
-      type: instance.type
+      userCount: hit.user_count,
+      type: hit.type
     }
   end
 end

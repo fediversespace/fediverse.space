@@ -101,15 +101,67 @@ defmodule Backend.Api do
     end
   end
 
-  def search_instances(query, cursor_after \\ nil) do
-    ilike_query = "%#{query}%"
+  def search_instances(query, from \\ 0) do
+    page_size = 50
 
-    %{entries: instances, metadata: metadata} =
-      Instance
-      |> where([i], ilike(i.domain, ^ilike_query) and not i.opt_out)
-      |> order_by(asc: :id)
-      |> Repo.paginate(after: cursor_after, cursor_fields: [:id], limit: 50)
+    search_response =
+      Elasticsearch.post(Backend.Elasticsearch.Cluster, "/instances/_search", %{
+        "sort" => "_score",
+        "from" => from,
+        "size" => page_size,
+        "query" => %{
+          "bool" => %{
+            "should" => [
+              %{
+                "multi_match" => %{
+                  "query" => query,
+                  "fields" => [
+                    "description.english"
+                  ]
+                }
+              },
+              %{
+                "wildcard" => %{
+                  "domain.keyword" => %{
+                    "value" => query,
+                    "boost" => 100
+                  }
+                }
+              },
+              %{
+                "wildcard" => %{
+                  "domain.keyword" => %{
+                    "value" => "*#{query}*",
+                    "boost" => 1
+                  }
+                }
+              },
+              %{
+                "match" => %{
+                  "domain.ngram^0.5" => query
+                }
+              }
+            ]
+          }
+        }
+      })
 
-    %{instances: instances, next: metadata.after}
+    with {:ok, result} <- search_response do
+      hits =
+        get_in(result, ["hits", "hits"])
+        |> Enum.map(fn h -> h |> Map.get("_source") |> convert_keys_to_atoms() end)
+
+      next =
+        if length(hits) < page_size do
+          nil
+        else
+          from + page_size
+        end
+
+      %{
+        hits: hits,
+        next: next
+      }
+    end
   end
 end

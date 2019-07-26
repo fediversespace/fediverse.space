@@ -1,9 +1,16 @@
 import cytoscape from "cytoscape";
+import { isEqual } from "lodash";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
 import tippy, { Instance } from "tippy.js";
-import { DEFAULT_NODE_COLOR, QUALITATIVE_COLOR_SCHEME, SELECTED_NODE_COLOR } from "../../constants";
+import {
+  DEFAULT_NODE_COLOR,
+  HOVERED_NODE_COLOR,
+  QUALITATIVE_COLOR_SCHEME,
+  SEARCH_RESULT_COLOR,
+  SELECTED_NODE_COLOR
+} from "../../constants";
 import { IColorSchemeType } from "../../types";
 
 const CytoscapeContainer = styled.div`
@@ -16,6 +23,8 @@ interface ICytoscapeProps {
   colorScheme?: IColorSchemeType;
   currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
+  hoveringOver?: string;
+  searchResultIds?: string[];
   navigateToInstancePath?: (domain: string) => void;
   navigateToRoot?: () => void;
 }
@@ -128,6 +137,12 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     if (prevProps.colorScheme !== this.props.colorScheme) {
       this.updateColorScheme();
     }
+    if (prevProps.hoveringOver !== this.props.hoveringOver) {
+      this.updateHoveredNodeClass(prevProps.hoveringOver);
+    }
+    if (!isEqual(prevProps.searchResultIds, this.props.searchResultIds)) {
+      this.updateSearchResultNodeClass();
+    }
   }
 
   public componentWillUnmount() {
@@ -187,17 +202,39 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     if (!style) {
       style = this.cy!.style() as any;
     }
+    style = style.selector("node").style({
+      "background-color": DEFAULT_NODE_COLOR,
+      // The size from the backend is log_10(userCount), which from 10 <= userCount <= 1,000,000 gives us the range
+      // 1-6. We map this to the range of sizes we want.
+      // TODO: I should probably check that that the backend is actually using log_10 and not log_e, but it look
+      // quite good as it is, so...
+      height: "mapData(size, 1, 6, 20, 200)",
+      label: "data(id)",
+      width: "mapData(size, 1, 6, 20, 200)"
+    });
+
+    this.setNodeSearchColorScheme(style);
+  };
+
+  /**
+   * We always want to set node search/hover styles at the end of a style change to make sure they don't get overwritten.
+   */
+  private setNodeSearchColorScheme = (style?: any) => {
+    if (!style) {
+      style = this.cy!.style() as any;
+    }
     style
-      .selector("node")
+      .selector("node.searchResult")
       .style({
-        "background-color": DEFAULT_NODE_COLOR,
-        // The size from the backend is log_10(userCount), which from 10 <= userCount <= 1,000,000 gives us the range
-        // 1-6. We map this to the range of sizes we want.
-        // TODO: I should probably check that that the backend is actually using log_10 and not log_e, but it look
-        // quite good as it is, so...
-        height: "mapData(size, 1, 6, 20, 200)",
-        label: "data(id)",
-        width: "mapData(size, 1, 6, 20, 200)"
+        "background-color": SEARCH_RESULT_COLOR,
+        "border-color": SEARCH_RESULT_COLOR,
+        "border-opacity": 0.7,
+        "border-width": 250
+      })
+      .selector("node.hovered")
+      .style({
+        "border-color": HOVERED_NODE_COLOR,
+        "border-width": 1000
       })
       .selector("node:selected")
       .style({
@@ -220,11 +257,46 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
           "background-color": QUALITATIVE_COLOR_SCHEME[idx]
         });
       });
-      style
-        .selector("node:selected")
-        .style({ "background-color": SELECTED_NODE_COLOR })
-        .update();
+
+      this.setNodeSearchColorScheme(style);
     }
+  };
+
+  /**
+   * This function sets the hover class on the node that's currently being hovered over in the search results
+   * (and removes it from the previous one if there was one).
+   *
+   * We explicitly pass the ID of the previously hovered node, rather than just using a class selector.
+   * This is because lookups by ID are significantly faster than class selectors.
+   */
+  private updateHoveredNodeClass = (prevHoveredId?: string) => {
+    if (!this.cy) {
+      throw new Error("Expected cytoscape, but there wasn't one!");
+    }
+    const { hoveringOver } = this.props;
+
+    if (!!prevHoveredId) {
+      this.cy.$id(prevHoveredId).removeClass("hovered");
+    }
+    if (!!hoveringOver) {
+      this.cy.$id(hoveringOver).addClass("hovered");
+    }
+  };
+
+  private updateSearchResultNodeClass = () => {
+    if (!this.cy) {
+      throw new Error("Expected cytoscape, but there wasn't one!");
+    }
+    const { searchResultIds } = this.props;
+
+    this.cy.batch(() => {
+      this.cy!.nodes().removeClass("searchResult");
+
+      if (!!searchResultIds && searchResultIds.length > 0) {
+        const currentResultSelector = searchResultIds.map(id => `node[id = "${id}"]`).join(", ");
+        this.cy!.$(currentResultSelector).addClass("searchResult");
+      }
+    });
   };
 }
 

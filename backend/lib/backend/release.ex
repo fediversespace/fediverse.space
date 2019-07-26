@@ -1,10 +1,22 @@
 defmodule Backend.Release do
   @app :backend
 
+  alias Elasticsearch.Index
+  alias Backend.Elasticsearch.Cluster
+
+  def run_all do
+    migrate()
+    index()
+  end
+
   def migrate do
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
     end
+  end
+
+  def index do
+    Index.hot_swap(Cluster, "instances")
   end
 
   def rollback(repo, version) do

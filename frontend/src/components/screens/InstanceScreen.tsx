@@ -385,9 +385,9 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
         title="No data"
         description="This instance has fewer than 10 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
         action={
-          <AnchorButton icon={IconNames.CONFIRM} href="https://cursed.technology/@fediversespace" target="_blank">
-            Message @fediversespace to opt in
-          </AnchorButton>
+          <Link to={"/admin"} className={Classes.BUTTON} role="button">
+            {"Opt in"}
+          </Link>
         }
       />
     );

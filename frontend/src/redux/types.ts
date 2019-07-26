@@ -15,9 +15,9 @@ export enum ActionType {
   REQUEST_SEARCH_RESULTS = "REQUEST_SEARCH_RESULTS",
   RECEIVE_SEARCH_RESULTS = "RECEIVE_SEARCH_RESULTS",
   SEARCH_RESULTS_ERROR = "SEARCH_RESULTS_ERROR",
-  RESET_SEARCH = "RESET_SEARCH"
-  // REQUEST_INSTANCES = "REQUEST_INSTANCES",
-  // RECEIVE_INSTANCES = "RECEIVE_INSTANCES",
+  RESET_SEARCH = "RESET_SEARCH",
+  // Search -- hovering over results
+  SET_SEARCH_RESULT_HOVER = "SET_SEARCH_RESULT_HOVER"
 }
 
 export interface IAction {
@@ -102,6 +102,7 @@ export interface ISearchState {
   next: string;
   query: string;
   results: ISearchResultInstance[];
+  hoveringOverResult?: string;
 }
 
 export interface IAppState {

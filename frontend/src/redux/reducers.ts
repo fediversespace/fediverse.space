@@ -86,6 +86,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
         ...state,
         error: false,
         isLoadingResults: true,
+        next: isNewQuery ? "" : state.next,
         query,
         results: isNewQuery ? [] : state.results
       };
@@ -108,6 +109,11 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
       };
     case ActionType.RESET_SEARCH:
       return initialSearchState;
+    case ActionType.SET_SEARCH_RESULT_HOVER:
+      return {
+        ...state,
+        hoveringOverResult: action.payload
+      };
     default:
       return state;
   }

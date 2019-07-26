@@ -1,0 +1,53 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0,
+    "analysis": {
+      "analyzer": {
+        "ngramAnalyzer": {
+          "tokenizer": "ngramTokenizer"
+        }
+      },
+      "tokenizer": {
+        "ngramTokenizer": {
+          "type": "ngram",
+          "min_gram": 5,
+          "max_gram": 5
+        }
+      }
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "domain": {
+          "type": "text",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "ngramAnalyzer"
+            },
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "description": {
+          "type": "text",
+          "fields": {
+            "english": {
+              "type": "text",
+              "analyzer": "english"
+            }
+          }
+        },
+        "type": {
+          "type": "keyword"
+        },
+        "user_count": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

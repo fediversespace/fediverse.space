@@ -52,7 +52,8 @@ defmodule Backend.MixProject do
       {:public_suffix, "~> 0.6.0"},
       {:idna, "~> 5.1.2", override: true},
       {:swoosh, "~> 0.23.3"},
-      {:ex_twilio, "~> 0.7.0"}
+      {:ex_twilio, "~> 0.7.0"},
+      {:elasticsearch, "~> 1.0"}
     ]
   end
 

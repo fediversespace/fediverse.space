@@ -1,11 +1,8 @@
 defmodule BackendWeb.AdminView do
   use BackendWeb, :view
-  import Backend.Util
   require Logger
 
   def render("show.json", %{instance: instance}) do
-    Logger.info(inspect(instance))
-
     %{
       domain: domain,
       opt_in: opt_in,

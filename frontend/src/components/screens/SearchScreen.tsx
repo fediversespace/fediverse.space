@@ -5,7 +5,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
-import { updateSearch } from "../../redux/actions";
+import { setResultHover, updateSearch } from "../../redux/actions";
 import { IAppState, ISearchResultInstance } from "../../redux/types";
 import { SearchResult } from "../molecules";
 
@@ -34,6 +34,7 @@ interface ISearchScreenProps {
   results: ISearchResultInstance[];
   handleSearch: (query: string) => void;
   navigateToInstance: (domain: string) => void;
+  setIsHoveringOver: (domain?: string) => void;
 }
 interface ISearchScreenState {
   currentQuery: string;
@@ -72,7 +73,13 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
         {this.renderSearchBar()}
         <SearchResults>
           {results.map(result => (
-            <SearchResult result={result} key={result.name} onClick={this.selectInstanceFactory(result.name)} />
+            <SearchResult
+              result={result}
+              key={result.name}
+              onClick={this.selectInstanceFactory(result.name)}
+              onMouseEnter={this.onMouseEnterFactory(result.name)}
+              onMouseLeave={this.onMouseLeave}
+            />
           ))}
           {isLoadingResults && <StyledSpinner size={Spinner.SIZE_SMALL} />}
           {!isLoadingResults && hasMoreResults && (
@@ -100,7 +107,16 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
   };
 
   private selectInstanceFactory = (domain: string) => () => {
+    this.props.setIsHoveringOver(undefined);
     this.props.navigateToInstance(domain);
+  };
+
+  private onMouseEnterFactory = (domain: string) => () => {
+    this.props.setIsHoveringOver(domain);
+  };
+
+  private onMouseLeave = () => {
+    this.props.setIsHoveringOver(undefined);
   };
 
   private renderSearchBar = () => (
@@ -128,7 +144,8 @@ const mapStateToProps = (state: IAppState) => ({
 });
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   handleSearch: (query: string) => dispatch(updateSearch(query) as any),
-  navigateToInstance: (domain: string) => dispatch(push(`/instance/${domain}`))
+  navigateToInstance: (domain: string) => dispatch(push(`/instance/${domain}`)),
+  setIsHoveringOver: (domain?: string) => dispatch(setResultHover(domain))
 });
 export default connect(
   mapStateToProps,

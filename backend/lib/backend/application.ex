@@ -21,7 +21,8 @@ defmodule Backend.Application do
          Honeydew.start_queue(:crawl_queue, failure_mode: Honeydew.FailureMode.Abandon)
          Honeydew.start_workers(:crawl_queue, Backend.Crawler, num: crawl_worker_count)
        end},
-      Backend.Scheduler
+      Backend.Scheduler,
+      Backend.Elasticsearch.Cluster
     ]
 
     children =

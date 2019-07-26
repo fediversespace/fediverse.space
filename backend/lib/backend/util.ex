@@ -157,4 +157,14 @@ defmodule Backend.Util do
       "#{String.downcase(username)}@#{clean_domain(domain)}"
     end
   end
+
+  @doc """
+  Converts a map with string keys to a map with atom keys.
+  Be very careful with this -- only use it on maps where you know the keys! Never run it if the keys can be supplied
+  by the user.
+  """
+  # sobelow_skip ["DOS.StringToAtom"]
+  def convert_keys_to_atoms(map) do
+    map |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+  end
 end

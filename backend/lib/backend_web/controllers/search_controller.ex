@@ -6,8 +6,8 @@ defmodule BackendWeb.SearchController do
 
   def index(conn, params) do
     query = Map.get(params, "query")
-    cursor_after = Map.get(params, "after", nil)
-    %{instances: instances, next: next} = Api.search_instances(query, cursor_after)
-    render(conn, "index.json", instances: instances, next: next)
+    from = Map.get(params, "after", "0") |> String.to_integer()
+    %{hits: hits, next: next} = Api.search_instances(query, from)
+    render(conn, "index.json", hits: hits, next: next)
   end
 end
