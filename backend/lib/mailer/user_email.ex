@@ -1,6 +1,6 @@
 defmodule Backend.Mailer.UserEmail do
   import Swoosh.Email
-  import Backend.Auth
+  import Backend.{Auth, Util}
   require Logger
 
   @spec send_login_email(String.t(), String.t()) :: {:ok | :error, term}
