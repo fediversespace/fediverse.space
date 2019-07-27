@@ -1,5 +1,6 @@
 import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
 import * as React from "react";
+import nlnetLogo from "../../assets/nlnet.png";
 import { Page } from "../atoms/";
 
 const AboutScreen: React.FC = () => (
@@ -33,24 +34,32 @@ const AboutScreen: React.FC = () => (
     </p>
 
     <H4>How do I add my personal instance?</H4>
-    <p className={Classes.RUNNING_TEXT}>
-      Send a DM to{" "}
-      <a href="https://cursed.technology/@fediversespace" target="_blank" rel="noopener noreferrer">
-        @fediversespace
-      </a>{" "}
-      on Mastodon. Make sure to send it from the account that's listed as the instance admin.
-    </p>
+    <p className={Classes.RUNNING_TEXT}>Click on the Administration link in the top right to opt-in.</p>
 
     <H4>How do you calculate the strength of relationships between instances?</H4>
     <p className={Classes.RUNNING_TEXT}>
-      fediverse.space scrapes the last 5000 statuses from within the last month on the public timeline of each instance.
-      It looks at the ratio of
+      fediverse.space looks at statuses from within the last month on the public timeline of each instance. It
+      calculates at the ratio of
       <Code>mentions of an instance / total statuses</Code>. It uses a ratio rather than an absolute number of mentions
       to reflect that smaller instances can play a large role in a community.
     </p>
 
     <H2>Credits</H2>
-    <p className={Classes.RUNNING_TEXT}>This site is inspired by several other sites in the same vein:</p>
+
+    <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
+      <img src={nlnetLogo} alt="NLnet logo" width={160} height={60} />
+    </a>
+    <br />
+    <br />
+    <p className={Classes.RUNNING_TEXT}>
+      This project is proudly supported by{" "}
+      <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
+        NLnet
+      </a>
+      .
+    </p>
+
+    <p className={Classes.RUNNING_TEXT}>Inspiration for this site comes from several places:</p>
     <ul className={Classes.LIST}>
       <li>
         <a href="https://the-federation.info/" target="_blank" rel="noopener noreferrer">
