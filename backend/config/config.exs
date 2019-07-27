@@ -74,8 +74,8 @@ config :backend, Backend.Scheduler,
     {"15 0 * * *", {Backend.Scheduler, :generate_edges, []}},
     # 00.30 every night
     {"30 0 * * *", {Backend.Scheduler, :generate_insularity_scores, []}},
-    # Every 30 minutes
-    {"*/30 * * * *", {Backend.Scheduler, :check_for_spam_instances, []}}
+    # Every 3 hours
+    {"0 */3 * * *", {Backend.Scheduler, :check_for_spam_instances, []}}
   ]
 
 # Import environment specific config. This must remain at the bottom

@@ -165,7 +165,7 @@ defmodule Backend.Scheduler do
   notifies the server admin over SMS.
   """
   def check_for_spam_instances() do
-    hour_range = 6
+    hour_range = 3
 
     count_subquery =
       Instance
