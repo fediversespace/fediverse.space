@@ -4,6 +4,7 @@ import styled from "styled-components";
 
 const FloatingCardRow = styled.div`
   display: flex;
+  max-width: 250px;
 `;
 const FloatingCardElement = styled(Card)`
   margin: 0 0 10px 10px;

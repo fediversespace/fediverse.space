@@ -8,10 +8,12 @@ import {
   DEFAULT_NODE_COLOR,
   HOVERED_NODE_COLOR,
   QUALITATIVE_COLOR_SCHEME,
+  QUANTITATIVE_COLOR_SCHEME,
   SEARCH_RESULT_COLOR,
   SELECTED_NODE_COLOR
 } from "../../constants";
-import { IColorSchemeType } from "../../types";
+import { IColorScheme } from "../../types";
+import { getBuckets } from "../../util";
 
 const CytoscapeContainer = styled.div`
   width: 100%;
@@ -20,10 +22,11 @@ const CytoscapeContainer = styled.div`
 `;
 
 interface ICytoscapeProps {
-  colorScheme?: IColorSchemeType;
+  colorScheme?: IColorScheme;
   currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
   hoveringOver?: string;
+  ranges?: { [key: string]: [number, number] };
   searchResultIds?: string[];
   navigateToInstancePath?: (domain: string) => void;
   navigateToRoot?: () => void;
@@ -251,15 +254,33 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     let style = this.cy.style() as any;
     if (!colorScheme) {
       this.resetNodeColorScheme();
-    } else {
+      return;
+    } else if (colorScheme.type === "qualitative") {
       colorScheme.values.forEach((v, idx) => {
         style = style.selector(`node[${colorScheme.cytoscapeDataKey} = '${v}']`).style({
           "background-color": QUALITATIVE_COLOR_SCHEME[idx]
         });
       });
+    } else if (colorScheme.type === "quantitative") {
+      const dataKey = colorScheme.cytoscapeDataKey;
+      if (!this.props.ranges || !this.props.ranges[dataKey]) {
+        throw new Error("Expected a range but did not receive one!");
+      }
+      // Create buckets for the range and corresponding classes
+      const [minVal, maxVal] = this.props.ranges[dataKey];
+      const buckets = getBuckets(minVal, maxVal, QUANTITATIVE_COLOR_SCHEME.length, colorScheme.exponential);
 
-      this.setNodeSearchColorScheme(style);
+      QUANTITATIVE_COLOR_SCHEME.forEach((color, idx) => {
+        const min = buckets[idx];
+        // Make sure the max value is also included in a bucket!
+        const max = idx === QUANTITATIVE_COLOR_SCHEME.length - 1 ? maxVal + 1 : buckets[idx + 1];
+        const selector = `node[${dataKey} >= ${min}][${dataKey} < ${max}]`;
+        style = style.selector(selector).style({
+          "background-color": color
+        });
+      });
     }
+    this.setNodeSearchColorScheme(style);
   };
 
   /**

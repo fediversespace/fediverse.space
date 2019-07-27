@@ -3,9 +3,24 @@ defmodule BackendWeb.GraphView do
   alias BackendWeb.GraphView
 
   def render("index.json", %{nodes: nodes, edges: edges}) do
+    statuses_per_day =
+      nodes
+      |> Enum.map(fn %{statuses_per_day: statuses_per_day} -> statuses_per_day end)
+      |> Enum.filter(fn s -> s != nil end)
+
     %{
-      nodes: render_many(nodes, GraphView, "node.json", as: :node),
-      edges: render_many(edges, GraphView, "edge.json", as: :edge)
+      graph: %{
+        nodes: render_many(nodes, GraphView, "node.json", as: :node),
+        edges: render_many(edges, GraphView, "edge.json", as: :edge)
+      },
+      metadata: %{
+        ranges: %{
+          statusesPerDay: [
+            Enum.min(statuses_per_day),
+            Enum.max(statuses_per_day)
+          ]
+        }
+      }
     }
   end
 
@@ -22,7 +37,8 @@ defmodule BackendWeb.GraphView do
         id: node.domain,
         label: node.domain,
         size: size,
-        type: node.type
+        type: node.type,
+        statusesPerDay: node.statuses_per_day
       },
       position: %{
         x: node.x,

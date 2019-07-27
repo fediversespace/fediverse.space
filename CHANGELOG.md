@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added ElasticSearch full-text search over instance domains and descriptions.
 - Search results are now highlighted on the graph.
 - When you hover a search result, it is now highlighted on the graph.
+- Instance details now show activity rate (average number of statuses posted per day).
+- It's now possible to color code by activity rate.
 
 ### Changed
 

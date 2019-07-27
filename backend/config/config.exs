@@ -74,6 +74,8 @@ config :backend, Backend.Scheduler,
     {"15 0 * * *", {Backend.Scheduler, :generate_edges, []}},
     # 00.30 every night
     {"30 0 * * *", {Backend.Scheduler, :generate_insularity_scores, []}},
+    # 00.45 every night
+    {"45 0 * * *", {Backend.Scheduler, :generate_status_rate, []}},
     # Every 3 hours
     {"0 */3 * * *", {Backend.Scheduler, :check_for_spam_instances, []}}
   ]

@@ -259,7 +259,16 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     if (!this.props.instanceDetails) {
       throw new Error("Did not receive instance details as expected!");
     }
-    const { version, userCount, statusCount, domainCount, lastUpdated, insularity, type } = this.props.instanceDetails;
+    const {
+      version,
+      userCount,
+      statusCount,
+      domainCount,
+      lastUpdated,
+      insularity,
+      type,
+      statusesPerDay
+    } = this.props.instanceDetails;
     return (
       <StyledHTMLTable small={true} striped={true}>
         <tbody>
@@ -297,6 +306,25 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
               </Tooltip>
             </td>
             <td>{(insularity && numeral.default(insularity).format("0.0%")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>
+              Statuses / day{" "}
+              <Tooltip
+                content={
+                  <span>
+                    The average number of statuses per day
+                    <br />
+                    over the last month.
+                  </span>
+                }
+                position={Position.TOP}
+                className={Classes.DARK}
+              >
+                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+              </Tooltip>
+            </td>
+            <td>{(statusesPerDay && numeral.default(statusesPerDay).format("0.0")) || "Unknown"}</td>
           </tr>
           <tr>
             <td>Known peers</td>
@@ -430,7 +458,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
 const mapStateToProps = (state: IAppState) => {
   const match = domainMatchSelector(state);
   return {
-    graph: state.data.graph,
+    graph: state.data.graphResponse && state.data.graphResponse.graph,
     instanceDetails: state.currentInstance.currentInstanceDetails,
     instanceLoadError: state.currentInstance.error,
     instanceName: match && match.params.domain,

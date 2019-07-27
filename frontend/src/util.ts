@@ -1,5 +1,6 @@
 import { createMatchSelector } from "connected-react-router";
 import fetch from "cross-fetch";
+import { range } from "lodash";
 import { DESKTOP_WIDTH_THRESHOLD, IInstanceDomainPath, INSTANCE_DOMAIN_PATH } from "./constants";
 import { IAppState } from "./redux/types";
 
@@ -50,5 +51,20 @@ export const unsetAuthToken = () => {
 
 export const getAuthToken = () => {
   return sessionStorage.getItem("adminToken");
-  // TODO: check if it's expired, and if so a) delete it and b) return null
+};
+
+export const getBuckets = (min: number, max: number, steps: number, exponential: boolean) => {
+  if (exponential) {
+    const logSpace = range(steps).map(i => Math.E ** i);
+    // Scale the log space to the linear range
+    const logRange = logSpace[logSpace.length - 1] - logSpace[0];
+    const linearRange = max - min;
+    const scalingFactor = linearRange / logRange;
+    const translation = min - logSpace[0];
+    return logSpace.map(i => (i + translation) * scalingFactor);
+  } else {
+    // Linear
+    const bucketSize = Math.ceil((max - min) / steps);
+    return range(min, max, bucketSize);
+  }
 };

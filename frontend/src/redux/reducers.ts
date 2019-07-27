@@ -8,18 +8,18 @@ const initialDataState = {
   error: false,
   isLoadingGraph: false
 };
-const data = (state: IDataState = initialDataState, action: IAction) => {
+const data = (state: IDataState = initialDataState, action: IAction): IDataState => {
   switch (action.type) {
     case ActionType.REQUEST_GRAPH:
       return {
         ...state,
-        graph: undefined,
+        graphResponse: undefined,
         isLoadingGraph: true
       };
     case ActionType.RECEIVE_GRAPH:
       return {
         ...state,
-        graph: action.payload,
+        graphResponse: action.payload,
         isLoadingGraph: false
       };
     case ActionType.GRAPH_LOAD_ERROR:

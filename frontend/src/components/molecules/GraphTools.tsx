@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { IColorSchemeType } from "../../types";
+import { IColorScheme } from "../../types";
 import { GraphKey, GraphResetButton } from "../atoms";
 
 const GraphToolsContainer = styled.div`
@@ -12,21 +12,28 @@ const GraphToolsContainer = styled.div`
 `;
 
 interface IGraphToolsProps {
-  currentColorScheme?: IColorSchemeType;
-  colorSchemes: IColorSchemeType[];
-  onColorSchemeSelect: (colorScheme?: IColorSchemeType) => void;
+  currentColorScheme?: IColorScheme;
+  colorSchemes: IColorScheme[];
+  ranges?: { [key: string]: [number, number] };
+  onColorSchemeSelect: (colorScheme?: IColorScheme) => void;
   onResetButtonClick: () => void;
 }
 const GraphTools: React.FC<IGraphToolsProps> = ({
   currentColorScheme,
   colorSchemes,
+  ranges,
   onColorSchemeSelect,
   onResetButtonClick
 }) => {
   return (
     <GraphToolsContainer>
       <GraphResetButton onClick={onResetButtonClick} />
-      <GraphKey current={currentColorScheme} colorSchemes={colorSchemes} onItemSelect={onColorSchemeSelect} />
+      <GraphKey
+        current={currentColorScheme}
+        colorSchemes={colorSchemes}
+        onItemSelect={onColorSchemeSelect}
+        ranges={ranges}
+      />
     </GraphToolsContainer>
   );
 };
