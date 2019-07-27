@@ -20,7 +20,15 @@ defmodule Backend.MixProject do
   def application do
     [
       mod: {Backend.Application, []},
-      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum, :ex_twilio, :appsignal]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :mnesia,
+        :gollum,
+        :ex_twilio,
+        :elasticsearch,
+        :appsignal
+      ]
     ]
   end
 
