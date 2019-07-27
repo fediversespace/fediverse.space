@@ -28,6 +28,9 @@ backend-sobelow:
   only:
     changes:
       - backend/*
+  except:
+    - develop
+    - master
   before_script:
     - cd backend
   script:
