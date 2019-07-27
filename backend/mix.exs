@@ -20,7 +20,7 @@ defmodule Backend.MixProject do
   def application do
     [
       mod: {Backend.Application, []},
-      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum, :ex_twilio]
+      extra_applications: [:logger, :runtime_tools, :mnesia, :gollum, :ex_twilio, :appsignal]
     ]
   end
 
@@ -53,7 +53,8 @@ defmodule Backend.MixProject do
       {:idna, "~> 5.1.2", override: true},
       {:swoosh, "~> 0.23.3"},
       {:ex_twilio, "~> 0.7.0"},
-      {:elasticsearch, "~> 1.0"}
+      {:elasticsearch, "~> 1.0"},
+      {:appsignal, "~> 1.10.1"}
     ]
   end
 

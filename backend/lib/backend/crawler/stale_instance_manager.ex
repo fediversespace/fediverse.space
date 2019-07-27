@@ -16,6 +16,8 @@ defmodule Backend.Crawler.StaleInstanceManager do
 
   @impl true
   def init(_opts) do
+    Logger.info("Starting crawler manager...")
+
     instance_count =
       Instance
       |> where([i], not is_nil(i.version))

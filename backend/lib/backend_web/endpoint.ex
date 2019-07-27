@@ -1,5 +1,6 @@
 defmodule BackendWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :backend
+  use Appsignal.Phoenix
 
   socket("/socket", BackendWeb.UserSocket,
     websocket: true,

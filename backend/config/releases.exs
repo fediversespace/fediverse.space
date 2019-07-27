@@ -17,6 +17,8 @@ config :backend, Backend.Repo,
 config :backend, Backend.Elasticsearch.Cluster,
   url: System.get_env("ELASTICSEARCH_URL") || "http://localhost:9200"
 
+config :appsignal, :config, revision: System.get_env("GIT_REV")
+
 port = String.to_integer(System.get_env("PORT") || "4000")
 
 config :backend, BackendWeb.Endpoint,

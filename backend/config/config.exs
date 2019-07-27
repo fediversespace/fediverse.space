@@ -15,7 +15,8 @@ config :backend, BackendWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "XL4NKGBN9lZMrQbMEI1KJOlwAt8S7younVJl90TdAgzmwyapr3g7BRYSNYvX0sZ9",
   render_errors: [view: BackendWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Backend.PubSub, adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Backend.PubSub, adapter: Phoenix.PubSub.PG2],
+  instrumenters: [Appsignal.Phoenix.Instrumenter]
 
 config :backend, Backend.Repo, queue_target: 5000
 

@@ -10,6 +10,7 @@ defmodule Backend.Crawler do
   import Ecto.Query
   import Backend.Util
   require Logger
+  use Appsignal.Instrumentation.Decorators
 
   defstruct [
     # the instance domain (a string)
@@ -31,9 +32,9 @@ defmodule Backend.Crawler do
           error: String.t() | nil
         }
 
+  @decorate transaction()
   def run(domain) do
-    Logger.info("Crawling #{domain}...")
-    HTTPoison.start()
+    Logger.debug("Starting crawl of #{domain}")
 
     state = %Crawler{
       domain: domain,
@@ -59,11 +60,13 @@ defmodule Backend.Crawler do
 
   # Recursive function to check whether `domain` has an API that the head of the api_crawlers list can read.
   # If so, crawls it. If not, continues with the tail of the api_crawlers list.
+  @decorate transaction_event()
   defp crawl(%Crawler{api_crawlers: [], domain: domain} = state) do
     Logger.debug("Found no compatible API for #{domain}")
     Map.put(state, :found_api?, false)
   end
 
+  @decorate transaction_event()
   defp crawl(%Crawler{domain: domain, api_crawlers: [curr | remaining_crawlers]} = state) do
     if curr.is_instance_type?(domain) do
       Logger.debug("Found #{curr} instance")
@@ -94,6 +97,7 @@ defmodule Backend.Crawler do
   end
 
   # Save the state (after crawling) to the database.
+  @decorate transaction_event()
   defp save(%Crawler{
          domain: domain,
          result: result,
@@ -210,6 +214,7 @@ defmodule Backend.Crawler do
     |> Repo.insert_all(interactions)
   end
 
+  @decorate transaction_event()
   defp save(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
     error =
       cond do

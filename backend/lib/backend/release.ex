@@ -16,7 +16,11 @@ defmodule Backend.Release do
   end
 
   def index do
+    # TODO: this isn't the right way to handle this.
+    # See https://github.com/danielberkompas/elasticsearch-elixir/issues/76
+    Application.ensure_all_started(@app)
     Index.hot_swap(Cluster, "instances")
+    :init.stop()
   end
 
   def rollback(repo, version) do
