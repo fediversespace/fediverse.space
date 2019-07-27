@@ -49,6 +49,8 @@ defmodule Backend.Crawler do
     # go!
     |> crawl()
     |> save()
+
+    Appsignal.increment_counter("crawler.total", 1)
   end
 
   # Adds a new ApiCrawler that run/1 will check.
@@ -207,6 +209,8 @@ defmodule Backend.Crawler do
 
     CrawlInteraction
     |> Repo.insert_all(interactions)
+
+    Appsignal.increment_counter("crawler.success", 1)
   end
 
   defp save(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
@@ -232,6 +236,8 @@ defmodule Backend.Crawler do
         error: error
       })
     end)
+
+    Appsignal.increment_counter("crawler.failure", 1)
   end
 
   defp get_base_domain(domain) do

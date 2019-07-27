@@ -74,10 +74,28 @@ defmodule Backend.Crawler.StaleInstanceManager do
       )
       |> select([i], i.domain)
       |> Repo.all()
+      |> MapSet.new()
 
-    Logger.debug("Adding #{length(stale_domains)} stale domains to queue.")
+    # Don't add a domain that's already in the queue
+    domains_in_queue =
+      Honeydew.filter(:crawl_queue, fn job ->
+        is_pending_crawl_job = match?(%Honeydew.Job{completed_at: nil, task: {:run, [_]}}, job)
 
-    stale_domains
+        if is_pending_crawl_job do
+          %Honeydew.Job{completed_at: nil, task: {:run, [d]}} = job
+          MapSet.member?(stale_domains, d)
+        else
+          false
+        end
+      end)
+      |> Enum.map(fn %Honeydew.Job{task: {:run, [d]}} -> d end)
+      |> MapSet.new()
+
+    domains_to_queue = MapSet.difference(stale_domains, domains_in_queue)
+
+    Logger.debug("Adding #{MapSet.size(domains_to_queue)} stale domains to queue.")
+
+    domains_to_queue
     |> Enum.each(fn domain -> add_to_queue(domain) end)
   end
 
