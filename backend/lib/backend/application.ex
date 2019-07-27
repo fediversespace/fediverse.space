@@ -61,17 +61,23 @@ defmodule Backend.Application do
     Appsignal.Probes.register(:crawler, fn ->
       %{
         queue: %{
-          count: count,
-          in_progress: in_progress,
           mnesia: mnesia
         }
       } = Honeydew.status(:crawl_queue)
 
+      # How much memory the mnesia queue in using
       memory = mnesia |> Map.get(:"honeydew_:crawl_queue") |> Keyword.get(:memory)
-
-      Appsignal.set_gauge("queue_length", count)
-      Appsignal.set_gauge("in_progress", in_progress)
       Appsignal.set_gauge("mnesia_memory", memory)
+
+      # How many jobs are pending in the queue
+      queue_length =
+        Honeydew.filter(
+          :crawl_queue,
+          &match?(%Honeydew.Job{completed_at: nil, task: {:run, _}}, &1)
+        )
+        |> Enum.count()
+
+      Appsignal.set_gauge("queue_length", queue_length)
     end)
   end
 end

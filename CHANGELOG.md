@@ -17,13 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Instances are now crawled hourly instead of every 30 minutes.
-- The colors for color coding have been made brighter (more visible against the dark background.
+- There are now 100 concurrent crawl workers by default (increased from 50).
+- The colors for color coding have been made brighter (more visible against the dark background).
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Fixed a process leak that could cause the server to OOM.
+- Domains are no longer added to the queue twice.
 
 ### Security
 
