@@ -42,7 +42,8 @@ defmodule BackendWeb.InstanceView do
           peers: render_many(filtered_peers, InstanceView, "instance.json"),
           lastUpdated: last_updated,
           status: status,
-          type: instance.type
+          type: instance.type,
+          statusesPerDay: instance.statuses_per_day
         }
     end
   end

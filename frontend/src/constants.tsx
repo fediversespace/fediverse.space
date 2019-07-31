@@ -20,6 +20,20 @@ export const QUALITATIVE_COLOR_SCHEME = [
   "#AD99FF"
 ];
 
+// From https://blueprintjs.com/docs/#core/colors.sequential-color-schemes
+export const QUANTITATIVE_COLOR_SCHEME = [
+  "#FFB7A5",
+  "#F5A793",
+  "#EB9882",
+  "#E18970",
+  "#D77A60",
+  "#CC6A4F",
+  "#C15B3F",
+  "#B64C2F",
+  "#AA3C1F",
+  "#9E2B0E"
+];
+
 export const INSTANCE_DOMAIN_PATH = "/instance/:domain";
 export interface IInstanceDomainPath {
   domain: string;

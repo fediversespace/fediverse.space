@@ -6,8 +6,8 @@ import { push } from "connected-react-router";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import { fetchGraph } from "../../redux/actions";
-import { IAppState, IGraph } from "../../redux/types";
-import { colorSchemes, IColorSchemeType } from "../../types";
+import { IAppState, IGraphResponse } from "../../redux/types";
+import { colorSchemes, IColorScheme } from "../../types";
 import { domainMatchSelector } from "../../util";
 import { Cytoscape, ErrorState, GraphTools } from "../molecules/";
 
@@ -18,7 +18,7 @@ const GraphDiv = styled.div`
 interface IGraphProps {
   currentInstanceName: string | null;
   fetchGraph: () => void;
-  graph?: IGraph;
+  graphResponse?: IGraphResponse;
   graphLoadError: boolean;
   hoveringOverResult?: string;
   isLoadingGraph: boolean;
@@ -26,7 +26,7 @@ interface IGraphProps {
   navigate: (path: string) => void;
 }
 interface IGraphState {
-  colorScheme?: IColorSchemeType;
+  colorScheme?: IColorScheme;
 }
 class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
   private cytoscapeComponent: React.RefObject<Cytoscape>;
@@ -45,7 +45,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
     let content;
     if (this.props.isLoadingGraph) {
       content = <NonIdealState icon={<Spinner />} title="Loading..." />;
-    } else if (this.props.graphLoadError || !this.props.graph) {
+    } else if (this.props.graphLoadError || !this.props.graphResponse) {
       content = <ErrorState />;
     } else {
       content = (
@@ -53,7 +53,8 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
           <Cytoscape
             colorScheme={this.state.colorScheme}
             currentNodeId={this.props.currentInstanceName}
-            elements={this.props.graph}
+            elements={this.props.graphResponse.graph}
+            ranges={this.props.graphResponse.metadata.ranges}
             hoveringOver={this.props.hoveringOverResult}
             navigateToInstancePath={this.navigateToInstancePath}
             navigateToRoot={this.navigateToRoot}
@@ -65,6 +66,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
             currentColorScheme={this.state.colorScheme}
             colorSchemes={colorSchemes}
             onColorSchemeSelect={this.setColorScheme}
+            ranges={this.props.graphResponse.metadata.ranges}
           />
         </>
       );
@@ -85,7 +87,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
     }
   };
 
-  private setColorScheme = (colorScheme?: IColorSchemeType) => {
+  private setColorScheme = (colorScheme?: IColorScheme) => {
     this.setState({ colorScheme });
   };
 
@@ -101,8 +103,8 @@ const mapStateToProps = (state: IAppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
-    graph: state.data.graph,
     graphLoadError: state.data.error,
+    graphResponse: state.data.graphResponse,
     hoveringOverResult: state.search.hoveringOverResult,
     isLoadingGraph: state.data.isLoadingGraph,
     searchResultDomains: state.search.results.map(r => r.name)

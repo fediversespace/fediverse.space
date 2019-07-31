@@ -10,6 +10,7 @@ defmodule Backend.Instance do
     field :version, :string
     field :insularity, :float
     field :type, :string
+    field :statuses_per_day, :float
     field :base_domain, :string
     field :opt_in, :boolean
     field :opt_out, :boolean
@@ -39,6 +40,7 @@ defmodule Backend.Instance do
       :insularity,
       :updated_at,
       :type,
+      :statuses_per_day,
       :base_domain,
       :opt_in,
       :opt_out

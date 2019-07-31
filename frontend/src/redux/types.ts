@@ -48,6 +48,7 @@ export interface IInstanceDetails {
   lastUpdated?: string;
   status: string;
   type?: string;
+  statusesPerDay?: number;
 }
 
 interface IGraphNode {
@@ -71,9 +72,18 @@ interface IGraphEdge {
   };
 }
 
+interface IGraphMetadata {
+  ranges: { [key: string]: [number, number] };
+}
+
 export interface IGraph {
   nodes: IGraphNode[];
   edges: IGraphEdge[];
+}
+
+export interface IGraphResponse {
+  graph: IGraph;
+  metadata: IGraphMetadata;
 }
 
 export interface ISearchResponse {
@@ -91,7 +101,7 @@ export interface ICurrentInstanceState {
 }
 
 export interface IDataState {
-  graph?: IGraph;
+  graphResponse?: IGraphResponse;
   isLoadingGraph: boolean;
   error: boolean;
 }

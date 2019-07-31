@@ -37,7 +37,7 @@ defmodule Backend.Api do
         i.user_count >= ^user_threshold and not i.opt_out
     )
     |> maybe_filter_nodes_to_neighborhood(domain)
-    |> select([c], [:domain, :user_count, :x, :y, :type])
+    |> select([c], [:domain, :user_count, :x, :y, :type, :statuses_per_day])
     |> Repo.all()
   end
 

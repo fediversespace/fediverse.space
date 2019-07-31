@@ -77,6 +77,61 @@ defmodule Backend.Scheduler do
   end
 
   @doc """
+  This function calculates the average number of statuses per hour over the last month.
+  """
+  def generate_status_rate() do
+    now = get_now()
+    # We want the earliest sucessful crawl so that we can exclude it from the statistics.
+    # This is because the first crawl goes up to one month into the past -- this would mess up the counts!
+    # The statistics from here assume that all statuses were written at exactly the crawl's inserted_at timestamp.
+    earliest_successful_crawl_subquery =
+      Crawl
+      |> group_by([c], c.instance_domain)
+      |> select([c], %{
+        instance_domain: c.instance_domain,
+        earliest_crawl: min(c.inserted_at)
+      })
+
+    instances =
+      Crawl
+      |> join(:inner, [c], c2 in subquery(earliest_successful_crawl_subquery),
+        on: c.instance_domain == c2.instance_domain
+      )
+      |> where(
+        [c, c2],
+        c.inserted_at > c2.earliest_crawl and not is_nil(c.statuses_seen) and is_nil(c.error)
+      )
+      |> select([c], %{
+        instance_domain: c.instance_domain,
+        status_count: sum(c.statuses_seen),
+        second_earliest_crawl: min(c.inserted_at)
+      })
+      |> group_by([c], c.instance_domain)
+      |> Repo.all()
+      |> Enum.map(fn %{
+                       instance_domain: domain,
+                       status_count: status_count,
+                       second_earliest_crawl: oldest_timestamp
+                     } ->
+        time_diff_days = NaiveDateTime.diff(now, oldest_timestamp, :second) / (3600 * 24)
+
+        # (we're actually only ever updating, not inserting, so inserted_at will always be ignored...)
+        %{
+          domain: domain,
+          statuses_per_day: status_count / time_diff_days,
+          updated_at: now,
+          inserted_at: now
+        }
+      end)
+
+    Instance
+    |> Repo.insert_all(instances,
+      on_conflict: {:replace, [:statuses_per_day, :updated_at]},
+      conflict_target: :domain
+    )
+  end
+
+  @doc """
   This function aggregates statistics from the interactions in the database.
   It calculates the strength of edges between nodes. Self-edges are not generated.
   Edges are only generated if both instances have been succesfully crawled.
