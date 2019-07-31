@@ -19,7 +19,9 @@ defmodule Backend.Release do
     # TODO: this isn't the right way to handle this.
     # See https://github.com/danielberkompas/elasticsearch-elixir/issues/76
     Application.ensure_all_started(@app)
+    IO.puts("Indexing...")
     Index.hot_swap(Cluster, "instances")
+    IO.puts("Done indexing.")
     :init.stop()
   end
 

@@ -1,2 +1,2 @@
 web: /app/bin/backend start
-release: /app/bin/backend eval "Backend.Release.run_all"
+release: SKIP_CRAWL=true /app/bin/backend eval "Backend.Release.run_all()"
