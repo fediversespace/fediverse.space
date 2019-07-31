@@ -16,9 +16,9 @@ ENV MIX_ENV=prod
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
+COPY config config
 RUN mix deps.get
 RUN mix deps.compile
-COPY config config
 
 # build assets
 # COPY assets assets
