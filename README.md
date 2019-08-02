@@ -34,6 +34,9 @@ Though dockerized, backend development is easiest if you have the following inst
 - `docker-compose build`
 - `docker-compose up -d phoenix`
   - if you don't specify `phoenix`, it'll also start `gephi` which should only be run as a regular one-off job
+- Create the elasticsearch index:
+  - `iex -S mix app.start`
+  - `Elasticsearch.Index.hot_swap(Backend.Elasticsearch.Cluster, :instances)`
 
 ### Frontend
 
@@ -95,6 +98,9 @@ SHELL=/bin/bash
 ```
 
 10. (Optional) Set up caching with something like [dokku-nginx-cache](https://github.com/Aluxian/dokku-nginx-cache)
+
+Before the app starts running, make sure that the Elasticsearch index exists -- otherwise it'll create one called
+`instances`, which should be the name of the alias. Then it won't be able to hot swap if you reindex in the future.
 
 ## Acknowledgements
 

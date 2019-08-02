@@ -111,21 +111,25 @@ defmodule Backend.Crawler do
       end
 
     ## Update the instance we crawled ##
+    instance = %Instance{
+      domain: domain,
+      description: result.description,
+      version: result.version,
+      user_count: result.user_count,
+      status_count: result.status_count,
+      type: instance_type,
+      base_domain: get_base_domain(domain)
+    }
+
     Repo.insert!(
-      %Instance{
-        domain: domain,
-        description: result.description,
-        version: result.version,
-        user_count: result.user_count,
-        status_count: result.status_count,
-        type: instance_type,
-        base_domain: get_base_domain(domain)
-      },
+      instance,
       on_conflict:
         {:replace,
          [:description, :version, :user_count, :status_count, :type, :base_domain, :updated_at]},
       conflict_target: :domain
     )
+
+    Elasticsearch.put_document(Backend.Elasticsearch.Cluster, instance, "instances/_doc")
 
     # Save details of a new crawl
     curr_crawl =
