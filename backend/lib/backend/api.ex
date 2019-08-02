@@ -115,6 +115,7 @@ defmodule Backend.Api do
         "sort" => "_score",
         "from" => from,
         "size" => page_size,
+        "min_score" => 1,
         "query" => %{
           "bool" => %{
             "filter" => %{
@@ -127,7 +128,8 @@ defmodule Backend.Api do
                 "multi_match" => %{
                   "query" => query,
                   "fields" => [
-                    "description.english"
+                    "description.english",
+                    "domain.english"
                   ]
                 }
               },
@@ -143,13 +145,8 @@ defmodule Backend.Api do
                 "wildcard" => %{
                   "domain.keyword" => %{
                     "value" => "*#{query}*",
-                    "boost" => 1
+                    "boost" => 50
                   }
-                }
-              },
-              %{
-                "match" => %{
-                  "domain.ngram^0.5" => query
                 }
               }
             ]

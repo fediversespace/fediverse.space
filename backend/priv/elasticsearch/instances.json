@@ -1,21 +1,7 @@
 {
   "settings": {
     "number_of_shards": 1,
-    "number_of_replicas": 0,
-    "analysis": {
-      "analyzer": {
-        "ngramAnalyzer": {
-          "tokenizer": "ngramTokenizer"
-        }
-      },
-      "tokenizer": {
-        "ngramTokenizer": {
-          "type": "ngram",
-          "min_gram": 5,
-          "max_gram": 5
-        }
-      }
-    }
+    "number_of_replicas": 0
   },
   "mappings": {
     "_doc": {
@@ -23,12 +9,12 @@
         "domain": {
           "type": "text",
           "fields": {
-            "ngram": {
-              "type": "text",
-              "analyzer": "ngramAnalyzer"
-            },
             "keyword": {
               "type": "keyword"
+            },
+            "english": {
+              "type": "text",
+              "analyzer": "english"
             }
           }
         },
