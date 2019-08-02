@@ -63,7 +63,7 @@ This project doesn't crawl personal instances: the goal is to understand communi
 You don't have to follow these instructions, but it's one way to set up a continuous deployment pipeline. The following are for the backend; the frontend is just a static HTML/JS site that can be deployed anywhere.
 
 1. Install [Dokku](http://dokku.viewdocs.io/dokku/) on your web server.
-2. Install [dokku-postgres](https://github.com/dokku/dokku-postgres), [dokku-monorepo](https://github.com/notpushkin/dokku-monorepo), and [dokku-letsencrypt](https://github.com/dokku/dokku-letsencrypt).
+2. Install [dokku-postgres](https://github.com/dokku/dokku-postgres), [dokku-monorepo](https://github.com/notpushkin/dokku-monorepo), [dokku-elasticsearch](https://github.com/dokku/dokku-elasticsearch), and [dokku-letsencrypt](https://github.com/dokku/dokku-letsencrypt).
 3. Create the apps
 
 - `dokku apps:create phoenix`
@@ -75,14 +75,19 @@ You don't have to follow these instructions, but it's one way to set up a contin
 - `dokku postgres:link fediversedb phoenix`
 - `dokku postgres:link fediversedb gephi`
 
-5. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
-6. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
-7. Set up SSL for the Phoenix app
+5. Set up ElasticSearch
+
+- `dokku elasticsearch:create fediverse`
+- `dokku elasticsearch:link fediverse phoenix`
+
+6. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
+7. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
+8. Set up SSL for the Phoenix app
 
 - `dokku letsencrypt phoenix`
 - `dokku letsencrypt:cron-job --add`
 
-8. Set up a cron job for the graph layout (use the `dokku` user). E.g.
+9. Set up a cron job for the graph layout (use the `dokku` user). E.g.
 
 ```
 SHELL=/bin/bash
