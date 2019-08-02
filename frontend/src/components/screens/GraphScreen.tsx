@@ -30,28 +30,53 @@ interface IGraphScreenProps extends RouteComponentProps {
   graphLoadError: boolean;
   loadInstance: (domain: string | null) => void;
 }
+interface IGraphScreenState {
+  hasBeenViewed: boolean;
+}
 /**
  * This component takes care of loading or deselecting the current instance when the URL path changes.
  * It also handles changing and animating the screen shown in the sidebar.
+ *
+ * state.hasBeenViewed is used because once the component with the graph has been mounted, we never want to unmount it.
+ * However, if it's not the first page viewed (e.g. if someone opens directly on /about) we don't want to render the
+ * graph since it slows down everything else!
  */
-class GraphScreenImpl extends React.Component<IGraphScreenProps> {
+class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenState> {
+  public constructor(props: IGraphScreenProps) {
+    super(props);
+    this.state = { hasBeenViewed: false };
+  }
+
   public render() {
     return <Route render={this.renderRoutes} />;
   }
 
   public componentDidMount() {
+    this.setHasBeenViewed();
     this.loadCurrentInstance();
   }
 
   public componentDidUpdate(prevProps: IGraphScreenProps) {
+    this.setHasBeenViewed();
     this.loadCurrentInstance(prevProps.currentInstanceName);
   }
+
+  private setHasBeenViewed = () => {
+    if (this.state.hasBeenViewed) {
+      return;
+    }
+
+    const { location } = this.props;
+    if (location.pathname.startsWith("/instance") || location.pathname === "/") {
+      this.setState({ hasBeenViewed: true });
+    }
+  };
 
   private renderRoutes = ({ location }: RouteComponentProps) => (
     <FullDiv>
       <GraphContainer>
         {/* Smaller screens never load the entire graph. Instead, `InstanceScreen` shows only the neighborhood. */}
-        {isSmallScreen || <Graph />}
+        {isSmallScreen || !this.state.hasBeenViewed || <Graph />}
         <SidebarContainer>
           <Switch>
             <Route path={INSTANCE_DOMAIN_PATH} component={InstanceScreen} />
