@@ -94,6 +94,8 @@ SHELL=/bin/bash
 0 2 * * * /usr/bin/dokku run gephi java -Xmx1g -jar build/libs/graphBuilder.jar
 ```
 
+10. (Optional) Set up caching with something like [dokku-nginx-cache](https://github.com/Aluxian/dokku-nginx-cache)
+
 ## Acknowledgements
 
 [![NLnet logo](/nlnet-logo.png)](https://nlnet.nl/project/fediverse_space/)
