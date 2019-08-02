@@ -1,12 +1,24 @@
 defmodule Backend.Release do
   @app :backend
+  @start_apps [
+    :crypto,
+    :ssl,
+    :postgrex,
+    :ecto,
+    :elasticsearch,
+    @app
+  ]
 
-  alias Elasticsearch.Index
-  alias Backend.Elasticsearch.Cluster
+  # Ecto repos to start, if any
+  @repos Application.get_env(:backend, :ecto_repos, [])
+  # Elasticsearch clusters to start
+  @clusters [Backend.Elasticsearch.Cluster]
+  # Elasticsearch indexes to build
+  @indexes [:instances]
 
   def run_all do
     migrate()
-    index()
+    build_elasticsearch_indexes()
   end
 
   def migrate do
@@ -15,18 +27,30 @@ defmodule Backend.Release do
     end
   end
 
-  def index do
-    # TODO: this isn't the right way to handle this.
-    # See https://github.com/danielberkompas/elasticsearch-elixir/issues/76
-    Application.ensure_all_started(@app)
-    IO.puts("Indexing...")
-    Index.hot_swap(Cluster, "instances")
-    IO.puts("Done indexing.")
-    :init.stop()
-  end
-
   def rollback(repo, version) do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
+  end
+
+  def build_elasticsearch_indexes() do
+    start_services()
+    IO.puts("Building indexes...")
+    Enum.each(@indexes, &Elasticsearch.Index.hot_swap(Backend.Elasticsearch.Cluster, &1))
+    stop_services()
+  end
+
+  # Ensure that all OTP apps, repos used by your Elasticsearch store,
+  # and your Elasticsearch Cluster(s) are started
+  defp start_services do
+    IO.puts("Starting dependencies...")
+    Enum.each(@start_apps, &Application.ensure_all_started/1)
+    IO.puts("Starting repos...")
+    Enum.each(@repos, & &1.start_link(pool_size: 1))
+    IO.puts("Starting clusters...")
+    Enum.each(@clusters, & &1.start_link())
+  end
+
+  defp stop_services do
+    :init.stop()
   end
 
   defp repos do
