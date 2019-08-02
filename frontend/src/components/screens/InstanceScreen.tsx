@@ -267,7 +267,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
       lastUpdated,
       insularity,
       type,
-      statusesPerDay
+      statusesPerDay,
+      statusesPerUserPerDay
     } = this.props.instanceDetails;
     return (
       <StyledHTMLTable small={true} striped={true}>
@@ -290,7 +291,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>
-              Insularity{" "}
+              Insularity{"  "}
               <Tooltip
                 content={
                   <span>
@@ -309,11 +310,11 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>
-              Statuses / day{" "}
+              Statuses / day{"  "}
               <Tooltip
                 content={
                   <span>
-                    The average number of statuses per day
+                    The average number of statuses written each day on this instance,
                     <br />
                     over the last month.
                   </span>
@@ -325,6 +326,25 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
               </Tooltip>
             </td>
             <td>{(statusesPerDay && numeral.default(statusesPerDay).format("0.0")) || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td>
+              Statuses / person / day{"  "}
+              <Tooltip
+                content={
+                  <span>
+                    The average number of statuses written per person each day,
+                    <br />
+                    over the last month.
+                  </span>
+                }
+                position={Position.TOP}
+                className={Classes.DARK}
+              >
+                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+              </Tooltip>
+            </td>
+            <td>{(statusesPerUserPerDay && numeral.default(statusesPerUserPerDay).format("0.000")) || "Unknown"}</td>
           </tr>
           <tr>
             <td>Known peers</td>

@@ -49,6 +49,7 @@ export interface IInstanceDetails {
   status: string;
   type?: string;
   statusesPerDay?: number;
+  statusesPerUserPerDay?: number;
 }
 
 interface IGraphNode {

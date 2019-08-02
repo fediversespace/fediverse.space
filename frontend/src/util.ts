@@ -64,7 +64,7 @@ export const getBuckets = (min: number, max: number, steps: number, exponential:
     return logSpace.map(i => (i + translation) * scalingFactor);
   } else {
     // Linear
-    const bucketSize = Math.ceil((max - min) / steps);
+    const bucketSize = (max - min) / steps;
     return range(min, max, bucketSize);
   }
 };

@@ -111,7 +111,7 @@ const renderQuantitativeKey = (range: number[]) => {
     <ColorKeyContainer>
       <ColorBarContainer>
         {QUANTITATIVE_COLOR_SCHEME.map((color, idx) => (
-          <ColorBar color={color} />
+          <ColorBar color={color} key={color} />
         ))}
       </ColorBarContainer>
       <TextContainer>

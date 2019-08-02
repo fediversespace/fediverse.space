@@ -115,7 +115,8 @@ defmodule Backend.Scheduler do
                      } ->
         time_diff_days = NaiveDateTime.diff(now, oldest_timestamp, :second) / (3600 * 24)
 
-        # (we're actually only ever updating, not inserting, so inserted_at will always be ignored...)
+        # (we're actually only ever updating, not inserting, so inserted_at will always be ignored... but ecto
+        # requires it)
         %{
           domain: domain,
           statuses_per_day: status_count / time_diff_days,

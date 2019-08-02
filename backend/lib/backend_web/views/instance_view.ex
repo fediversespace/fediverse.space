@@ -2,7 +2,6 @@ defmodule BackendWeb.InstanceView do
   use BackendWeb, :view
   alias BackendWeb.InstanceView
   import Backend.Util
-  require Logger
 
   def render("show.json", %{instance: instance, crawl: crawl}) do
     user_threshold = get_config(:personal_instance_threshold)
@@ -31,6 +30,14 @@ defmodule BackendWeb.InstanceView do
           instance.peers
           |> Enum.filter(fn peer -> not peer.opt_out end)
 
+        statuses_per_user_per_day =
+          if instance.statuses_per_day != nil and instance.user_count != nil and
+               instance.user_count > 0 do
+            instance.statuses_per_day / instance.user_count
+          else
+            nil
+          end
+
         %{
           name: instance.domain,
           description: instance.description,
@@ -43,7 +50,8 @@ defmodule BackendWeb.InstanceView do
           lastUpdated: last_updated,
           status: status,
           type: instance.type,
-          statusesPerDay: instance.statuses_per_day
+          statusesPerDay: instance.statuses_per_day,
+          statusesPerUserPerDay: statuses_per_user_per_day
         }
     end
   end
