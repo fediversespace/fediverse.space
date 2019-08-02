@@ -76,6 +76,9 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
         <p className={Classes.RUNNING_TEXT}>
           To manage how fediverse.space interacts with your instance, you must be the instance admin.
         </p>
+        <p className={Classes.RUNNING_TEXT}>
+          Note that it's currently only possible to administrate Mastodon and Pleroma instances.
+        </p>
         <FormContainer error={this.state.error}>{content}</FormContainer>
       </Page>
     );
@@ -172,7 +175,12 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     }
     getFromApi(`admin/login/${domain}`)
       .then(response => {
-        this.setState({ loginTypes: response, isGettingLoginTypes: false });
+        if ("error" in response || "errors" in response) {
+          // Go to catch() below
+          throw new Error();
+        } else {
+          this.setState({ loginTypes: response, isGettingLoginTypes: false });
+        }
       })
       .catch(() => {
         this.setState({ error: true });
@@ -183,8 +191,9 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     this.setState({ isSendingLoginRequest: true, selectedLoginType: type });
     postToApi("admin/login", { domain: this.state.loginTypes!.domain, type })
       .then(response => {
-        if ("error" in response) {
-          this.setState({ isSendingLoginRequest: false, error: true });
+        if ("error" in response || "errors" in response) {
+          // Go to catch() below
+          throw new Error();
         } else {
           this.setState({ isSendingLoginRequest: false });
         }

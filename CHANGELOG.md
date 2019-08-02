@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Clarify that the admin page only works for Mastodon and Pleroma instances.
+
 ### Changed
 
 ### Deprecated
@@ -19,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed some instances being duplicated (due to un-normalized data).
 - Fixed mobile instance view erroring for uncrawled instances.
+- Improved error handling in admin login page.
 
 ### Security
 
