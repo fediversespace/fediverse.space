@@ -6,8 +6,14 @@ defmodule Backend.Api do
   @spec get_instance!(String.t()) :: Instance.t()
   def get_instance!(domain) do
     Instance
-    |> preload(:peers)
     |> Repo.get_by!(domain: domain)
+  end
+
+  @spec get_instance_with_peers(String.t()) :: Instance.t() | nil
+  def get_instance_with_peers(domain) do
+    Instance
+    |> preload(:peers)
+    |> Repo.get_by(domain: domain)
   end
 
   def update_instance(instance) do
@@ -111,6 +117,11 @@ defmodule Backend.Api do
         "size" => page_size,
         "query" => %{
           "bool" => %{
+            "filter" => %{
+              "term" => %{
+                "opt_out" => "false"
+              }
+            },
             "should" => [
               %{
                 "multi_match" => %{

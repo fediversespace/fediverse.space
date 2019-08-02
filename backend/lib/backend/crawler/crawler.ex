@@ -129,7 +129,7 @@ defmodule Backend.Crawler do
       conflict_target: :domain
     )
 
-    Elasticsearch.put_document(Backend.Elasticsearch.Cluster, instance, "instances/_doc")
+    Elasticsearch.put_document!(Backend.Elasticsearch.Cluster, instance, "instances/_doc")
 
     # Save details of a new crawl
     curr_crawl =

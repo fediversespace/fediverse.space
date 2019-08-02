@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed some instances being duplicated (due to un-normalized data).
 - Fixed mobile instance view erroring for uncrawled instances.
 - Improved error handling in admin login page.
+- Instances that opt-out will no longer show up in search results ever, nor are they accessible through the API.
 
 ### Security
 

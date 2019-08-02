@@ -46,6 +46,9 @@
         },
         "user_count": {
           "type": "integer"
+        },
+        "opt_out": {
+          "type": "boolean"
         }
       }
     }

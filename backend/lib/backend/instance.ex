@@ -59,7 +59,8 @@ defmodule Backend.Instance do
         domain: instance.domain,
         description: instance.description,
         type: instance.type,
-        user_count: instance.user_count
+        user_count: instance.user_count,
+        opt_out: instance.opt_out
       }
     end
   end
