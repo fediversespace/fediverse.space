@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [2.3.0 - 2019-08-02]
+
+### Added
+
 - Instance administrators can now log in to opt in or out of crawling.
 - Added ElasticSearch full-text search over instance domains and descriptions.
 - Search results are now highlighted on the graph.
@@ -21,10 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Instances are now crawled hourly instead of every 30 minutes.
 - There are now 100 concurrent crawl workers by default (increased from 50).
 - The colors for color coding have been made brighter (more visible against the dark background).
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
