@@ -1,4 +1,4 @@
-import { Button, Classes, H2, NonIdealState, Spinner } from "@blueprintjs/core";
+import { Button, Callout, Classes, H2, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { push } from "connected-react-router";
 import React from "react";
@@ -7,6 +7,7 @@ import { Dispatch } from "redux";
 import styled from "styled-components";
 import { setResultHover, updateSearch } from "../../redux/actions";
 import { IAppState, ISearchResultInstance } from "../../redux/types";
+import { isSmallScreen } from "../../util";
 import { SearchResult } from "../molecules";
 
 const SearchContainer = styled.div`
@@ -24,6 +25,11 @@ const SearchResults = styled.div`
 `;
 const StyledSpinner = styled(Spinner)`
   margin-top: 10px;
+`;
+const CalloutContainer = styled.div`
+  width: 90%;
+  margin: 0 auto 20px auto;
+  text-align: left;
 `;
 
 interface ISearchScreenProps {
@@ -69,6 +75,7 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
 
     return (
       <SearchContainer>
+        {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
         <H2>Find an instance</H2>
         {this.renderSearchBar()}
         <SearchResults>
@@ -132,6 +139,15 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
         onKeyPress={this.handleKeyPress}
       />
     </SearchBarContainer>
+  );
+
+  private renderMobileWarning = () => (
+    <CalloutContainer>
+      <Callout intent={Intent.WARNING} title="Desktop site">
+        This is a desktop-optimized site with large visualizations. You can view a simplified version on smaller
+        devices, but for the full experience, open it on a computer.
+      </Callout>
+    </CalloutContainer>
   );
 }
 
