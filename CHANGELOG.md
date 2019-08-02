@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed some instances being duplicated (due to un-normalized data).
+
 ### Security
 
 ## [2.3.0 - 2019-08-02]

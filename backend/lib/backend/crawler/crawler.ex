@@ -148,6 +148,7 @@ defmodule Backend.Crawler do
       |> Map.keys()
       |> list_union(result.peers)
       |> Enum.filter(fn domain -> domain != nil and not is_blacklisted?(domain) end)
+      |> Enum.map(&clean_domain(&1))
 
     peers =
       peers_domains

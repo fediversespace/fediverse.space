@@ -65,4 +65,5 @@ config :backend, :crawler,
   blacklist: [
     "gab.best",
     "4chan.icu"
-  ]
+  ],
+  frontend_domain: "localhost:3000"
