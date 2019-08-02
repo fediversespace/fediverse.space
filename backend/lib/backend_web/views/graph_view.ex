@@ -26,12 +26,12 @@ defmodule BackendWeb.GraphView do
         ranges: %{
           # Make sure that these keys match what's in the "node.json" render function.
           statusesPerDay: [
-            Enum.min(statuses_per_day),
-            Enum.max(statuses_per_day)
+            Enum.min(statuses_per_day, fn -> nil end),
+            Enum.max(statuses_per_day, fn -> nil end)
           ],
           statusesPerUserPerDay: [
-            Enum.min(statuses_per_user_per_day),
-            Enum.max(statuses_per_user_per_day)
+            Enum.min(statuses_per_user_per_day, fn -> nil end),
+            Enum.max(statuses_per_user_per_day, fn -> nil end)
           ]
         }
       }
