@@ -1,4 +1,4 @@
-import { Button, Callout, Classes, H2, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
+import { Button, Callout, H2, InputGroup, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { push } from "connected-react-router";
 import React from "react";
@@ -60,24 +60,19 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
   public render() {
     const { error, hasMoreResults, results, isLoadingResults, query } = this.props;
 
+    let content;
     if (error) {
-      return <NonIdealState icon={IconNames.ERROR} title="Something went wrong." action={this.renderSearchBar()} />;
+      content = <NonIdealState icon={IconNames.ERROR} title="Something went wrong." />;
     } else if (!isLoadingResults && query && results.length === 0) {
-      return (
+      content = (
         <NonIdealState
           icon={IconNames.SEARCH}
           title="No search results"
           description="Try searching for something else."
-          action={this.renderSearchBar()}
         />
       );
-    }
-
-    return (
-      <SearchContainer>
-        {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
-        <H2>Find an instance</H2>
-        {this.renderSearchBar()}
+    } else if (!!results && results.length > 0) {
+      content = (
         <SearchResults>
           {results.map(result => (
             <SearchResult
@@ -95,6 +90,37 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
             </Button>
           )}
         </SearchResults>
+      );
+    }
+
+    let rightSearchBarElement;
+    if (isLoadingResults) {
+      rightSearchBarElement = <Spinner size={Spinner.SIZE_SMALL} />;
+    } else if (query) {
+      rightSearchBarElement = <Button minimal={true} icon={IconNames.CROSS} onClick={this.clearQuery} />;
+    } else {
+      rightSearchBarElement = (
+        <Button minimal={true} icon={IconNames.ARROW_RIGHT} intent={Intent.PRIMARY} onClick={this.search} />
+      );
+    }
+
+    return (
+      <SearchContainer>
+        {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
+        <H2>Find an instance</H2>
+        <SearchBarContainer>
+          <InputGroup
+            leftIcon={IconNames.SEARCH}
+            rightElement={rightSearchBarElement}
+            large={true}
+            placeholder="Search instance names and descriptions"
+            type="search"
+            value={this.state.currentQuery}
+            onChange={this.handleInputChange}
+            onKeyPress={this.handleKeyPress}
+          />
+        </SearchBarContainer>
+        {content}
       </SearchContainer>
     );
   }
@@ -113,6 +139,11 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
     this.props.handleSearch(this.state.currentQuery);
   };
 
+  private clearQuery = () => {
+    this.setState({ currentQuery: "" });
+    this.props.handleSearch("");
+  };
+
   private selectInstanceFactory = (domain: string) => () => {
     this.props.setIsHoveringOver(undefined);
     this.props.navigateToInstance(domain);
@@ -125,21 +156,6 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
   private onMouseLeave = () => {
     this.props.setIsHoveringOver(undefined);
   };
-
-  private renderSearchBar = () => (
-    <SearchBarContainer className={`${Classes.INPUT_GROUP} ${Classes.LARGE}`}>
-      <span className={`${Classes.ICON} bp3-icon-${IconNames.SEARCH}`} />
-      <input
-        className={Classes.INPUT}
-        type="search"
-        placeholder="Instance name"
-        dir="auto"
-        value={this.state.currentQuery}
-        onChange={this.handleInputChange}
-        onKeyPress={this.handleKeyPress}
-      />
-    </SearchBarContainer>
-  );
 
   private renderMobileWarning = () => (
     <CalloutContainer>
