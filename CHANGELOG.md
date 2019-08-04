@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - You can now click a button in the search bar to search (you can also still just prss enter, of course).
 - You can now filter searches by instance type.
+- Full-text search across instance descriptions now supports the following languages: arabic, armenian, basque,
+  bengali, brazilian, bulgarian, catalan, cjk (i.e. chinese, japanese, korean), czech, danish, dutch, english, finnish,
+  french, galician, german, greek, hindi, hungarian, indonesian, irish, italian, latvian, lithuanian, norwegian,
+  persian, romanian, russian, sorani, spanish, swedish, turkish, thai.
 
 ### Changed
 

@@ -154,7 +154,7 @@ defmodule Backend.Api do
               "multi_match" => %{
                 "query" => query,
                 "fields" => [
-                  "description.english",
+                  "description.*",
                   "domain.english"
                 ]
               }
