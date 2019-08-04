@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   bengali, brazilian, bulgarian, catalan, cjk (i.e. chinese, japanese, korean), czech, danish, dutch, english, finnish,
   french, galician, german, greek, hindi, hungarian, indonesian, irish, italian, latvian, lithuanian, norwegian,
   persian, romanian, russian, sorani, spanish, swedish, turkish, thai.
+- Added toggle to show/hide edges on graph.
 
 ### Changed
 

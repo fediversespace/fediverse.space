@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { IColorScheme } from "../../types";
-import { GraphKey, GraphResetButton } from "../atoms";
+import { GraphHideEdgesButton, GraphKey, GraphResetButton } from "../atoms";
 
 const GraphToolsContainer = styled.div`
   position: absolute;
@@ -14,20 +14,25 @@ const GraphToolsContainer = styled.div`
 interface IGraphToolsProps {
   currentColorScheme?: IColorScheme;
   colorSchemes: IColorScheme[];
+  isShowingEdges: boolean;
   ranges?: { [key: string]: [number, number] };
   onColorSchemeSelect: (colorScheme?: IColorScheme) => void;
   onResetButtonClick: () => void;
+  toggleEdges: () => void;
 }
 const GraphTools: React.FC<IGraphToolsProps> = ({
   currentColorScheme,
   colorSchemes,
+  isShowingEdges,
   ranges,
   onColorSchemeSelect,
-  onResetButtonClick
+  onResetButtonClick,
+  toggleEdges
 }) => {
   return (
     <GraphToolsContainer>
       <GraphResetButton onClick={onResetButtonClick} />
+      <GraphHideEdgesButton isShowingEdges={isShowingEdges} toggleEdges={toggleEdges} />
       <GraphKey
         current={currentColorScheme}
         colorSchemes={colorSchemes}

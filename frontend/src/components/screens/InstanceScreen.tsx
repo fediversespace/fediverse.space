@@ -236,6 +236,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           elements={localGraph!}
           currentNodeId={this.props.instanceName}
           navigateToInstancePath={this.props.navigateToInstance}
+          showEdges={true}
         />
         <Divider />
       </StyledGraphContainer>

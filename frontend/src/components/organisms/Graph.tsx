@@ -27,6 +27,7 @@ interface IGraphProps {
 }
 interface IGraphState {
   colorScheme?: IColorScheme;
+  isShowingEdges: boolean;
 }
 class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
   private cytoscapeComponent: React.RefObject<Cytoscape>;
@@ -34,7 +35,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
   public constructor(props: IGraphProps) {
     super(props);
     this.cytoscapeComponent = React.createRef();
-    this.state = { colorScheme: undefined };
+    this.state = { colorScheme: undefined, isShowingEdges: true };
   }
 
   public componentDidMount() {
@@ -59,14 +60,17 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
             navigateToInstancePath={this.navigateToInstancePath}
             navigateToRoot={this.navigateToRoot}
             searchResultIds={this.props.searchResultDomains}
+            showEdges={this.state.isShowingEdges}
             ref={this.cytoscapeComponent}
           />
           <GraphTools
             onResetButtonClick={this.resetGraphPosition}
             currentColorScheme={this.state.colorScheme}
             colorSchemes={colorSchemes}
+            isShowingEdges={this.state.isShowingEdges}
             onColorSchemeSelect={this.setColorScheme}
             ranges={this.props.graphResponse.metadata.ranges}
+            toggleEdges={this.toggleEdges}
           />
         </>
       );
@@ -85,6 +89,10 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
     if (this.cytoscapeComponent.current) {
       this.cytoscapeComponent.current.resetGraphPosition();
     }
+  };
+
+  private toggleEdges = () => {
+    this.setState({ isShowingEdges: !this.state.isShowingEdges });
   };
 
   private setColorScheme = (colorScheme?: IColorScheme) => {

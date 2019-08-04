@@ -28,6 +28,7 @@ interface ICytoscapeProps {
   hoveringOver?: string;
   ranges?: { [key: string]: [number, number] };
   searchResultIds?: string[];
+  showEdges: boolean;
   navigateToInstancePath?: (domain: string) => void;
   navigateToRoot?: () => void;
 }
@@ -85,7 +86,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         "font-size": "mapData(size, 1, 6, 10, 100)",
         "min-zoomed-font-size": 16
       })
-      .selector(".hidden") // used to hide nodes not in the neighborhood of the selected
+      .selector(".hidden") // used to hide nodes not in the neighborhood of the selected, or to hide edges
       .style({
         display: "none"
       })
@@ -145,6 +146,13 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     }
     if (!isEqual(prevProps.searchResultIds, this.props.searchResultIds)) {
       this.updateSearchResultNodeClass();
+    }
+    if (prevProps.showEdges !== this.props.showEdges) {
+      if (this.props.showEdges) {
+        this.showEdges();
+      } else {
+        this.hideEdges();
+      }
     }
   }
 
@@ -318,6 +326,20 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         this.cy!.$(currentResultSelector).addClass("searchResult");
       }
     });
+  };
+
+  private showEdges = () => {
+    if (!this.cy) {
+      throw new Error("Expected cytoscape, but there wasn't one!");
+    }
+    this.cy.edges().removeClass("hidden");
+  };
+
+  private hideEdges = () => {
+    if (!this.cy) {
+      throw new Error("Expected cytoscape, but there wasn't one!");
+    }
+    this.cy.edges().addClass("hidden");
   };
 }
 
