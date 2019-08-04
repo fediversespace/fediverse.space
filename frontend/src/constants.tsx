@@ -38,3 +38,6 @@ export const INSTANCE_DOMAIN_PATH = "/instance/:domain";
 export interface IInstanceDomainPath {
   domain: string;
 }
+
+// We could also extract the values from the server response, but this would slow things down...
+export const INSTANCE_TYPES = ["mastodon", "gab", "pleroma"];

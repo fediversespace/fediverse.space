@@ -1,27 +1,33 @@
 import { Button, Callout, H2, InputGroup, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { push } from "connected-react-router";
-import React from "react";
+import { get, isEqual } from "lodash";
+import React, { MouseEvent } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import { setResultHover, updateSearch } from "../../redux/actions";
 import { IAppState, ISearchResultInstance } from "../../redux/types";
+import { ISearchFilter } from "../../searchFilters";
 import { isSmallScreen } from "../../util";
 import { SearchResult } from "../molecules";
+import { SearchFilters } from "../organisms";
 
-const SearchContainer = styled.div`
-  align-self: center;
-  text-align: center;
-  width: 100%;
-`;
-const SearchBarContainer = styled.div`
+interface ISearchBarContainerProps {
+  hasSearchResults: boolean;
+  hasError: boolean;
+}
+const SearchBarContainer = styled.div<ISearchBarContainerProps>`
   width: 80%;
-  margin: 0 auto;
   text-align: center;
+  margin: ${props => (props.hasSearchResults || props.hasError ? "0 auto" : "auto")};
+  align-self: center;
 `;
 const SearchResults = styled.div`
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
 `;
 const StyledSpinner = styled(Spinner)`
   margin-top: 10px;
@@ -38,17 +44,18 @@ interface ISearchScreenProps {
   query: string;
   hasMoreResults: boolean;
   results: ISearchResultInstance[];
-  handleSearch: (query: string) => void;
+  handleSearch: (query: string, filters: ISearchFilter[]) => void;
   navigateToInstance: (domain: string) => void;
   setIsHoveringOver: (domain?: string) => void;
 }
 interface ISearchScreenState {
   currentQuery: string;
+  searchFilters: ISearchFilter[];
 }
 class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreenState> {
   public constructor(props: ISearchScreenProps) {
     super(props);
-    this.state = { currentQuery: "" };
+    this.state = { currentQuery: "", searchFilters: [] };
   }
 
   public componentDidMount() {
@@ -96,19 +103,25 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
     let rightSearchBarElement;
     if (isLoadingResults) {
       rightSearchBarElement = <Spinner size={Spinner.SIZE_SMALL} />;
-    } else if (query) {
+    } else if (query || error) {
       rightSearchBarElement = <Button minimal={true} icon={IconNames.CROSS} onClick={this.clearQuery} />;
     } else {
       rightSearchBarElement = (
-        <Button minimal={true} icon={IconNames.ARROW_RIGHT} intent={Intent.PRIMARY} onClick={this.search} />
+        <Button
+          minimal={true}
+          icon={IconNames.ARROW_RIGHT}
+          intent={Intent.PRIMARY}
+          onClick={this.search}
+          disabled={!this.state.currentQuery}
+        />
       );
     }
 
     return (
-      <SearchContainer>
+      <>
         {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
-        <H2>Find an instance</H2>
-        <SearchBarContainer>
+        <SearchBarContainer hasSearchResults={results.length > 0} hasError={!!error}>
+          <H2>Find an instance</H2>
           <InputGroup
             leftIcon={IconNames.SEARCH}
             rightElement={rightSearchBarElement}
@@ -119,9 +132,14 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
             onChange={this.handleInputChange}
             onKeyPress={this.handleKeyPress}
           />
+          <SearchFilters
+            selectedFilters={this.state.searchFilters}
+            selectFilter={this.selectSearchFilter}
+            deselectFilter={this.deselectSearchFilter}
+          />
         </SearchBarContainer>
         {content}
-      </SearchContainer>
+      </>
     );
   }
 
@@ -136,12 +154,31 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
   };
 
   private search = () => {
-    this.props.handleSearch(this.state.currentQuery);
+    this.props.handleSearch(this.state.currentQuery, this.state.searchFilters);
   };
 
   private clearQuery = () => {
-    this.setState({ currentQuery: "" });
-    this.props.handleSearch("");
+    this.setState({ currentQuery: "" }, () => this.props.handleSearch("", []));
+  };
+
+  private selectSearchFilter = (filter: ISearchFilter) => {
+    const { searchFilters } = this.state;
+    // Don't add the same filters twice
+    if (searchFilters.some(sf => isEqual(sf, filter))) {
+      return;
+    }
+    this.setState({ searchFilters: [...searchFilters, filter] }, this.search);
+  };
+
+  private deselectSearchFilter = (e: MouseEvent<HTMLButtonElement>) => {
+    const { searchFilters } = this.state;
+    const displayValueToRemove = get(e, "currentTarget.parentElement.innerText", "");
+    if (!!displayValueToRemove) {
+      this.setState(
+        { searchFilters: searchFilters.filter(sf => sf.displayValue !== displayValueToRemove) },
+        this.search
+      );
+    }
   };
 
   private selectInstanceFactory = (domain: string) => () => {
@@ -175,7 +212,7 @@ const mapStateToProps = (state: IAppState) => ({
   results: state.search.results
 });
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  handleSearch: (query: string) => dispatch(updateSearch(query) as any),
+  handleSearch: (query: string, filters: ISearchFilter[]) => dispatch(updateSearch(query, filters) as any),
   navigateToInstance: (domain: string) => dispatch(push(`/instance/${domain}`)),
   setIsHoveringOver: (domain?: string) => dispatch(setResultHover(domain))
 });

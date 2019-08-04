@@ -9,7 +9,7 @@ import { InstanceType } from "../atoms";
 
 const StyledCard = styled(Card)`
   width: 80%;
-  margin: 1em auto;
+  margin: 0.5em auto;
   background-color: #394b59 !important;
   text-align: left;
 `;

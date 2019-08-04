@@ -107,52 +107,15 @@ defmodule Backend.Api do
     end
   end
 
-  def search_instances(query, from \\ 0) do
+  def search_instances(query, filters, from \\ 0) do
     page_size = 50
 
     search_response =
-      Elasticsearch.post(Backend.Elasticsearch.Cluster, "/instances/_search", %{
-        "sort" => "_score",
-        "from" => from,
-        "size" => page_size,
-        "min_score" => 1,
-        "query" => %{
-          "bool" => %{
-            "filter" => %{
-              "term" => %{
-                "opt_out" => "false"
-              }
-            },
-            "should" => [
-              %{
-                "multi_match" => %{
-                  "query" => query,
-                  "fields" => [
-                    "description.english",
-                    "domain.english"
-                  ]
-                }
-              },
-              %{
-                "wildcard" => %{
-                  "domain.keyword" => %{
-                    "value" => query,
-                    "boost" => 100
-                  }
-                }
-              },
-              %{
-                "wildcard" => %{
-                  "domain.keyword" => %{
-                    "value" => "*#{query}*",
-                    "boost" => 50
-                  }
-                }
-              }
-            ]
-          }
-        }
-      })
+      Elasticsearch.post(
+        Backend.Elasticsearch.Cluster,
+        "/instances/_search",
+        build_es_query(query, filters, page_size, from)
+      )
 
     with {:ok, result} <- search_response do
       hits =
@@ -171,5 +134,52 @@ defmodule Backend.Api do
         next: next
       }
     end
+  end
+
+  defp build_es_query(query, filters, page_size, from) do
+    opt_out_filter = %{"term" => %{"opt_out" => "false"}}
+    filters = [opt_out_filter | filters]
+
+    %{
+      "sort" => "_score",
+      "from" => from,
+      "size" => page_size,
+      # This must be >0, otherwise all documents will be returned
+      "min_score" => 1,
+      "query" => %{
+        "bool" => %{
+          "filter" => filters,
+          "should" => [
+            %{
+              "multi_match" => %{
+                "query" => query,
+                "fields" => [
+                  "description.english",
+                  "domain.english"
+                ]
+              }
+            },
+            %{
+              # If the query exactly matches a domain, that instance should always be the first result.
+              "wildcard" => %{
+                "domain.keyword" => %{
+                  "value" => query,
+                  "boost" => 100
+                }
+              }
+            },
+            %{
+              # Give substring matches in domains a large boost, too.
+              "wildcard" => %{
+                "domain.keyword" => %{
+                  "value" => "*#{query}*",
+                  "boost" => 10
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
   end
 end

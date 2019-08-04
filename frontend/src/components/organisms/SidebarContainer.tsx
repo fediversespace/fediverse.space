@@ -16,8 +16,6 @@ const StyledCard = styled(Card)`
   padding: 20px 0;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
 `;
 const SidebarContainer: React.FC = ({ children }) => {
   return (

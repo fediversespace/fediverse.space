@@ -1,4 +1,5 @@
 import { RouterState } from "connected-react-router";
+import { ISearchFilter } from "../searchFilters";
 
 export enum ActionType {
   // Instance details
@@ -113,6 +114,7 @@ export interface ISearchState {
   next: string;
   query: string;
   results: ISearchResultInstance[];
+  filters: ISearchFilter[];
   hoveringOverResult?: string;
 }
 
