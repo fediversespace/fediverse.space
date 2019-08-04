@@ -4,7 +4,7 @@ defmodule Backend.MixProject do
   def project do
     [
       app: :backend,
-      version: "2.3.1",
+      version: "2.4.0",
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),

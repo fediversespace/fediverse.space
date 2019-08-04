@@ -9,14 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- You can now click a button in the search bar to search (you can also still just prss enter, of course).
-- You can now filter searches by instance type.
-- Full-text search across instance descriptions now supports the following languages: arabic, armenian, basque,
-  bengali, brazilian, bulgarian, catalan, cjk (i.e. chinese, japanese, korean), czech, danish, dutch, english, finnish,
-  french, galician, german, greek, hindi, hungarian, indonesian, irish, italian, latvian, lithuanian, norwegian,
-  persian, romanian, russian, sorani, spanish, swedish, turkish, thai.
-- Added toggle to show/hide edges on graph.
-
 ### Changed
 
 ### Deprecated
@@ -26,6 +18,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [2.4.0 - 2019-08-04]
+
+### Added
+
+- You can now click a button in the search bar to search (you can also still just press enter, of course).
+- You can now filter searches by instance type.
+- Added toggle to show/hide edges on graph.
+- Full-text search across instance descriptions now supports the following languages: arabic, armenian, basque,
+  bengali, brazilian, bulgarian, catalan, cjk (i.e. chinese, japanese, korean), czech, danish, dutch, english, finnish,
+  french, galician, german, greek, hindi, hungarian, indonesian, irish, italian, latvian, lithuanian, norwegian,
+  persian, romanian, russian, sorani, spanish, swedish, turkish, thai.
 
 ## [2.3.1 - 2019-08-03]
 
