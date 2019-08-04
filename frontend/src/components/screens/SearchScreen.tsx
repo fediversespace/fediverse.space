@@ -120,7 +120,7 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
     return (
       <>
         {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
-        <SearchBarContainer hasSearchResults={results.length > 0} hasError={!!error}>
+        <SearchBarContainer hasSearchResults={!!query && !!results} hasError={!!error}>
           <H2>Find an instance</H2>
           <InputGroup
             leftIcon={IconNames.SEARCH}

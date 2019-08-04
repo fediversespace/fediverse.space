@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.4.1 - 2019-08-04]
+
+### Fixed
+
+- Fixed a wonky search UI when there are no results.
+
 ## [2.4.0 - 2019-08-04]
 
 ### Added
