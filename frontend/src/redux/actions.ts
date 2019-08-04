@@ -1,6 +1,8 @@
+import { isEqual } from "lodash";
 import { Dispatch } from "redux";
 
 import { push } from "connected-react-router";
+import { ISearchFilter } from "../searchFilters";
 import { getFromApi } from "../util";
 import { ActionType, IAppState, IGraph, IInstanceDetails, ISearchResponse } from "./types";
 
@@ -47,9 +49,9 @@ const graphLoadFailed = () => {
 };
 
 // Search
-const requestSearchResult = (query: string) => {
+const requestSearchResult = (query: string, filters: ISearchFilter[]) => {
   return {
-    payload: query,
+    payload: { query, filters },
     type: ActionType.REQUEST_SEARCH_RESULTS
   };
 };
@@ -96,7 +98,7 @@ export const loadInstance = (instanceName: string | null) => {
   };
 };
 
-export const updateSearch = (query: string) => {
+export const updateSearch = (query: string, filters: ISearchFilter[]) => {
   return (dispatch: Dispatch, getState: () => IAppState) => {
     query = query.trim();
 
@@ -105,14 +107,23 @@ export const updateSearch = (query: string) => {
       return;
     }
 
-    const isNewQuery = getState().search.query !== query;
+    const prevQuery = getState().search.query;
+    const prevFilters = getState().search.filters;
+    const isNewQuery = prevQuery !== query || !isEqual(prevFilters, filters);
 
     const next = getState().search.next;
     let url = `search/?query=${query}`;
     if (!isNewQuery && next) {
       url += `&after=${next}`;
     }
-    dispatch(requestSearchResult(query));
+
+    // Add filters
+    // The format is e.g. type_eq=mastodon or user_count_gt=1000
+    filters.forEach(filter => {
+      url += `&${filter.field}_${filter.relation}=${filter.value}`;
+    });
+
+    dispatch(requestSearchResult(query, filters));
     return getFromApi(url)
       .then(result => dispatch(receiveSearchResults(result)))
       .catch(() => dispatch(searchFailed()));

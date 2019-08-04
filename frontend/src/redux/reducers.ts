@@ -1,4 +1,5 @@
 import { connectRouter } from "connected-react-router";
+import { isEqual } from "lodash";
 import { combineReducers } from "redux";
 
 import { History } from "history";
@@ -72,6 +73,7 @@ const currentInstance = (state = initialCurrentInstanceState, action: IAction): 
 
 const initialSearchState: ISearchState = {
   error: false,
+  filters: [],
   isLoadingResults: false,
   next: "",
   query: "",
@@ -80,11 +82,12 @@ const initialSearchState: ISearchState = {
 const search = (state = initialSearchState, action: IAction): ISearchState => {
   switch (action.type) {
     case ActionType.REQUEST_SEARCH_RESULTS:
-      const query = action.payload;
-      const isNewQuery = state.query !== query;
+      const { query, filters } = action.payload;
+      const isNewQuery = state.query !== query || !isEqual(state.filters, filters);
       return {
         ...state,
         error: false,
+        filters,
         isLoadingResults: true,
         next: isNewQuery ? "" : state.next,
         query,
@@ -99,14 +102,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
         results: state.results.concat(action.payload.results)
       };
     case ActionType.SEARCH_RESULTS_ERROR:
-      return {
-        ...state,
-        error: true,
-        isLoadingResults: false,
-        next: "",
-        query: "",
-        results: []
-      };
+      return { ...initialSearchState, error: true };
     case ActionType.RESET_SEARCH:
       return initialSearchState;
     case ActionType.SET_SEARCH_RESULT_HOVER:

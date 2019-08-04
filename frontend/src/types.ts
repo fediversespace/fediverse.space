@@ -1,3 +1,5 @@
+import { INSTANCE_TYPES } from "./constants";
+
 interface IColorSchemeBase {
   // The name of the coloring, e.g. "Instance type"
   name: string;
@@ -23,8 +25,7 @@ export const typeColorScheme: IQualitativeColorScheme = {
   cytoscapeDataKey: "type",
   name: "Instance type",
   type: "qualitative",
-  // We could also extract the values from the server response, but this would slow things down...
-  values: ["mastodon", "gab", "pleroma"]
+  values: INSTANCE_TYPES
 };
 export const activityColorScheme: IQuantitativeColorScheme = {
   cytoscapeDataKey: "statusesPerDay",
