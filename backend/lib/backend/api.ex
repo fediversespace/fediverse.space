@@ -40,7 +40,7 @@ defmodule Backend.Api do
     |> where(
       [i],
       not is_nil(i.x) and not is_nil(i.y) and not is_nil(i.user_count) and
-        i.user_count >= ^user_threshold and not i.opt_out
+        (i.user_count >= ^user_threshold or i.opt_in) and not i.opt_out
     )
     |> maybe_filter_nodes_to_neighborhood(domain)
     |> select([c], [:domain, :user_count, :x, :y, :type, :statuses_per_day])
@@ -79,7 +79,8 @@ defmodule Backend.Api do
       [e, i1, i2],
       not is_nil(i1.x) and not is_nil(i1.y) and
         not is_nil(i2.x) and not is_nil(i2.y) and
-        i1.user_count >= ^user_threshold and i2.user_count >= ^user_threshold and
+        (i1.user_count >= ^user_threshold or i1.opt_in) and
+        (i2.user_count >= ^user_threshold or i2.opt_in) and
         not i1.opt_out and not i2.opt_out
     )
     |> Repo.all()

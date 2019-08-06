@@ -1,6 +1,6 @@
 defmodule Backend.Crawler.Util do
   require Logger
-  alias Backend.Repo
+  alias Backend.{Instance, Repo}
   import Backend.Util
   import Ecto.Query
 
