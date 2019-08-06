@@ -4,7 +4,7 @@ defmodule Backend.Crawler do
   """
 
   alias __MODULE__
-  alias Backend.Crawler.Crawlers.Mastodon
+  alias Backend.Crawler.Crawlers.{Mastodon, Misskey}
   alias Backend.Crawler.ApiCrawler
   alias Backend.{Crawl, CrawlInteraction, Repo, Instance, InstancePeer}
   import Ecto.Query
@@ -46,6 +46,7 @@ defmodule Backend.Crawler do
     state
     # register APICrawlers here
     |> register(Mastodon)
+    |> register(Misskey)
     # go!
     |> crawl()
     |> save()

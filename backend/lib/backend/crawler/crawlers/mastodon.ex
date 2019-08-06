@@ -2,9 +2,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   require Logger
   import Backend.Crawler.Util
   import Backend.Util
-  import Ecto.Query
   alias Backend.Crawler.ApiCrawler
-  alias Backend.{Instance, Repo}
 
   @behaviour ApiCrawler
 
@@ -18,31 +16,21 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
   @impl ApiCrawler
   def allows_crawling?(domain) do
-    endpoints = [
+    [
       "/api/v1/instance",
       "/api/v1/instance/peers",
       "/api/v1/timelines/public"
     ]
-
-    user_agent = get_config(:user_agent)
-
-    endpoints
     |> Enum.map(fn endpoint -> "https://#{domain}#{endpoint}" end)
-    |> Enum.all?(fn endpoint -> Gollum.crawlable?(user_agent, endpoint) != :uncrawlable end)
+    |> urls_are_crawlable?()
   end
 
   @impl ApiCrawler
   def crawl(domain) do
     instance = Jason.decode!(get!("https://#{domain}/api/v1/instance").body)
+    user_count = get_in(instance, ["stats", "user_count"])
 
-    has_opted_in =
-      case Instance |> select([:opt_in]) |> Repo.get_by(domain: domain) do
-        %{opt_in: true} -> true
-        _ -> false
-      end
-
-    if get_in(instance, ["stats", "user_count"]) > get_config(:personal_instance_threshold) or
-         has_opted_in do
+    if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
       crawl_large_instance(domain, instance)
     else
       Map.merge(
@@ -148,7 +136,11 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
     if length(filtered_statuses) > 0 do
       # get statuses that are eligible (i.e. users don't have #nobot in their profile) and have mentions
-      interactions = Map.merge(interactions, statuses_to_interactions(filtered_statuses))
+      interactions =
+        filtered_statuses
+        |> statuses_to_interactions()
+        |> merge_count_maps(interactions)
+
       statuses_seen = statuses_seen + length(filtered_statuses)
 
       status_datetime_threshold =

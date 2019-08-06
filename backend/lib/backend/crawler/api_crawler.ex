@@ -14,7 +14,7 @@ defmodule Backend.Crawler.ApiCrawler do
   # {domain_mentioned, count}
   @type instance_interactions :: %{String.t() => integer}
 
-  @type instance_type :: :mastodon | :pleroma | :gab
+  @type instance_type :: :mastodon | :pleroma | :gab | :misskey
 
   defstruct [
     :version,

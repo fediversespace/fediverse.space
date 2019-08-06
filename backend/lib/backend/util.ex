@@ -30,7 +30,7 @@ defmodule Backend.Util do
     blacklist =
       case get_config(:blacklist) do
         nil -> []
-        _ -> get_config(:blacklist)
+        other -> other
       end
 
     blacklist

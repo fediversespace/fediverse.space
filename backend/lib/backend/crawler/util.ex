@@ -1,6 +1,8 @@
 defmodule Backend.Crawler.Util do
   require Logger
+  alias Backend.Repo
   import Backend.Util
+  import Ecto.Query
 
   # Gets the domain from a Mastodon/Pleroma account URL
   # (e.g. https://mastodon.social/@demouser or https://pleroma.site/users/demouser)
@@ -59,5 +61,42 @@ defmodule Backend.Crawler.Util do
       recv_timeout: 15000,
       timeout: 15000
     )
+  end
+
+  def post(url, body \\ "") do
+    HTTPoison.post(url, body, [{"User-Agent", get_config(:user_agent)}],
+      hackney: [pool: :crawler],
+      recv_timeout: 15000,
+      timeout: 15000
+    )
+  end
+
+  def post!(url, body \\ "") do
+    HTTPoison.post!(url, body, [{"User-Agent", get_config(:user_agent)}],
+      hackney: [pool: :crawler],
+      recv_timeout: 15000,
+      timeout: 15000
+    )
+  end
+
+  @spec urls_are_crawlable?([String.t()]) :: boolean()
+  def urls_are_crawlable?(urls) do
+    user_agent = get_config(:user_agent)
+
+    urls
+    |> Enum.all?(fn url -> Gollum.crawlable?(user_agent, url) != :uncrawlable end)
+  end
+
+  @spec has_opted_in?(String.t()) :: boolean()
+  def has_opted_in?(domain) do
+    case Instance |> select([:opt_in]) |> Repo.get_by(domain: domain) do
+      %{opt_in: true} -> true
+      _ -> false
+    end
+  end
+
+  @spec is_above_user_threshold?(integer) :: boolean()
+  def is_above_user_threshold?(user_count) do
+    user_count > get_config(:personal_instance_threshold)
   end
 end
