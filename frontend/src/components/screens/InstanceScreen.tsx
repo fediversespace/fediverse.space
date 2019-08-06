@@ -28,7 +28,7 @@ import { push } from "connected-react-router";
 import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 import styled from "styled-components";
-import { IAppState, IGraph, IInstanceDetails } from "../../redux/types";
+import { IAppState, IGraph, IGraphResponse, IInstanceDetails } from "../../redux/types";
 import { domainMatchSelector, getFromApi, isSmallScreen } from "../../util";
 import { InstanceType } from "../atoms";
 import { Cytoscape, ErrorState } from "../molecules/";
@@ -173,14 +173,15 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     }
     this.setState({ isLoadingLocalGraph: true });
     getFromApi(`graph/${this.props.instanceName}`)
-      .then((response: IGraph) => {
+      .then((response: IGraphResponse) => {
         // We do some processing of edges here to make sure that every edge's source and target are in the neighborhood
         // We could (and should) be doing this in the backend, but I don't want to mess around with complex SQL
         // queries.
         // TODO: think more about moving the backend to a graph database that would make this easier.
-        const nodeIds = new Set(response.nodes.map(n => n.data.id));
-        const edges = response.edges.filter(e => nodeIds.has(e.data.source) && nodeIds.has(e.data.target));
-        this.setState({ isLoadingLocalGraph: false, localGraph: { ...response, edges } });
+        const graph = response.graph;
+        const nodeIds = new Set(graph.nodes.map(n => n.data.id));
+        const edges = graph.edges.filter(e => nodeIds.has(e.data.source) && nodeIds.has(e.data.target));
+        this.setState({ isLoadingLocalGraph: false, localGraph: { ...graph, edges } });
       })
       .catch(() => this.setState({ isLoadingLocalGraph: false, localGraphLoadError: true }));
   };
