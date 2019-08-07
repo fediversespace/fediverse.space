@@ -14,6 +14,7 @@ defmodule Backend.Instance do
     field :base_domain, :string
     field :opt_in, :boolean
     field :opt_out, :boolean
+    field :next_crawl, :naive_datetime
 
     many_to_many :peers, Backend.Instance,
       join_through: Backend.InstancePeer,
@@ -43,7 +44,8 @@ defmodule Backend.Instance do
       :statuses_per_day,
       :base_domain,
       :opt_in,
-      :opt_out
+      :opt_out,
+      :next_crawl
     ])
     |> validate_required([:domain])
     |> put_assoc(:peers, attrs.peers)

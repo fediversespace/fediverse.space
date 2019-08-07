@@ -167,4 +167,28 @@ defmodule Backend.Util do
   def convert_keys_to_atoms(map) do
     map |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
   end
+
+  # Given a domain, returns the number of n most recent crawls that errored
+  @spec get_recent_crawl_error_count(String.t()) :: integer
+  def get_recent_crawl_error_count(domain) do
+    most_recent_success_crawl_subquery =
+      Crawl
+      |> select([c], %{
+        instance_domain: c.instance_domain,
+        timestamp: max(c.inserted_at)
+      })
+      |> where([c], c.instance_domain == ^domain and is_nil(c.error))
+      |> group_by([c], c.instance_domain)
+
+    Crawl
+    |> join(:left, [c1], c2 in subquery(most_recent_success_crawl_subquery),
+      on: c1.instance_domain == c2.instance_domain
+    )
+    |> where(
+      [c1, c2],
+      c1.instance_domain == ^domain and (c1.inserted_at > c2.timestamp or is_nil(c2.timestamp))
+    )
+    |> select([c1, c2], count(c1.id))
+    |> Repo.one()
+  end
 end

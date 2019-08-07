@@ -119,14 +119,24 @@ defmodule Backend.Crawler do
       user_count: result.user_count,
       status_count: result.status_count,
       type: instance_type,
-      base_domain: get_base_domain(domain)
+      base_domain: get_base_domain(domain),
+      next_crawl: NaiveDateTime.add(now, get_config(:crawl_interval_mins) * 60, :second)
     }
 
     Repo.insert!(
       instance,
       on_conflict:
         {:replace,
-         [:description, :version, :user_count, :status_count, :type, :base_domain, :updated_at]},
+         [
+           :description,
+           :version,
+           :user_count,
+           :status_count,
+           :type,
+           :base_domain,
+           :updated_at,
+           :next_crawl
+         ]},
       conflict_target: :domain
     )
 
@@ -153,7 +163,7 @@ defmodule Backend.Crawler do
 
     peers =
       peers_domains
-      |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now})
+      |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now, next_crawl: now})
 
     Instance
     |> Repo.insert_all(peers, on_conflict: :nothing, conflict_target: :domain)
@@ -220,6 +230,8 @@ defmodule Backend.Crawler do
   end
 
   defp save(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
+    now = get_now()
+
     error =
       cond do
         not allows_crawling -> "robots.txt"
@@ -227,13 +239,22 @@ defmodule Backend.Crawler do
         true -> "unknown error"
       end
 
+    # The "+1" is this error!
+    error_count = get_recent_crawl_error_count(domain) + 1
+    # The crawl interval grows exponentially at first but never goes above 24 hours
+    crawl_interval_mins =
+      min(get_config(:crawl_interval_mins) * round(:math.pow(2, error_count)), 1440)
+
+    next_crawl = NaiveDateTime.add(now, crawl_interval_mins * 60, :second)
+
     Repo.transaction(fn ->
       Repo.insert!(
         %Instance{
           domain: domain,
-          base_domain: get_base_domain(domain)
+          base_domain: get_base_domain(domain),
+          next_crawl: next_crawl
         },
-        on_conflict: {:replace, [:base_domain]},
+        on_conflict: {:replace, [:next_crawl]},
         conflict_target: :domain
       )
 
