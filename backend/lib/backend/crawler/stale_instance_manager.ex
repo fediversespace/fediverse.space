@@ -125,7 +125,7 @@ defmodule Backend.Crawler.StaleInstanceManager do
   @spec get_dead_domains_to_crawl() :: MapSet.t()
   defp get_dead_domains_to_crawl() do
     now = get_now()
-    interval_mins = -1 * get_config(:crawl_interval_mins)
+    interval_mins = get_config(:crawl_interval_mins)
 
     most_recent_successful_crawl_subquery =
       Crawl
@@ -165,7 +165,7 @@ defmodule Backend.Crawler.StaleInstanceManager do
                      failed_crawls: failed_crawls
                    } ->
       # The interval is never more than 24 hours
-      curr_interval = min(1440, interval_mins * :math.pow(2, failed_crawls))
+      curr_interval = min(1440, interval_mins * round(:math.pow(2, failed_crawls)))
       next_crawl = NaiveDateTime.add(most_recent_crawl, curr_interval * 60, :second)
 
       %{
