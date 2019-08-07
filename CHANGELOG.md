@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed broken instance view on mobile devices.
+- Increased database connection timeout - required as the database grows!
 
 ### Security
 
