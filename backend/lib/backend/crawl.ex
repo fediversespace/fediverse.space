@@ -11,16 +11,13 @@ defmodule Backend.Crawl do
     field :interactions_seen, :integer
     field :statuses_seen, :integer
 
-    # if something went wrong, otherwise null
-    field :error, :string
-
     timestamps()
   end
 
   @doc false
   def changeset(crawl, attrs) do
     crawl
-    |> cast(attrs, [:instance, :statuses_seen, :interactions_seen, :error])
+    |> cast(attrs, [:instance, :statuses_seen, :interactions_seen])
     |> validate_required([:instance])
   end
 end

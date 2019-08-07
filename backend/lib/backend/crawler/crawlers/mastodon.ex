@@ -108,7 +108,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     # most recent status we have.
     min_timestamp =
       if statuses_seen == 0 do
-        get_last_successful_crawl_timestamp(domain)
+        get_last_crawl_timestamp(domain)
       else
         min_timestamp
       end

@@ -120,7 +120,9 @@ defmodule Backend.Crawler do
       status_count: result.status_count,
       type: instance_type,
       base_domain: get_base_domain(domain),
-      next_crawl: NaiveDateTime.add(now, get_config(:crawl_interval_mins) * 60, :second)
+      next_crawl: NaiveDateTime.add(now, get_config(:crawl_interval_mins) * 60, :second),
+      crawl_error: nil,
+      crawl_error_count: 0
     }
 
     Repo.insert!(
@@ -135,7 +137,9 @@ defmodule Backend.Crawler do
            :type,
            :base_domain,
            :updated_at,
-           :next_crawl
+           :next_crawl,
+           :crawl_error,
+           :crawl_error_count
          ]},
       conflict_target: :domain
     )
@@ -240,10 +244,15 @@ defmodule Backend.Crawler do
       end
 
     # The "+1" is this error!
-    error_count = get_recent_crawl_error_count(domain) + 1
-    # The crawl interval grows exponentially at first but never goes above 24 hours
+    error_count =
+      Instance
+      |> Repo.get_by!(domain: domain)
+      |> Map.get(:crawl_error_count)
+      |> Kernel.+(1)
+
+    # The crawl interval grows exponentially at first but never goes above 72 hours
     crawl_interval_mins =
-      min(get_config(:crawl_interval_mins) * round(:math.pow(2, error_count)), 1440)
+      min(get_config(:crawl_interval_mins) * round(:math.pow(2, error_count)), 4320)
 
     next_crawl = NaiveDateTime.add(now, crawl_interval_mins * 60, :second)
 
@@ -252,16 +261,13 @@ defmodule Backend.Crawler do
         %Instance{
           domain: domain,
           base_domain: get_base_domain(domain),
+          crawl_error: error,
+          crawl_error_count: error_count,
           next_crawl: next_crawl
         },
-        on_conflict: {:replace, [:next_crawl]},
+        on_conflict: {:replace, [:base_domain, :crawl_error, :crawl_error_count, :next_crawl]},
         conflict_target: :domain
       )
-
-      Repo.insert!(%Crawl{
-        instance_domain: domain,
-        error: error
-      })
     end)
 
     Appsignal.increment_counter("crawler.failure", 1)

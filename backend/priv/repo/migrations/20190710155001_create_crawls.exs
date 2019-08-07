@@ -13,7 +13,6 @@ defmodule Backend.Repo.Migrations.CreateCrawls do
       timestamps()
     end
 
-    # TODO: does this actually make WHERE error IS NULL queries faster? if not, drop it
     create index(:crawls, [:error])
     create index(:crawls, [:inserted_at])
   end

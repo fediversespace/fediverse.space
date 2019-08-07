@@ -56,8 +56,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
       |> NaiveDateTime.add(get_config(:status_age_limit_days) * 24 * 3600 * -1, :second)
 
     # Don't get any statuses older than this
-    min_timestamp =
-      max_datetime(get_last_successful_crawl_timestamp(domain), status_datetime_threshold)
+    min_timestamp = max_datetime(get_last_crawl_timestamp(domain), status_datetime_threshold)
 
     {interactions, statuses_seen} = get_interactions(domain, min_timestamp)
     {:ok, {version, description}} = get_version_and_description(domain)

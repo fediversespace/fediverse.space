@@ -6,18 +6,6 @@ defmodule BackendWeb.InstanceView do
   def render("show.json", %{instance: instance, crawl: crawl}) do
     user_threshold = get_config(:personal_instance_threshold)
 
-    [status, last_updated] =
-      case crawl do
-        nil ->
-          ["not crawled", nil]
-
-        _ ->
-          case crawl.error do
-            nil -> ["success", crawl.inserted_at]
-            err -> [err, crawl.inserted_at]
-          end
-      end
-
     cond do
       instance.user_count < user_threshold and not instance.opt_in ->
         %{
@@ -25,7 +13,21 @@ defmodule BackendWeb.InstanceView do
           status: "personal instance"
         }
 
+      instance.crawl_error == "robots.txt" ->
+        %{
+          name: instance.domain,
+          status: instance.crawl_error
+        }
+
+      instance.crawl_error != nil and instance.type == nil ->
+        %{
+          name: instance.domain,
+          status: instance.crawl_error
+        }
+
       true ->
+        last_updated = max_datetime(crawl.inserted_at, instance.updated_at)
+
         filtered_peers =
           instance.peers
           |> Enum.filter(fn peer -> not peer.opt_out end)
@@ -48,7 +50,7 @@ defmodule BackendWeb.InstanceView do
           domainCount: length(instance.peers),
           peers: render_many(filtered_peers, InstanceView, "instance.json"),
           lastUpdated: last_updated,
-          status: status,
+          status: "success",
           type: instance.type,
           statusesPerDay: instance.statuses_per_day,
           statusesPerUserPerDay: statuses_per_user_per_day

@@ -43,7 +43,6 @@ defmodule Backend.Scheduler do
         instance_domain: c.instance_domain,
         interactions_seen: sum(c.interactions_seen)
       })
-      |> where([c], is_nil(c.error))
       |> group_by([c], c.instance_domain)
 
     scores =
@@ -100,7 +99,7 @@ defmodule Backend.Scheduler do
       )
       |> where(
         [c, c2],
-        c.inserted_at > c2.earliest_crawl and not is_nil(c.statuses_seen) and is_nil(c.error)
+        c.inserted_at > c2.earliest_crawl and not is_nil(c.statuses_seen)
       )
       |> select([c], %{
         instance_domain: c.instance_domain,
@@ -148,7 +147,6 @@ defmodule Backend.Scheduler do
         instance_domain: c.instance_domain,
         statuses_seen: sum(c.statuses_seen)
       })
-      |> where([c], is_nil(c.error))
       |> group_by([c], c.instance_domain)
 
     interactions =
