@@ -47,6 +47,11 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :gollum,
+  refresh_secs: 86_400,
+  lazy_refresh: true,
+  user_agent: "fediverse.space crawler"
+
 config :ex_twilio,
   account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
   auth_token: System.get_env("TWILIO_AUTH_TOKEN")
@@ -60,7 +65,7 @@ config :backend, :crawler,
   status_count_limit: 5000,
   personal_instance_threshold: 10,
   crawl_interval_mins: 60,
-  crawl_workers: 100,
+  crawl_workers: 50,
   blacklist: [
     "gab.best",
     "4chan.icu"
