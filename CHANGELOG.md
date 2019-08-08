@@ -9,11 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added Misskey crawler.
-
 ### Changed
-
-- Crawl instances that are down or unrecognized less often.
 
 ### Deprecated
 
@@ -21,10 +17,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## [2.5.0 - 2019-08-08]
+
+### Added
+
+- Added Misskey crawler.
+
+### Changed
+
+- Crawl instances that are down or unrecognized less often.
+
+### Fixed
+
 - Fixed broken instance view on mobile devices.
 - Increased database connection timeout - required as the database grows!
-
-### Security
 
 ## [2.4.1 - 2019-08-04]
 
