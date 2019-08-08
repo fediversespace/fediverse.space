@@ -2,8 +2,8 @@ include:
   template: Dependency-Scanning.gitlab-ci.yml
 
 dependency_scanning:
-  except:
-    - develop
+  only:
+    - schedules
 
 test-frontend:
   image: node:lts-alpine
