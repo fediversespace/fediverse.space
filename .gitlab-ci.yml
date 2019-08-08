@@ -52,6 +52,8 @@ deploy-backend-develop:
   image: ilyasemenov/gitlab-ci-git-push
   only:
     - develop
+  except:
+    - schedules
   script:
     - git-push dokku@api-develop.fediverse.space:phoenix develop
 
@@ -62,6 +64,8 @@ deploy-gephi-develop:
     name: develop
   only:
     - develop
+  except:
+    - schedules
   script:
     - git-push dokku@api-develop.fediverse.space:gephi develop
     
@@ -73,6 +77,8 @@ deploy-backend-production:
   image: ilyasemenov/gitlab-ci-git-push
   only:
     - master
+  except:
+    - schedules
   script:
     - git-push dokku@api.fediverse.space:phoenix master
 
@@ -83,5 +89,7 @@ deploy-gephi-production:
     name: production
   only:
     - master
+  except:
+    - schedules
   script:
     - git-push dokku@api.fediverse.space:gephi master
