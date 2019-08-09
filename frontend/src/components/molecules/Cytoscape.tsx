@@ -47,7 +47,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         name: "preset"
       },
       maxZoom: 2,
-      minZoom: 0.02,
+      minZoom: 0.01,
       pixelRatio: 1.0,
       selectionType: "single"
     });
