@@ -68,3 +68,13 @@ export const getBuckets = (min: number, max: number, steps: number, exponential:
     return range(min, max, bucketSize);
   }
 };
+
+const typeToDisplay = {
+  gnusocial: "GNU Social"
+};
+export const getTypeDisplayString = (key: string) => {
+  if (key in typeToDisplay) {
+    return typeToDisplay[key];
+  }
+  return capitalize(key);
+};

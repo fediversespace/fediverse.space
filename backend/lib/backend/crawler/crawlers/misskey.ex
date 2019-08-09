@@ -7,10 +7,15 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   require Logger
 
   @impl ApiCrawler
-  def is_instance_type?(domain) do
-    case get_version_and_description(domain) do
-      {:ok, _} -> true
-      {:error, _} -> false
+  def is_instance_type?(domain, result) do
+    # We may already know that this is a Misskey instance from nodeinfo
+    if result != nil and Map.get(result, :instance_type) == :misskey do
+      true
+    else
+      case get_version_and_description(domain) do
+        {:ok, _} -> true
+        {:error, _} -> false
+      end
     end
   end
 
@@ -27,11 +32,9 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   end
 
   @impl ApiCrawler
-  def crawl(domain) do
-    with {:ok, %{status_code: 200, body: stats_body}} <- post("https://#{domain}/api/stats") do
-      %{"originalUsersCount" => user_count, "originalNotesCount" => status_count} =
-        Jason.decode!(stats_body)
-
+  def crawl(domain, _result) do
+    with {:ok, %{"originalUsersCount" => user_count, "originalNotesCount" => status_count}} <-
+           post_and_decode("https://#{domain}/api/stats") do
       if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
         crawl_large_instance(domain, user_count, status_count)
       else
@@ -107,15 +110,15 @@ defmodule Backend.Crawler.Crawlers.Misskey do
 
     Logger.debug("Crawling #{endpoint} with untilId=#{until_id}")
 
-    statuses =
-      endpoint
-      |> post!(Jason.encode!(params))
-      |> Map.get(:body)
-      |> Jason.decode!()
+    statuses = post_and_decode!(endpoint, Jason.encode!(params))
 
     filtered_statuses =
       statuses
-      |> Enum.filter(fn s -> is_after?(s["createdAt"], min_timestamp) end)
+      |> Enum.filter(fn s ->
+        s["createdAt"]
+        |> NaiveDateTime.from_iso8601!()
+        |> is_after?(min_timestamp)
+      end)
 
     if length(filtered_statuses) > 0 do
       # get statuses that are eligible (i.e. users don't have #nobot in their profile) and have mentions
@@ -151,35 +154,22 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   end
 
   @spec get_version_and_description(String.t()) ::
-          {:ok, {String.t(), String.t()}} | {:error, String.t()}
+          {:ok, {String.t(), String.t()}} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
   defp get_version_and_description(domain) do
-    case post("https://#{domain}/api/meta") do
-      {:ok, %{status_code: 200, body: body}} ->
-        case Jason.decode(body) do
-          {:ok, decoded} ->
-            {:ok, {Map.get(decoded, "version"), Map.get(decoded, "description")}}
+    case post_and_decode("https://#{domain}/api/meta") do
+      {:ok, %{"version" => version, "description" => description}} ->
+        {:ok, {version, description}}
 
-          {:error, _error} ->
-            {:error, "invalid response"}
-        end
-
-      _ ->
-        {:error, "unsuccesful request"}
+      {:error, err} ->
+        {:error, err}
     end
   end
 
   @spec get_peers(String.t()) :: {:ok, [String.t()]} | {:error, Jason.DecodeError.t()}
   defp get_peers(domain) do
-    case get("https://#{domain}/api/v1/instance/peers") do
-      {:ok, response} ->
-        with %{status_code: 200, body: body} <- response do
-          Jason.decode(body)
-        else
-          _ -> {:ok, []}
-        end
-
-      {:error, _} ->
-        {:ok, []}
+    case get_and_decode("https://#{domain}/api/v1/instance/peers") do
+      {:ok, peers} -> {:ok, peers}
+      {:error, _} -> {:ok, []}
     end
   end
 

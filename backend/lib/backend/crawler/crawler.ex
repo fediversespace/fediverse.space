@@ -4,7 +4,7 @@ defmodule Backend.Crawler do
   """
 
   alias __MODULE__
-  alias Backend.Crawler.Crawlers.{Mastodon, Misskey}
+  alias Backend.Crawler.Crawlers.{GnuSocial, Mastodon, Misskey, Nodeinfo}
   alias Backend.Crawler.ApiCrawler
   alias Backend.{Crawl, CrawlInteraction, Repo, Instance, InstancePeer}
   import Ecto.Query
@@ -16,8 +16,8 @@ defmodule Backend.Crawler do
     :domain,
     # a list of ApiCrawlers that will be attempted
     :api_crawlers,
-    :found_api?,
     :allows_crawling?,
+    :found_api?,
     :result,
     :error
   ]
@@ -25,8 +25,8 @@ defmodule Backend.Crawler do
   @type t() :: %__MODULE__{
           domain: String.t(),
           api_crawlers: [ApiCrawler.t()],
-          found_api?: boolean,
           allows_crawling?: boolean,
+          found_api?: boolean,
           result: ApiCrawler.t() | nil,
           error: String.t() | nil
         }
@@ -37,16 +37,18 @@ defmodule Backend.Crawler do
     state = %Crawler{
       domain: domain,
       api_crawlers: [],
-      found_api?: false,
       allows_crawling?: true,
+      found_api?: false,
       result: nil,
       error: nil
     }
 
     state
-    # register APICrawlers here
+    # These crawlers are run in the order they're registered. Nodeinfo should be the first one.
+    |> register(Nodeinfo)
     |> register(Mastodon)
     |> register(Misskey)
+    |> register(GnuSocial)
     # go!
     |> crawl()
     |> save()
@@ -56,33 +58,47 @@ defmodule Backend.Crawler do
 
   # Adds a new ApiCrawler that run/1 will check.
   defp register(%Crawler{api_crawlers: crawlers} = state, api_crawler) do
-    Map.put(state, :api_crawlers, [api_crawler | crawlers])
+    Map.put(state, :api_crawlers, crawlers ++ [api_crawler])
   end
 
   # Recursive function to check whether `domain` has an API that the head of the api_crawlers list can read.
   # If so, crawls it. If not, continues with the tail of the api_crawlers list.
   defp crawl(%Crawler{api_crawlers: [], domain: domain} = state) do
     Logger.debug("Found no compatible API for #{domain}")
-    Map.put(state, :found_api?, false)
+    state
   end
 
-  defp crawl(%Crawler{domain: domain, api_crawlers: [curr | remaining_crawlers]} = state) do
-    if curr.is_instance_type?(domain) do
+  # Nodeinfo is distinct from other crawlers in that
+  # a) it should always be run first
+  # b) it passes the results on to the next crawlers (e.g. user_count)
+  defp crawl(%Crawler{api_crawlers: [Nodeinfo | remaining_crawlers], domain: domain} = state) do
+    with true <- Nodeinfo.allows_crawling?(domain), {:ok, nodeinfo} <- Nodeinfo.crawl(domain) do
+      Logger.debug("Found nodeinfo for #{domain}.")
+      result = Map.merge(nodeinfo, %{peers: [], interactions: %{}, statuses_seen: 0})
+      crawl(%Crawler{state | result: result, found_api?: true, api_crawlers: remaining_crawlers})
+    else
+      _ ->
+        Logger.debug("Did not find nodeinfo for #{domain}.")
+        crawl(%Crawler{state | api_crawlers: remaining_crawlers})
+    end
+  end
+
+  defp crawl(
+         %Crawler{domain: domain, result: result, api_crawlers: [curr | remaining_crawlers]} =
+           state
+       ) do
+    if curr.is_instance_type?(domain, result) do
       Logger.debug("Found #{curr} instance")
-      state = Map.put(state, :found_api?, true)
 
       if curr.allows_crawling?(domain) do
         try do
-          %Crawler{state | result: curr.crawl(domain), api_crawlers: []}
+          %Crawler{state | result: curr.crawl(domain, result), found_api?: true}
         rescue
           e in HTTPoison.Error ->
             Map.put(state, :error, "HTTPoison error: " <> HTTPoison.Error.message(e))
 
           e in Jason.DecodeError ->
             Map.put(state, :error, "Jason DecodeError: " <> Jason.DecodeError.message(e))
-
-          e in _ ->
-            Map.put(state, :error, "Unknown error: " <> inspect(e))
         end
       else
         Logger.debug("#{domain} does not allow crawling.")
@@ -99,9 +115,9 @@ defmodule Backend.Crawler do
   defp save(%Crawler{
          domain: domain,
          result: result,
-         found_api?: true,
          error: nil,
-         allows_crawling?: true
+         allows_crawling?: true,
+         found_api?: true
        }) do
     now = get_now()
 
@@ -240,7 +256,7 @@ defmodule Backend.Crawler do
       cond do
         not allows_crawling -> "robots.txt"
         error == nil -> "no api found"
-        true -> "unknown error"
+        true -> error
       end
 
     # The "+1" is this error!
@@ -250,25 +266,25 @@ defmodule Backend.Crawler do
       |> Map.get(:crawl_error_count)
       |> Kernel.+(1)
 
-    # The crawl interval grows exponentially at first but never goes above 72 hours
+    # The crawl interval grows exponentially at first but never goes above 24 hours
     crawl_interval_mins =
-      min(get_config(:crawl_interval_mins) * round(:math.pow(2, error_count)), 4320)
+      min(get_config(:crawl_interval_mins) * round(:math.pow(2, error_count)), 1440)
 
     next_crawl = NaiveDateTime.add(now, crawl_interval_mins * 60, :second)
 
-    Repo.transaction(fn ->
-      Repo.insert!(
-        %Instance{
-          domain: domain,
-          base_domain: get_base_domain(domain),
-          crawl_error: error,
-          crawl_error_count: error_count,
-          next_crawl: next_crawl
-        },
-        on_conflict: {:replace, [:base_domain, :crawl_error, :crawl_error_count, :next_crawl]},
-        conflict_target: :domain
-      )
-    end)
+    Repo.insert!(
+      %Instance{
+        domain: domain,
+        base_domain: get_base_domain(domain),
+        crawl_error: error,
+        crawl_error_count: error_count,
+        next_crawl: next_crawl,
+        updated_at: now
+      },
+      on_conflict:
+        {:replace, [:base_domain, :crawl_error, :crawl_error_count, :next_crawl, :updated_at]},
+      conflict_target: :domain
+    )
 
     Appsignal.increment_counter("crawler.failure", 1)
   end

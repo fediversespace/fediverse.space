@@ -14,10 +14,7 @@ defmodule BackendWeb.AdminLoginController do
     # TODO: this assumes mastodon/pleroma API
     cleaned_domain = clean_domain(domain)
 
-    instance_data =
-      HTTPoison.get!("https://#{cleaned_domain}/api/v1/instance")
-      |> Map.get(:body)
-      |> Jason.decode!()
+    instance_data = get_and_decode!("https://#{cleaned_domain}/api/v1/instance")
 
     render(conn, "show.json", instance_data: instance_data, cleaned_domain: cleaned_domain)
   end
@@ -25,10 +22,7 @@ defmodule BackendWeb.AdminLoginController do
   def create(conn, %{"domain" => domain, "type" => type}) do
     cleaned_domain = clean_domain(domain)
 
-    instance_data =
-      HTTPoison.get!("https://#{cleaned_domain}/api/v1/instance")
-      |> Map.get(:body)
-      |> Jason.decode!()
+    instance_data = get_and_decode!("https://#{cleaned_domain}/api/v1/instance")
 
     error =
       cond do

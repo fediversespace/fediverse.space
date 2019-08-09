@@ -54,7 +54,7 @@ defmodule Backend.Crawler.StaleInstanceManager do
     stale_domains =
       Instance
       |> select([i], i.domain)
-      |> where([i], i.next_crawl < ^now)
+      |> where([i], i.next_crawl < ^now and not i.opt_out)
       |> Repo.all()
       |> MapSet.new()
 

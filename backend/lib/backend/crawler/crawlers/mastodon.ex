@@ -7,10 +7,15 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   @behaviour ApiCrawler
 
   @impl ApiCrawler
-  def is_instance_type?(domain) do
-    case get("https://#{domain}/api/v1/instance") do
-      {:ok, response} -> if is_http_200?(response), do: has_title?(response.body), else: false
-      {:error, _error} -> false
+  def is_instance_type?(domain, result) do
+    # We might already know that this is a Pleroma instance from nodeinfo
+    if result != nil and Map.get(result, :instance_type) == :pleroma do
+      true
+    else
+      case get_and_decode("https://#{domain}/api/v1/instance") do
+        {:ok, %{"title" => _title}} -> true
+        _other -> false
+      end
     end
   end
 
@@ -26,8 +31,8 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   end
 
   @impl ApiCrawler
-  def crawl(domain) do
-    instance = Jason.decode!(get!("https://#{domain}/api/v1/instance").body)
+  def crawl(domain, _current_result) do
+    instance = get_and_decode!("https://#{domain}/api/v1/instance")
     user_count = get_in(instance, ["stats", "user_count"])
 
     if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
@@ -51,12 +56,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
   @spec crawl_large_instance(String.t(), any()) :: ApiCrawler.t()
   defp crawl_large_instance(domain, instance) do
-    # servers may not publish peers
-    peers =
-      case get("https://#{domain}/api/v1/instance/peers") do
-        {:ok, response} -> if is_http_200?(response), do: Jason.decode!(response.body), else: []
-        {:error, _error} -> []
-      end
+    peers = get_peers(domain)
 
     Logger.debug("Found #{length(peers)} peers.")
 
@@ -124,15 +124,15 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
     Logger.debug("Crawling #{endpoint}")
 
-    statuses =
-      endpoint
-      |> get!()
-      |> Map.get(:body)
-      |> Jason.decode!()
+    statuses = get_and_decode!(endpoint)
 
     filtered_statuses =
       statuses
-      |> Enum.filter(fn s -> is_after?(s["created_at"], min_timestamp) end)
+      |> Enum.filter(fn s ->
+        s["created_at"]
+        |> NaiveDateTime.from_iso8601!()
+        |> is_after?(min_timestamp)
+      end)
 
     if length(filtered_statuses) > 0 do
       # get statuses that are eligible (i.e. users don't have #nobot in their profile) and have mentions
@@ -166,12 +166,11 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     end
   end
 
-  # To check if the endpoint works as expected
-  @spec has_title?(String.t()) :: boolean
-  defp has_title?(body) do
-    case Jason.decode(body) do
-      {:ok, decoded} -> Map.has_key?(decoded, "title")
-      {:error, _error} -> false
+  defp get_peers(domain) do
+    # servers may not publish peers
+    case get_and_decode("https://#{domain}/api/v1/instance/peers") do
+      {:ok, peers} -> peers
+      {:error, _err} -> []
     end
   end
 

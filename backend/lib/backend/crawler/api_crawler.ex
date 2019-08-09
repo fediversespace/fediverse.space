@@ -11,10 +11,12 @@ defmodule Backend.Crawler.ApiCrawler do
   * Make sure to check the most recent crawl of the instance so you don't re-crawl old statuses
   """
 
+  alias Backend.Crawler.Crawlers.Nodeinfo
+
   # {domain_mentioned, count}
   @type instance_interactions :: %{String.t() => integer}
 
-  @type instance_type :: :mastodon | :pleroma | :gab | :misskey
+  @type instance_type :: :mastodon | :pleroma | :gab | :misskey | :gnusocial
 
   defstruct [
     :version,
@@ -30,8 +32,8 @@ defmodule Backend.Crawler.ApiCrawler do
   @type t() :: %__MODULE__{
           version: String.t(),
           description: String.t(),
-          user_count: integer,
-          status_count: integer,
+          user_count: integer | nil,
+          status_count: integer | nil,
           peers: [String.t()],
           interactions: instance_interactions,
           statuses_seen: integer,
@@ -40,8 +42,9 @@ defmodule Backend.Crawler.ApiCrawler do
 
   @doc """
   Check whether the instance at the given domain is of the type that this ApiCrawler implements.
+  Arguments are the instance domain and the nodeinfo results.
   """
-  @callback is_instance_type?(String.t()) :: boolean()
+  @callback is_instance_type?(String.t(), Nodeinfo.t()) :: boolean()
 
   @doc """
   Check whether the instance allows crawling according to its robots.txt or otherwise.
@@ -50,6 +53,7 @@ defmodule Backend.Crawler.ApiCrawler do
 
   @doc """
   Crawl the instance at the given domain.
+  Takes two arguments: the domain to crawl and the existing results (from nodeinfo).
   """
-  @callback crawl(String.t()) :: t()
+  @callback crawl(String.t(), Nodeinfo.t()) :: t()
 end

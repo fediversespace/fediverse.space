@@ -4,7 +4,7 @@ import React, { MouseEvent } from "react";
 import styled from "styled-components";
 import { INSTANCE_TYPES } from "../../constants";
 import { getSearchFilterDisplayValue, ISearchFilter } from "../../searchFilters";
-import { capitalize } from "../../util";
+import { getTypeDisplayString } from "../../util";
 
 const SearchFilterContainer = styled.div`
   margin: 10px 0 0 0;
@@ -30,7 +30,7 @@ const SearchFilters: React.FC<ISearchFiltersProps> = ({ selectedFilters, selectF
   const handleSelectInstanceType = (e: MouseEvent<HTMLElement>) => {
     const field = "type";
     const relation = "eq";
-    const value = e.currentTarget.innerText.toLowerCase();
+    const value = e.currentTarget.innerText.toLowerCase().replace(" ", "");
     const filter: ISearchFilter = {
       displayValue: getSearchFilterDisplayValue(field, relation, value),
       field,
@@ -43,7 +43,7 @@ const SearchFilters: React.FC<ISearchFiltersProps> = ({ selectedFilters, selectF
     <Menu>
       <MenuItem icon={IconNames.SYMBOL_CIRCLE} text="Instance type" disabled={hasInstanceTypeFilter}>
         {INSTANCE_TYPES.map(t => (
-          <MenuItem key={t} text={capitalize(t)} onClick={handleSelectInstanceType} />
+          <MenuItem key={t} text={getTypeDisplayString(t)} onClick={handleSelectInstanceType} />
         ))}
       </MenuItem>
     </Menu>

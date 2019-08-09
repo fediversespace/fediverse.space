@@ -3,7 +3,7 @@ import { IconNames } from "@blueprintjs/icons";
 import React from "react";
 import { QUALITATIVE_COLOR_SCHEME } from "../../constants";
 import { typeColorScheme } from "../../types";
-import { capitalize } from "../../util";
+import { getTypeDisplayString } from "../../util";
 
 interface IInstanceTypeProps {
   type: string;
@@ -15,7 +15,7 @@ interface IInstanceTypeProps {
  */
 const InstanceType: React.FC<IInstanceTypeProps> = ({ type, colorAfterName }) => {
   const idx = typeColorScheme.values.indexOf(type);
-  const name = " " + capitalize(type);
+  const name = " " + getTypeDisplayString(type);
   return (
     <>
       {!!colorAfterName && name}
