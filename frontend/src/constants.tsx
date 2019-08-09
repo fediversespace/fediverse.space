@@ -39,5 +39,4 @@ export interface IInstanceDomainPath {
   domain: string;
 }
 
-// We could also extract the values from the server response, but this would slow things down...
-export const INSTANCE_TYPES = ["mastodon", "gab", "pleroma", "misskey", "gnusocial"];
+export const INSTANCE_TYPES = ["mastodon", "gab", "pleroma", "misskey", "gnusocial", "writefreely", "peertube"];
