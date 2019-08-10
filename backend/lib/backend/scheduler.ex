@@ -84,7 +84,7 @@ defmodule Backend.Scheduler do
     # We want the earliest sucessful crawl so that we can exclude it from the statistics.
     # This is because the first crawl goes up to one month into the past -- this would mess up the counts!
     # The statistics from here assume that all statuses were written at exactly the crawl's inserted_at timestamp.
-    earliest_successful_crawl_subquery =
+    earliest_crawl_subquery =
       Crawl
       |> group_by([c], c.instance_domain)
       |> select([c], %{
@@ -94,7 +94,7 @@ defmodule Backend.Scheduler do
 
     instances =
       Crawl
-      |> join(:inner, [c], c2 in subquery(earliest_successful_crawl_subquery),
+      |> join(:inner, [c], c2 in subquery(earliest_crawl_subquery),
         on: c.instance_domain == c2.instance_domain
       )
       |> where(

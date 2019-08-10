@@ -8,8 +8,15 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
   @behaviour ApiCrawler
 
   @impl ApiCrawler
-  def is_instance_type?(_domain, nodeinfo_result) do
-    nodeinfo_result != nil and Map.get(nodeinfo_result, :instance_type) == :gnusocial
+  def is_instance_type?(domain, nodeinfo_result) do
+    if nodeinfo_result != nil do
+      Map.get(nodeinfo_result, :instance_type) == :gnusocial
+    else
+      case get_and_decode("https://#{domain}/api/statuses/public_timeline.json") do
+        {:ok, statuses} -> is_list(statuses)
+        {:error, _other} -> false
+      end
+    end
   end
 
   @impl ApiCrawler
