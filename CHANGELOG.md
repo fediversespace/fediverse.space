@@ -19,6 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.6.0 - 2019-08-10]
+
+### Added
+
+- Add nodeinfo and GNU Social crawler.
+  - Thanks to nodeinfo, Peertube and Writefreely are now also displayed on the map.
+  - Note that the information about connections comes from other instances.
+
+### Changed
+
+- You can now zoom slightly further out on the map to see more of the fediverse at once.
+
+### Fixed
+
+- Database deletions are now properly handled with `ON DELETE CASCADE` where necessary.
+
 ## [2.5.0 - 2019-08-08]
 
 ### Added
