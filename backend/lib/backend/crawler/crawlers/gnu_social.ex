@@ -30,7 +30,8 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
 
   @impl ApiCrawler
   def crawl(domain, nodeinfo_result) do
-    if nodeinfo_result |> Map.get(:user_count) |> is_above_user_threshold?() do
+    if nodeinfo_result == nil or
+         nodeinfo_result |> Map.get(:user_count) |> is_above_user_threshold?() do
       crawl_large_instance(domain, nodeinfo_result)
     else
       nodeinfo_result
