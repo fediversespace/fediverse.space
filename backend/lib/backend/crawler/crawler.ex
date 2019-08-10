@@ -6,7 +6,7 @@ defmodule Backend.Crawler do
   alias __MODULE__
   alias Backend.Crawler.Crawlers.{GnuSocial, Mastodon, Misskey, Nodeinfo}
   alias Backend.Crawler.ApiCrawler
-  alias Backend.{Crawl, CrawlInteraction, Repo, Instance, InstancePeer}
+  alias Backend.{Crawl, CrawlInteraction, MostRecentCrawl, Repo, Instance, InstancePeer}
   import Ecto.Query
   import Backend.Util
   require Logger
@@ -167,9 +167,22 @@ defmodule Backend.Crawler do
       Repo.insert!(%Crawl{
         instance_domain: domain,
         interactions_seen:
-          result.interactions |> Map.values() |> Enum.reduce(0, fn count, acc -> count + acc end),
+          result.interactions
+          |> Map.values()
+          |> Enum.reduce(0, fn count, acc -> count + acc end),
         statuses_seen: result.statuses_seen
       })
+
+    Repo.insert!(
+      %MostRecentCrawl{
+        instance_domain: domain,
+        crawl_id: curr_crawl.id,
+        inserted_at: now,
+        updated_at: now
+      },
+      on_conflict: {:replace, [:crawl_id, :updated_at]},
+      conflict_target: :instance_domain
+    )
 
     # We get a list of peers from two places:
     # * the official peers endpoint (which may be disabled)

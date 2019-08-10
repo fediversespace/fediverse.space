@@ -49,11 +49,24 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
 
     {interactions, statuses_seen} = get_interactions(domain, min_timestamp)
 
-    Map.merge(nodeinfo_result, %{
-      interactions: interactions,
-      statuses_seen: statuses_seen,
-      peers: []
-    })
+    if nodeinfo_result != nil do
+      Map.merge(nodeinfo_result, %{
+        interactions: interactions,
+        statuses_seen: statuses_seen,
+        peers: []
+      })
+    else
+      %{
+        version: nil,
+        description: nil,
+        user_count: nil,
+        status_count: nil,
+        peers: [],
+        interactions: interactions,
+        statuses_seen: statuses_seen,
+        instance_type: :gnusocial
+      }
+    end
   end
 
   @spec get_interactions(

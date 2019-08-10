@@ -1,7 +1,7 @@
 defmodule Backend.Util do
   import Ecto.Query
   require Logger
-  alias Backend.{Crawl, Repo}
+  alias Backend.{Crawl, MostRecentCrawl, Repo}
 
   @doc """
   Returns the given key from :backend, :crawler in the config.
@@ -78,11 +78,17 @@ defmodule Backend.Util do
 
   @spec get_last_crawl(String.t()) :: Crawl.t() | nil
   def get_last_crawl(domain) do
+    most_recent_crawl_subquery =
+      MostRecentCrawl
+      |> select([mrc], %{
+        most_recent_id: mrc.crawl_id
+      })
+      |> where([mrc], mrc.instance_domain == ^domain)
+
     Crawl
-    |> select([c], c)
-    |> where([c], c.instance_domain == ^domain)
-    |> order_by(desc: :id)
-    |> limit(1)
+    |> join(:inner, [c], mrc in subquery(most_recent_crawl_subquery),
+      on: c.id == mrc.most_recent_id
+    )
     |> Repo.one()
   end
 

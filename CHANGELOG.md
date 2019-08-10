@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Added missing indices on crawls and crawl_interactions tables.
+- Added missing indices on `crawls` and `crawl_interactions` tables.
+- Added table to store most recent crawl. This speeds up the instance view by a lot!
 
 ### Security
 
