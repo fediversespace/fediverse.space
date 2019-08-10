@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Added missing indices on crawls and crawl_interactions tables.
+
 ### Security
 
 ## [2.6.0 - 2019-08-10]
