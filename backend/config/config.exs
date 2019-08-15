@@ -28,16 +28,7 @@ instances_config_path =
 config :backend, Backend.Elasticsearch.Cluster,
   url: "http://localhost:9200",
   api: Elasticsearch.API.HTTP,
-  json_library: Jason,
-  indexes: %{
-    instances: %{
-      settings: instances_config_path,
-      store: Backend.Elasticsearch.Store,
-      sources: [Backend.Instance],
-      bulk_page_size: 1000,
-      bulk_wait_interval: 1_000
-    }
-  }
+  json_library: Jason
 
 # Configures Elixir's Logger
 config :logger, :console,

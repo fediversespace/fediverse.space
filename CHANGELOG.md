@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Cleaned up ElasticSearch configuration in backend.
+
 ## [2.6.1 - 2019-08-10]
 
 ### Fixed
