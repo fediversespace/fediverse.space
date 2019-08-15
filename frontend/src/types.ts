@@ -29,17 +29,10 @@ export const typeColorScheme: IQualitativeColorScheme = {
 };
 export const activityColorScheme: IQuantitativeColorScheme = {
   cytoscapeDataKey: "statusesPerDay",
-  description: "The average number of statuses posted per day. Note that this is colored by an exponential scale.",
+  description: "The average number of statuses posted per day. This is an exponential scale.",
   exponential: true,
-  name: "Activity (total)",
-  type: "quantitative"
-};
-export const activityPerUserColorScheme: IQuantitativeColorScheme = {
-  cytoscapeDataKey: "statusesPerUserPerDay",
-  description: "The average number of statuses posted per person per day.",
-  exponential: false,
-  name: "Activity (per person)",
+  name: "Activity",
   type: "quantitative"
 };
 
-export const colorSchemes: IColorScheme[] = [typeColorScheme, activityColorScheme, activityPerUserColorScheme];
+export const colorSchemes: IColorScheme[] = [typeColorScheme, activityColorScheme];

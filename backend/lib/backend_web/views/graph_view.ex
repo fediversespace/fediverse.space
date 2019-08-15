@@ -8,15 +8,6 @@ defmodule BackendWeb.GraphView do
       |> Enum.map(fn %{statuses_per_day: statuses_per_day} -> statuses_per_day end)
       |> Enum.filter(fn s -> s != nil end)
 
-    statuses_per_user_per_day =
-      nodes
-      |> Enum.filter(fn %{statuses_per_day: statuses_per_day, user_count: user_count} ->
-        statuses_per_day != nil and user_count != nil and user_count > 0
-      end)
-      |> Enum.map(fn %{statuses_per_day: statuses_per_day, user_count: user_count} ->
-        statuses_per_day / user_count
-      end)
-
     %{
       graph: %{
         nodes: render_many(nodes, GraphView, "node.json", as: :node),
@@ -28,10 +19,6 @@ defmodule BackendWeb.GraphView do
           statusesPerDay: [
             Enum.min(statuses_per_day, fn -> nil end),
             Enum.max(statuses_per_day, fn -> nil end)
-          ],
-          statusesPerUserPerDay: [
-            Enum.min(statuses_per_user_per_day, fn -> nil end),
-            Enum.max(statuses_per_user_per_day, fn -> nil end)
           ]
         }
       }
@@ -45,13 +32,6 @@ defmodule BackendWeb.GraphView do
         false -> 1
       end
 
-    statuses_per_user_per_day =
-      if node.statuses_per_day != nil and node.user_count != nil and node.user_count > 0 do
-        node.statuses_per_day / node.user_count
-      else
-        nil
-      end
-
     # This is the format that cytoscape.js expects.
     %{
       data: %{
@@ -59,8 +39,7 @@ defmodule BackendWeb.GraphView do
         label: node.domain,
         size: size,
         type: node.type,
-        statusesPerDay: node.statuses_per_day,
-        statusesPerUserPerDay: statuses_per_user_per_day
+        statusesPerDay: node.statuses_per_day
       },
       position: %{
         x: node.x,
