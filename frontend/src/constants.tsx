@@ -48,10 +48,12 @@ export const INSTANCE_TYPES = [
   "pleroma",
   "misskey",
   "gab",
+  "pixelfed",
   "gnusocial",
   "writefreely",
   "peertube",
   "friendica",
   "hubzilla",
-  "plume"
+  "plume",
+  "wordpress"
 ];
