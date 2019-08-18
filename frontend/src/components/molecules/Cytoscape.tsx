@@ -13,7 +13,7 @@ import {
   SELECTED_NODE_COLOR
 } from "../../constants";
 import { IColorScheme } from "../../types";
-import { getBuckets } from "../../util";
+import { getBuckets, getTypeDisplayString } from "../../util";
 
 const CytoscapeContainer = styled.div`
   width: 100%;
@@ -54,12 +54,12 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
 
     // Setup node tooltip on hover
     this.cy.nodes().forEach(n => {
-      const domain = n.data("id");
+      const tooltipContent = `${n.data("id")} (${getTypeDisplayString(n.data("type"))})`;
       const ref = (n as any).popperRef();
       const t = tippy(ref, {
         animateFill: false,
         animation: "fade",
-        content: domain,
+        content: tooltipContent,
         duration: 100,
         trigger: "manual"
       });
