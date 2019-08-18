@@ -11,15 +11,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Cleaned up ElasticSearch configuration in backend.
-
 ### Deprecated
 
 ### Removed
 
-- Remove color-coding by activity per user.
-
 ### Fixed
+
+## [2.7.0 - 2018-08-18]
+
+### Added
+
+- Add Friendica crawler (only supports peers; there's no timeline API endpoint.)
+- Color more server types on the map -- Hubzilla, Plume, Pixelfed, and Wordpress.
+
+### Changed
+
+- Cleaned up ElasticSearch configuration in backend.
+
+### Removed
+
+- Remove color-coding by activity per user. The vast majority of instances had the exact same color so this wasn't very useful.
 
 ## [2.6.1 - 2019-08-10]
 

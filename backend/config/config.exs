@@ -20,11 +20,6 @@ config :backend, BackendWeb.Endpoint,
 
 config :backend, Backend.Repo, queue_target: 5000
 
-instances_config_path =
-  if System.get_env("MIX_ENV") == "prod",
-    do: "lib/backend-2.6.1/priv/elasticsearch/instances.json",
-    else: "priv/elasticsearch/instances.json"
-
 config :backend, Backend.Elasticsearch.Cluster,
   url: "http://localhost:9200",
   api: Elasticsearch.API.HTTP,
