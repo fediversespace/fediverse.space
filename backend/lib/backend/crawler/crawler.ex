@@ -4,7 +4,7 @@ defmodule Backend.Crawler do
   """
 
   alias __MODULE__
-  alias Backend.Crawler.Crawlers.{GnuSocial, Mastodon, Misskey, Nodeinfo}
+  alias Backend.Crawler.Crawlers.{Friendica, GnuSocial, Mastodon, Misskey, Nodeinfo}
   alias Backend.Crawler.ApiCrawler
   alias Backend.{Crawl, CrawlInteraction, MostRecentCrawl, Repo, Instance, InstancePeer}
   import Ecto.Query
@@ -49,6 +49,7 @@ defmodule Backend.Crawler do
     |> register(Mastodon)
     |> register(Misskey)
     |> register(GnuSocial)
+    |> register(Friendica)
     # go!
     |> crawl()
     |> save()

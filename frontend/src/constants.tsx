@@ -39,4 +39,13 @@ export interface IInstanceDomainPath {
   domain: string;
 }
 
-export const INSTANCE_TYPES = ["mastodon", "gab", "pleroma", "misskey", "gnusocial", "writefreely", "peertube"];
+export const INSTANCE_TYPES = [
+  "mastodon",
+  "gab",
+  "pleroma",
+  "misskey",
+  "gnusocial",
+  "writefreely",
+  "peertube",
+  "friendica"
+];
