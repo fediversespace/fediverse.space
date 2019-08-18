@@ -9,15 +9,19 @@ export const HOVERED_NODE_COLOR = SEARCH_RESULT_COLOR;
 // From https://blueprintjs.com/docs/#core/colors.qualitative-color-schemes, but brightened
 export const QUALITATIVE_COLOR_SCHEME = [
   "#669EFF",
-  "#62D96B",
   "#FFC940",
   "#FF6E4A",
+  "#62D96B",
   "#C274C2",
   "#2EE6D6",
   "#FF66A1",
   "#D1F26D",
   "#C99765",
-  "#AD99FF"
+  "#AD99FF",
+  "#0E5A8A",
+  "#0A6640",
+  "#A66321",
+  "#A82A2A"
 ];
 
 // From https://blueprintjs.com/docs/#core/colors.sequential-color-schemes
@@ -41,9 +45,9 @@ export interface IInstanceDomainPath {
 
 export const INSTANCE_TYPES = [
   "mastodon",
-  "gab",
   "pleroma",
   "misskey",
+  "gab",
   "gnusocial",
   "writefreely",
   "peertube",
