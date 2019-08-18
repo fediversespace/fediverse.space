@@ -48,5 +48,6 @@ export const INSTANCE_TYPES = [
   "writefreely",
   "peertube",
   "friendica",
-  "hubzilla"
+  "hubzilla",
+  "plume"
 ];
