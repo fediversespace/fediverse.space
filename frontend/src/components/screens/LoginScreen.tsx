@@ -86,6 +86,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
 
   private renderChooseInstance = () => {
     const { isGettingLoginTypes } = this.state;
+    const onButtonClick = () => this.getLoginTypes();
     return (
       <form onSubmit={this.getLoginTypes}>
         <FormGroup label="Instance domain" labelFor="domain-input" disabled={isGettingLoginTypes} inline={true}>
@@ -101,6 +102,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
                 rightIcon={IconNames.ARROW_RIGHT}
                 title="submit"
                 loading={isGettingLoginTypes}
+                onClick={onButtonClick}
               />
             }
             placeholder="mastodon.social"
@@ -166,8 +168,10 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     this.setState({ domain: event.target.value });
   };
 
-  private getLoginTypes = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  private getLoginTypes = (e?: React.FormEvent<HTMLFormElement>) => {
+    if (!!e) {
+      e.preventDefault();
+    }
     this.setState({ isGettingLoginTypes: true });
     let { domain } = this.state;
     if (domain.startsWith("https://")) {

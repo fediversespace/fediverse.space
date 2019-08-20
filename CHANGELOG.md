@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Added ON DELETE to `most_recent_crawl` table, such that it can handle previously-crawled but now-dead instances.
+- You can now login to the admin view by clicking, not just by pressing enter.
 
 ## [2.7.0 - 2018-08-18]
 
