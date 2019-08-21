@@ -18,12 +18,12 @@ const AboutScreen: React.FC = () => (
 
     <H4>Why can't I see details about my instance?</H4>
     <p className={Classes.RUNNING_TEXT}>
-      Currently, fediverse.space only supports Mastodon and Pleroma instances. In addition, instances with 10 or fewer
-      users won't be scraped -- it's a tool for understanding communities, not individuals.
+      fediverse.space only supports servers using the Mastodon API, the Misskey API, the GNU Social API, or Nodeinfo.
+      Instances with 10 or fewer users won't be scraped -- it's a tool for understanding communities, not individuals.
     </p>
 
     <H4>
-      When is <Code>$OTHER_ACTIVITYPUB_SERVER</Code> going to be added?
+      When is <Code>$OTHER_FEDIVERSE_SERVER</Code> going to be added?
     </H4>
     <p className={Classes.RUNNING_TEXT}>
       Check out{" "}
@@ -38,7 +38,7 @@ const AboutScreen: React.FC = () => (
 
     <H4>How do you calculate the strength of relationships between instances?</H4>
     <p className={Classes.RUNNING_TEXT}>
-      fediverse.space looks at statuses from within the last month on the public timeline of each instance. It
+      fediverse.space looks at public statuses from within the last month on the public timeline of each instance. It
       calculates at the ratio of
       <Code>mentions of an instance / total statuses</Code>. It uses a ratio rather than an absolute number of mentions
       to reflect that smaller instances can play a large role in a community.
