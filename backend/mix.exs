@@ -54,7 +54,7 @@ defmodule Backend.MixProject do
       {:honeydew, "~> 1.4.3"},
       {:quantum, "~> 2.3"},
       {:corsica, "~> 1.1.2"},
-      {:sobelow, "~> 0.8", only: :dev},
+      {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:gollum, "~> 0.3.2"},
       {:paginator, "~> 0.6.0"},
       {:public_suffix, "~> 0.6.0"},
