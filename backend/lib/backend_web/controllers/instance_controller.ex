@@ -1,7 +1,5 @@
 defmodule BackendWeb.InstanceController do
   use BackendWeb, :controller
-
-  import Backend.Util
   alias Graph.Cache
 
   action_fallback(BackendWeb.FallbackController)

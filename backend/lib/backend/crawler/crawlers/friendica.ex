@@ -76,13 +76,15 @@ defmodule Backend.Crawler.Crawlers.Friendica do
   end
 
   defp to_domain(url) do
-    url =
-      cond do
-        String.starts_with?(url, "https://") -> String.slice(url, 8..-1)
-        String.starts_with?(url, "http://") -> String.slice(url, 7..-1)
-        true -> url
-      end
-
     url
+    |> strip_prefix("http://")
+    |> strip_prefix("https://")
+    |> strip_username()
+  end
+
+  # Sometimes a url at the poco/@server endpoint has the form username@domain.tld, in which case we only want domain.tld
+  defp strip_username(string) do
+    [_match, _username, domain] = Regex.run(~r/([\w-_]+@)?([\w.-_]+)/, string)
+    domain
   end
 end

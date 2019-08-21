@@ -9,7 +9,7 @@ defmodule Backend.Crawler.Util do
   # (e.g. https://mastodon.social/@demouser or https://pleroma.site/users/demouser)
   @spec get_domain(String.t()) :: String.t()
   def get_domain(url) do
-    [_match, domain] = Regex.run(~r/https?:\/\/([\w.-]+)\/.*/, url)
+    [_match, domain] = Regex.run(~r/https?:\/\/([\w.-_]+)\/.*/, url)
     domain
   end
 
