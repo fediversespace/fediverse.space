@@ -1,9 +1,4 @@
 defmodule Backend.Crawler.Crawlers.Nodeinfo do
-  alias Backend.Crawler.ApiCrawler
-  require Logger
-  import Backend.Util
-  import Backend.Crawler.Util
-
   @moduledoc """
   This module is slightly different from the other crawlers.
   It doesn't implement the ApiCrawler spec because it isn't run as a self-contained crawler.
@@ -12,6 +7,10 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
   This is to get the user count. Some servers don't publish this in other places (e.g. GNU Social, PeerTube) so we need
   nodeinfo to know whether it's a personal instance or not.
   """
+  alias Backend.Crawler.ApiCrawler
+  require Logger
+  import Backend.Util
+  import Backend.Crawler.Util
 
   defstruct [
     :description,

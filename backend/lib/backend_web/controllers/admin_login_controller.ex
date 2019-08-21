@@ -10,8 +10,6 @@ defmodule BackendWeb.AdminLoginController do
   choose one or the other by POSTing back.
   """
   def show(conn, %{"id" => domain}) do
-    # TODO: this should really be handled in a more async manner
-    # TODO: this assumes mastodon/pleroma API
     cleaned_domain = clean_domain(domain)
 
     instance_data = get_and_decode!("https://#{cleaned_domain}/api/v1/instance")
@@ -24,6 +22,7 @@ defmodule BackendWeb.AdminLoginController do
 
     instance_data = get_and_decode!("https://#{cleaned_domain}/api/v1/instance")
 
+    # credo:disable-for-lines:16 Credo.Check.Refactor.CondStatements
     error =
       cond do
         type == "email" ->

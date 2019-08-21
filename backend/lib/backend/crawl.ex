@@ -1,4 +1,7 @@
 defmodule Backend.Crawl do
+  @moduledoc """
+  Stores aggregate data about a single crawl (i.e. not individual statuses, but the number of statuses seen etc.)
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

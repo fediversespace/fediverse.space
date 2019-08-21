@@ -22,15 +22,14 @@ test-frontend:
     changes:
       - frontend/*
 
-backend-sobelow:
+test-backend:
   stage: test
   image: elixir:1.9
+  variables:
+    MIX_ENV: test
   only:
     changes:
       - backend/*
-  except:
-    - develop
-    - master
   before_script:
     - cd backend
   script:
@@ -38,6 +37,7 @@ backend-sobelow:
     - mix local.rebar --force
     - mix deps.get
     - mix deps.compile
+    - mix credo --strict
     - mix sobelow --config
   cache:
     paths:

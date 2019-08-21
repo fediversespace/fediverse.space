@@ -1,4 +1,7 @@
 defmodule Backend.Api do
+  @moduledoc """
+  Functions used in the API controllers. Most of these simply return data from the database.
+  """
   alias Backend.{Edge, Instance, Repo}
   import Backend.Util
   import Ecto.Query
@@ -67,6 +70,7 @@ defmodule Backend.Api do
   end
 
   @spec list_edges() :: [Edge.t()]
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def list_edges(domain \\ nil) do
     user_threshold = get_config(:personal_instance_threshold)
 

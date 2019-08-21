@@ -1,4 +1,7 @@
 defmodule Backend.Mailer.UserEmail do
+  @moduledoc """
+  Module for sending emails to users.
+  """
   import Swoosh.Email
   import Backend.{Auth, Util}
   require Logger

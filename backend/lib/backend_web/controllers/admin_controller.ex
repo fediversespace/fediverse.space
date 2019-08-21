@@ -1,7 +1,6 @@
 defmodule BackendWeb.AdminController do
+  alias Backend.{Api, Auth, Instance}
   use BackendWeb, :controller
-  alias Backend.{Auth, Api, Instance}
-  require Logger
 
   action_fallback BackendWeb.FallbackController
 

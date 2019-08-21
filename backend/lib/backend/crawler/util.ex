@@ -1,4 +1,5 @@
 defmodule Backend.Crawler.Util do
+  @moduledoc false
   require Logger
   alias Backend.{Instance, Repo}
   import Backend.Util

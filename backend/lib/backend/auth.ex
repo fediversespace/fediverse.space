@@ -1,4 +1,7 @@
 defmodule Backend.Auth do
+  @moduledoc """
+  Functions related to authentication.
+  """
   alias Phoenix.Token
   import Backend.Util
 
@@ -12,6 +15,6 @@ defmodule Backend.Auth do
 
   def verify_token(token) do
     # tokens are valid for 12 hours
-    Token.verify(BackendWeb.Endpoint, @salt, token, max_age: 43200)
+    Token.verify(BackendWeb.Endpoint, @salt, token, max_age: 43_200)
   end
 end

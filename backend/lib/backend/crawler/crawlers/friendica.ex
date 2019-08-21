@@ -1,4 +1,9 @@
 defmodule Backend.Crawler.Crawlers.Friendica do
+  @moduledoc """
+  A crawler for Friendica servers.
+  These don't expose a public list of statuses. This crawler combines nodeinfo data with the /statistics.json endpoint
+  in Friendica, and gets a list of peers from /poco/@server.
+  """
   alias Backend.Crawler.ApiCrawler
   import Backend.Crawler.Util
   import Backend.Util
@@ -21,7 +26,8 @@ defmodule Backend.Crawler.Crawlers.Friendica do
   @impl ApiCrawler
   def allows_crawling?(domain) do
     [
-      "/statistics.json"
+      "/statistics.json",
+      "/poco/@server"
     ]
     |> Enum.map(fn endpoint -> "https://#{domain}#{endpoint}" end)
     |> urls_are_crawlable?()

@@ -1,4 +1,5 @@
 defmodule Backend.Util do
+  @moduledoc false
   import Ecto.Query
   require Logger
   alias Backend.{Crawl, MostRecentCrawl, Repo}
@@ -53,7 +54,7 @@ defmodule Backend.Util do
   @doc """
   Gets the current UTC time as a NaiveDateTime in a format that can be inserted into the database.
   """
-  def get_now() do
+  def get_now do
     NaiveDateTime.truncate(NaiveDateTime.utc_now(), :second)
   end
 
@@ -160,8 +161,8 @@ defmodule Backend.Util do
   def get_and_decode(url) do
     case HTTPoison.get(url, [{"User-Agent", get_config(:user_agent)}],
            hackney: [pool: :crawler],
-           recv_timeout: 15000,
-           timeout: 15000
+           recv_timeout: 15_000,
+           timeout: 15_000
          ) do
       {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
       {:ok, _} -> {:error, %HTTPoison.Error{reason: "Non-200 response"}}
@@ -185,8 +186,8 @@ defmodule Backend.Util do
   def post_and_decode(url, body \\ "") do
     case HTTPoison.post(url, body, [{"User-Agent", get_config(:user_agent)}],
            hackney: [pool: :crawler],
-           recv_timeout: 15000,
-           timeout: 15000
+           recv_timeout: 15_000,
+           timeout: 15_000
          ) do
       {:ok, %{status_code: 200, body: response_body}} -> Jason.decode(response_body)
       {:ok, _} -> {:error, %HTTPoison.Error{reason: "Non-200 response"}}

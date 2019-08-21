@@ -1,4 +1,8 @@
 defmodule Backend.Instance do
+  @moduledoc """
+  Model for storing everything related to an instance: not only the data from crawls, but also statistics, the time
+  of the next scheduled crawl, X and Y coordinates on the graph, and so on.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

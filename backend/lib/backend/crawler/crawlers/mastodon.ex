@@ -1,4 +1,7 @@
 defmodule Backend.Crawler.Crawlers.Mastodon do
+  @moduledoc """
+  Crawler for the Mastodon API (used by Mastodon, its forks like Gab or Glitch, and Pleroma).
+  """
   require Logger
   import Backend.Crawler.Util
   import Backend.Util

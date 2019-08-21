@@ -1,4 +1,8 @@
 defmodule Backend.CrawlInteraction do
+  @moduledoc """
+  Model for tracking interactions between instances. Stores the source and target instance, as well as the number
+  of mentions seen in the given crawl.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,4 +1,8 @@
 defmodule Backend.Release do
+  @moduledoc """
+  Functions related to releases. Can be run against the compiled binary with e.g.
+  `/bin/backend eval "Backend.Release.migrate()"`
+  """
   @app :backend
   @start_apps [
     :crypto,
@@ -31,7 +35,7 @@ defmodule Backend.Release do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
-  def build_elasticsearch_indexes() do
+  def build_elasticsearch_indexes do
     start_services()
     IO.puts("Building indexes...")
     Enum.each(@indexes, &Elasticsearch.Index.hot_swap(Backend.Elasticsearch.Cluster, &1))

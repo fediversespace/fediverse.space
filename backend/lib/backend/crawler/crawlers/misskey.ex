@@ -1,4 +1,7 @@
 defmodule Backend.Crawler.Crawlers.Misskey do
+  @moduledoc """
+  Crawler for Misskey servers.
+  """
   alias Backend.Crawler.ApiCrawler
 
   @behaviour ApiCrawler
