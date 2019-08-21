@@ -4,11 +4,13 @@ defmodule Backend.Crawler do
   """
 
   alias __MODULE__
-  alias Backend.Crawler.Crawlers.{Friendica, GnuSocial, Mastodon, Misskey, Nodeinfo}
+  alias Backend.{Crawl, CrawlInteraction, Instance, InstancePeer, MostRecentCrawl, Repo}
   alias Backend.Crawler.ApiCrawler
-  alias Backend.{Crawl, CrawlInteraction, MostRecentCrawl, Repo, Instance, InstancePeer}
+  alias Backend.Crawler.Crawlers.{Friendica, GnuSocial, Mastodon, Misskey, Nodeinfo}
+
   import Ecto.Query
   import Backend.Util
+
   require Logger
 
   defstruct [

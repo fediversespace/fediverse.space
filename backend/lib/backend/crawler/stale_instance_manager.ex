@@ -1,14 +1,14 @@
 defmodule Backend.Crawler.StaleInstanceManager do
+  @moduledoc """
+  This module regularly finds stale instances (i.e. instances that haven't been updated for longer than the crawl
+  interval) and adds them to the job queue. It runs once a minute.
+  """
+
   use GenServer
   alias Backend.{Instance, Repo}
   import Ecto.Query
   import Backend.Util
   require Logger
-
-  @moduledoc """
-  This module regularly finds stale instances (i.e. instances that haven't been updated for longer than the crawl
-  interval) and adds them to the job queue. It runs once a minute.
-  """
 
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
@@ -44,11 +44,11 @@ defmodule Backend.Crawler.StaleInstanceManager do
     {:noreply, state}
   end
 
-  defp schedule_add() do
+  defp schedule_add do
     Process.send_after(self(), :queue_stale_domains, 60_000)
   end
 
-  defp queue_stale_domains() do
+  defp queue_stale_domains do
     now = get_now()
 
     stale_domains =

@@ -5,9 +5,12 @@ defmodule Backend.Scheduler do
 
   use Quantum.Scheduler, otp_app: :backend
 
-  alias Backend.{Crawl, Edge, CrawlInteraction, Instance, Repo}
+  alias Backend.{Crawl, CrawlInteraction, Edge, Instance, Repo}
+  alias Backend.Mailer.AdminEmail
+
   import Backend.Util
   import Ecto.Query
+
   require Logger
 
   @doc """
@@ -34,7 +37,7 @@ defmodule Backend.Scheduler do
   Calculates every instance's "insularity score" -- that is, the percentage of mentions that are among users on the
   instance, rather than at other instances.
   """
-  def generate_insularity_scores() do
+  def generate_insularity_scores do
     now = get_now()
 
     crawls_subquery =
@@ -79,7 +82,7 @@ defmodule Backend.Scheduler do
   @doc """
   This function calculates the average number of statuses per hour over the last month.
   """
-  def generate_status_rate() do
+  def generate_status_rate do
     now = get_now()
     # We want the earliest sucessful crawl so that we can exclude it from the statistics.
     # This is because the first crawl goes up to one month into the past -- this would mess up the counts!
@@ -138,7 +141,7 @@ defmodule Backend.Scheduler do
   It calculates the strength of edges between nodes. Self-edges are not generated.
   Edges are only generated if both instances have been succesfully crawled.
   """
-  def generate_edges() do
+  def generate_edges do
     now = get_now()
 
     crawls_subquery =
@@ -177,32 +180,7 @@ defmodule Backend.Scheduler do
 
         edges =
           interactions
-          # Get a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
-          |> Enum.reduce(%{}, fn
-            %{
-              source_domain: source_domain,
-              target_domain: target_domain,
-              mentions: mentions,
-              source_statuses_seen: source_statuses_seen,
-              target_statuses_seen: target_statuses_seen
-            },
-            acc ->
-              key = get_interaction_key(source_domain, target_domain)
-
-              # target_statuses_seen might be nil if that instance was never crawled. default to 0.
-              target_statuses_seen =
-                case target_statuses_seen do
-                  nil -> 0
-                  _ -> target_statuses_seen
-                end
-
-              statuses_seen = source_statuses_seen + target_statuses_seen
-
-              Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions,
-                                                                  curr_statuses_seen} ->
-                {curr_mentions + mentions, curr_statuses_seen}
-              end)
-          end)
+          |> reduce_mention_count()
           |> Enum.map(fn {{source_domain, target_domain}, {mention_count, statuses_seen}} ->
             %{
               source_domain: source_domain,
@@ -224,7 +202,7 @@ defmodule Backend.Scheduler do
   This function checks to see if a lot of instances on the same base domain have been created recently. If so,
   notifies the server admin over SMS.
   """
-  def check_for_spam_instances() do
+  def check_for_spam_instances do
     hour_range = 3
 
     count_subquery =
@@ -264,9 +242,38 @@ defmodule Backend.Scheduler do
 
       Logger.info(message)
       send_admin_sms(message)
-      Backend.Mailer.AdminEmail.send("Potential spam", message)
+      AdminEmail.send("Potential spam", message)
     else
       Logger.debug("Did not find potential spam instances.")
     end
+  end
+
+  # Takes a list of Interactions
+  # Returns a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
+  defp reduce_mention_count(interactions) do
+    Enum.reduce(interactions, %{}, fn
+      %{
+        source_domain: source_domain,
+        target_domain: target_domain,
+        mentions: mentions,
+        source_statuses_seen: source_statuses_seen,
+        target_statuses_seen: target_statuses_seen
+      },
+      acc ->
+        key = get_interaction_key(source_domain, target_domain)
+
+        # target_statuses_seen might be nil if that instance was never crawled. default to 0.
+        target_statuses_seen =
+          case target_statuses_seen do
+            nil -> 0
+            _ -> target_statuses_seen
+          end
+
+        statuses_seen = source_statuses_seen + target_statuses_seen
+
+        Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
+          {curr_mentions + mentions, curr_statuses_seen}
+        end)
+    end)
   end
 end

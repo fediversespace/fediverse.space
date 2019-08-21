@@ -1,4 +1,8 @@
 defmodule Backend.InstancePeer do
+  @moduledoc """
+  Model for tracking which other instances a given instance knows of
+  (the data returned from /api/v1/instance/peers from Mastodon, for example)
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

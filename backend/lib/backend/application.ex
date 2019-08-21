@@ -22,7 +22,7 @@ defmodule Backend.Application do
       # Start the endpoint when the application starts
       BackendWeb.Endpoint,
       # Crawler children
-      :hackney_pool.child_spec(:crawler, timeout: 15000, max_connections: crawl_worker_count),
+      :hackney_pool.child_spec(:crawler, timeout: 15_000, max_connections: crawl_worker_count),
       Supervisor.child_spec(
         {Task,
          fn ->

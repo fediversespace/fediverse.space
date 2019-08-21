@@ -1,4 +1,7 @@
 defmodule Backend.Mailer.AdminEmail do
+  @moduledoc """
+  Module for sending emails to the server administrator.
+  """
   import Swoosh.Email
   import Backend.Util
   require Logger

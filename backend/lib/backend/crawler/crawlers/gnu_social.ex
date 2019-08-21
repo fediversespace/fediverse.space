@@ -1,4 +1,7 @@
 defmodule Backend.Crawler.Crawlers.GnuSocial do
+  @moduledoc """
+  Crawler for GNU Social servers.
+  """
   alias Backend.Crawler.ApiCrawler
   alias Backend.Crawler.Crawlers.Nodeinfo
   import Backend.Crawler.Util

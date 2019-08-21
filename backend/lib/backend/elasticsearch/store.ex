@@ -1,4 +1,5 @@
 defmodule Backend.Elasticsearch.Store do
+  @moduledoc false
   @behaviour Elasticsearch.Store
 
   alias Backend.Repo
