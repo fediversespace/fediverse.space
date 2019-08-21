@@ -63,7 +63,8 @@ defmodule Backend.MixProject do
       {:ex_twilio, "~> 0.7.0"},
       {:elasticsearch, "~> 1.0"},
       {:appsignal, "~> 1.10.1"},
-      {:credo, "~> 1.1", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:nebulex, "~> 1.1"}
     ]
   end
 

@@ -34,9 +34,14 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :gollum,
+  # 24 hrs
   refresh_secs: 86_400,
   lazy_refresh: true,
   user_agent: "fediverse.space crawler"
+
+config :backend, Graph.Cache,
+  # 1 hour
+  gc_interval: 3600
 
 config :ex_twilio,
   account_sid: System.get_env("TWILIO_ACCOUNT_SID"),

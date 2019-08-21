@@ -1,19 +1,16 @@
 defmodule BackendWeb.GraphController do
   use BackendWeb, :controller
-
-  alias Backend.Api
+  alias Graph.Cache
 
   action_fallback BackendWeb.FallbackController
 
   def index(conn, _params) do
-    nodes = Api.list_nodes()
-    edges = Api.list_edges()
+    %{nodes: nodes, edges: edges} = Cache.get_graph()
     render(conn, "index.json", nodes: nodes, edges: edges)
   end
 
   def show(conn, %{"id" => domain}) do
-    nodes = Api.list_nodes(domain)
-    edges = Api.list_edges(domain)
+    %{nodes: nodes, edges: edges} = Cache.get_graph(domain)
     render(conn, "index.json", nodes: nodes, edges: edges)
   end
 end
