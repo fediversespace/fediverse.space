@@ -197,6 +197,11 @@ defmodule Backend.Crawler do
       |> Enum.filter(fn domain -> domain != nil and not is_blacklisted?(domain) end)
       |> Enum.map(&clean_domain(&1))
 
+    if not Enum.all?(peers_domains, &is_valid_domain?(&1)) do
+      invalid_peers = Enum.filter(peers_domains, &is_valid_domain?(&1))
+      raise "#{domain} has invalid peers: #{inspect(invalid_peers)}"
+    end
+
     peers =
       peers_domains
       |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now, next_crawl: now})
