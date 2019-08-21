@@ -3,6 +3,7 @@ defmodule Backend.Scheduler do
   This module runs recurring tasks.
   """
 
+  use Appsignal.Instrumentation.Decorators
   use Quantum.Scheduler, otp_app: :backend
 
   alias Backend.{Crawl, CrawlInteraction, Edge, Instance, Repo}
@@ -20,6 +21,7 @@ defmodule Backend.Scheduler do
   `unit` must singular, e.g. "second", "minute", "hour", "month", "year", etc...
   """
   @spec prune_crawls(integer, String.t()) :: any
+  @decorate transaction()
   def prune_crawls(amount, unit) do
     {deleted_num, _} =
       Crawl
@@ -37,6 +39,7 @@ defmodule Backend.Scheduler do
   Calculates every instance's "insularity score" -- that is, the percentage of mentions that are among users on the
   instance, rather than at other instances.
   """
+  @decorate transaction()
   def generate_insularity_scores do
     now = get_now()
 
@@ -82,6 +85,7 @@ defmodule Backend.Scheduler do
   @doc """
   This function calculates the average number of statuses per hour over the last month.
   """
+  @decorate transaction()
   def generate_status_rate do
     now = get_now()
     # We want the earliest sucessful crawl so that we can exclude it from the statistics.
@@ -141,6 +145,7 @@ defmodule Backend.Scheduler do
   It calculates the strength of edges between nodes. Self-edges are not generated.
   Edges are only generated if both instances have been succesfully crawled.
   """
+  @decorate transaction()
   def generate_edges do
     now = get_now()
 
@@ -202,6 +207,7 @@ defmodule Backend.Scheduler do
   This function checks to see if a lot of instances on the same base domain have been created recently. If so,
   notifies the server admin over SMS.
   """
+  @decorate transaction()
   def check_for_spam_instances do
     hour_range = 3
 
@@ -250,6 +256,7 @@ defmodule Backend.Scheduler do
 
   # Takes a list of Interactions
   # Returns a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
+  @decorate transaction_event()
   defp reduce_mention_count(interactions) do
     Enum.reduce(interactions, %{}, fn
       %{
