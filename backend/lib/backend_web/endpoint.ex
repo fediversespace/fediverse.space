@@ -46,11 +46,7 @@ defmodule BackendWeb.Endpoint do
   )
 
   plug(Corsica,
-    origins: [
-      "http://localhost:3000",
-      ~r{^https?://(.*\.?)fediverse\.space$},
-      ~r{^https?://(.*\.?)fediverse-space\.netlify.com$}
-    ],
+    origins: ["http://localhost:3000", ~r{^https?://(.*\.?)fediverse\.space$}],
     allow_headers: ["content-type", "token"]
   )
 

@@ -1672,10 +1672,10 @@
     hoist-non-react-statics "^3.3.0"
     redux "^4.0.0"
 
-"@types/react-router-dom@^4.3.5":
-  version "4.3.5"
-  resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-4.3.5.tgz#72f229967690c890d00f96e6b85e9ee5780db31f"
-  integrity sha512-eFajSUASYbPHg2BDM1G8Btx+YqGgvROPIg6sBhl3O4kbDdYXdFdfrgQFf/pcBuQVObjfT9AL/dd15jilR5DIEA==
+"@types/react-router-dom@^4.3.4":
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-4.3.4.tgz#63a7a8558129d2f4ff76e4bdd099bf4b98e25a0d"
+  integrity sha512-xrwaWHpnxKk/TTRe7pmoGy3E4SyF/ojFqNfFJacw7OLdfLXRvGfk4r/XePVaZNVfeJzL8fcnNilPN7xOdJ/vGw==
   dependencies:
     "@types/history" "*"
     "@types/react" "*"
@@ -3734,10 +3734,10 @@ cytoscape-popper@^1.0.4:
   dependencies:
     popper.js "^1.0.0"
 
-cytoscape@^3.9.1:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.9.1.tgz#b5520de3d7af9bf1d178d646d32557278d979f3c"
-  integrity sha512-NdmRylOdIelOXskUwK4Ayg+BRWsKzxj0moZbhffuwvNGfwylK8dTkIOkfeYkXd3CHtB4gtw11PTpTZStc7DWtQ==
+cytoscape@^3.9.0:
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/cytoscape/-/cytoscape-3.9.0.tgz#7cc9f10c2e02a167ddf7aeb2e3fddcf704913776"
+  integrity sha512-tEslrW0opFmcoDEU1XL68snE40HoVIdGvYcYabqVBxe+pE1YoHL7k3+07CFXDg3o52kRInRPUxnCc73V1pY4wQ==
   dependencies:
     heap "^0.2.6"
     lodash.debounce "^4.0.8"
@@ -11095,10 +11095,10 @@ tslint-react@^4.0.0:
   dependencies:
     tsutils "^3.9.1"
 
-tslint@^5.19.0:
-  version "5.19.0"
-  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.19.0.tgz#a2cbd4a7699386da823f6b499b8394d6c47bb968"
-  integrity sha512-1LwwtBxfRJZnUvoS9c0uj8XQtAnyhWr9KlNvDIdB+oXyT+VpsOAaEhEgKi1HrZ8rq0ki/AAnbGSv4KM6/AfVZw==
+tslint@^5.18.0:
+  version "5.18.0"
+  resolved "https://registry.yarnpkg.com/tslint/-/tslint-5.18.0.tgz#f61a6ddcf372344ac5e41708095bbf043a147ac6"
+  integrity sha512-Q3kXkuDEijQ37nXZZLKErssQVnwCV/+23gFEMROi8IlbaBG6tXqLPQJ5Wjcyt/yHPKBC+hD5SzuGaMora+ZS6w==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     builtin-modules "^1.1.1"

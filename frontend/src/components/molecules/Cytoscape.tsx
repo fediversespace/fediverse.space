@@ -200,9 +200,8 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       // Select instance
       this.cy.$id(currentNodeId).select();
       // Center it
-      this.cy.animate({
-        pan: this.cy.$id(currentNodeId).position()
-      });
+      const selected = this.cy.$id(currentNodeId);
+      this.cy.center(selected);
     }
   };
 
