@@ -198,8 +198,8 @@ defmodule Backend.Crawler do
       |> Enum.map(&clean_domain(&1))
 
     if not Enum.all?(peers_domains, &is_valid_domain?(&1)) do
-      invalid_peers = Enum.filter(peers_domains, &is_valid_domain?(&1))
-      raise "#{domain} has invalid peers: #{inspect(invalid_peers)}"
+      invalid_peers = Enum.filter(peers_domains, fn d -> not is_valid_domain?(d) end)
+      raise "#{domain} has invalid peers: #{Enum.join(invalid_peers, ", ")}"
     end
 
     peers =

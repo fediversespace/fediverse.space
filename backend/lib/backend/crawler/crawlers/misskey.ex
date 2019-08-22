@@ -205,7 +205,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   defp extract_mentions_from_status(status) do
     status_content = Map.get(status, "text")
 
-    Regex.scan(~r/@\w+@([\w._-]+)/, status_content)
+    Regex.scan(~r/@\w+@([\w\._\-]+)/, status_content)
     |> Enum.map(fn [_match, domain] -> domain end)
     |> Enum.reduce(%{}, fn domain, acc ->
       Map.update(acc, domain, 1, &(&1 + 1))

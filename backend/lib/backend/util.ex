@@ -129,10 +129,14 @@ defmodule Backend.Util do
   end
 
   def clean_domain(domain) do
-    domain
-    |> String.replace_prefix("https://", "")
-    |> String.trim_trailing("/")
-    |> String.downcase()
+    cleaned =
+      domain
+      |> String.replace_prefix("https://", "")
+      |> String.trim_trailing("/")
+      |> String.trim()
+      |> String.downcase()
+
+    Regex.replace(~r/:\d+/, cleaned, "")
   end
 
   def get_account(username, domain) do
@@ -203,21 +207,8 @@ defmodule Backend.Util do
     end
   end
 
-  @doc """
-  Strips `prefix` from `string`. If it doesn't start with that prefix, just returns the string.
-  """
-  @spec strip_prefix(String.t(), String.t()) :: String.t()
-  def strip_prefix(string, prefix) do
-    if String.starts_with?(string, prefix) do
-      prefix_length = String.length(prefix)
-      String.slice(string, prefix_length..-1)
-    else
-      string
-    end
-  end
-
   @spec is_valid_domain?(String.t()) :: boolean
   def is_valid_domain?(domain) do
-    Regex.match?(~r/[\w.-_]+/, domain)
+    Regex.match?(~r/^[\w\.\-_]+$/, domain)
   end
 end
