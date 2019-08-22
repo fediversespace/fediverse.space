@@ -14,6 +14,15 @@ const AboutScreen: React.FC = () => (
       . It works by crawling every instance it can find and aggregating statistics on communication between these.
     </p>
 
+    <p>
+      You can follow the project on{" "}
+      <a href="https://x0r.be/@fediversespace" target="_blank" rel="noopener noreferrer">
+        Mastodon
+      </a>
+      .
+    </p>
+
+    <br />
     <H2>FAQ</H2>
 
     <H4>Why can't I see details about my instance?</H4>
@@ -44,6 +53,7 @@ const AboutScreen: React.FC = () => (
       to reflect that smaller instances can play a large role in a community.
     </p>
 
+    <br />
     <H2>Credits</H2>
 
     <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
