@@ -1,4 +1,7 @@
 defmodule Mastodon.Messenger do
+  @moduledoc """
+  Module for interacting with a Mastodon account. In our case, it's only used to DM login links.
+  """
   import Backend.{Auth, Util}
   require Logger
 
