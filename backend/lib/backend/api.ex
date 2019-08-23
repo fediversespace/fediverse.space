@@ -6,10 +6,10 @@ defmodule Backend.Api do
   import Backend.Util
   import Ecto.Query
 
-  @spec get_instance!(String.t()) :: Instance.t()
-  def get_instance!(domain) do
+  @spec get_instance(String.t()) :: Instance.t() | nil
+  def get_instance(domain) do
     Instance
-    |> Repo.get_by!(domain: domain)
+    |> Repo.get_by(domain: domain)
   end
 
   @spec get_instance_with_peers(String.t()) :: Instance.t() | nil

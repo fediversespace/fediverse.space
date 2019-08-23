@@ -2,9 +2,17 @@ defmodule BackendWeb.AdminLoginView do
   use BackendWeb, :view
   import Backend.Util
 
-  def render("show.json", %{instance_data: instance_data, cleaned_domain: cleaned_domain}) do
-    username = get_in(instance_data, ["contact_account", "username"])
+  def render("show.json", %{error: error}) do
+    %{
+      error: error
+    }
+  end
 
+  def render("show.json", %{
+        instance_data: instance_data,
+        cleaned_domain: cleaned_domain
+      }) do
+    username = get_in(instance_data, ["contact_account", "username"])
     fedi_account = get_account(username, cleaned_domain)
 
     %{

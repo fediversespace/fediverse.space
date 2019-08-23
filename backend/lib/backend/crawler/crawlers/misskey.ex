@@ -42,14 +42,14 @@ defmodule Backend.Crawler.Crawlers.Misskey do
         crawl_large_instance(domain, user_count, status_count)
       else
         %{
+          instance_type: :misskey,
           version: nil,
           description: nil,
           user_count: user_count,
           status_count: nil,
           peers: [],
           interactions: %{},
-          statuses_seen: 0,
-          instance_type: nil
+          statuses_seen: 0
         }
       end
     end

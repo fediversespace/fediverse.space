@@ -51,6 +51,10 @@ config :backend, Backend.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: System.get_env("SENDGRID_API_KEY")
 
+config :backend, Mastodon.Messenger,
+  domain: System.get_env("MASTODON_DOMAIN"),
+  token: System.get_env("MASTODON_TOKEN")
+
 config :backend, :crawler,
   status_age_limit_days: 28,
   status_count_limit: 5000,

@@ -3,6 +3,7 @@ import { IconNames } from "@blueprintjs/icons";
 import React from "react";
 import { Redirect } from "react-router";
 import styled from "styled-components";
+import AppToaster from "../../toaster";
 import { getAuthToken, getFromApi, postToApi } from "../../util";
 import { Page } from "../atoms";
 import { ErrorState } from "../molecules";
@@ -118,7 +119,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
       return;
     }
     const loginWithEmail = () => this.login("email");
-    // const loginWithDm = () => this.login("fediverseAccount");
+    const loginWithDm = () => this.login("fediverseAccount");
     return (
       <>
         <H4>Choose an authentication method</H4>
@@ -133,7 +134,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
               {`Email ${loginTypes.email}`}
             </LoginTypeButton>
           )}
-          {/* {loginTypes.fediverseAccount && (
+          {loginTypes.fediverseAccount && (
             <LoginTypeButton
               large={true}
               icon={IconNames.GLOBE_NETWORK}
@@ -142,7 +143,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
             >
               {`DM ${loginTypes.fediverseAccount}`}
             </LoginTypeButton>
-          )} */}
+          )}
         </LoginTypeContainer>
       </>
     );
@@ -179,15 +180,20 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     }
     getFromApi(`admin/login/${domain}`)
       .then(response => {
-        if ("error" in response || "errors" in response) {
+        if (!!response.error) {
           // Go to catch() below
-          throw new Error();
+          throw new Error(response.error);
         } else {
           this.setState({ loginTypes: response, isGettingLoginTypes: false });
         }
       })
-      .catch(() => {
-        this.setState({ error: true });
+      .catch((err: Error) => {
+        AppToaster.show({
+          icon: IconNames.ERROR,
+          intent: Intent.DANGER,
+          message: err.message
+        });
+        this.setState({ isGettingLoginTypes: false });
       });
   };
 

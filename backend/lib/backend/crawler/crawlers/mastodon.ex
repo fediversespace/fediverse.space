@@ -45,10 +45,10 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
         Map.take(instance["stats"], ["user_count"])
         |> convert_keys_to_atoms(),
         %{
+          instance_type: get_instance_type(instance),
           peers: [],
           interactions: %{},
           statuses_seen: 0,
-          instance_type: nil,
           description: nil,
           version: nil,
           status_count: nil
@@ -71,13 +71,6 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
       } mentions in #{statuses_seen} statuses."
     )
 
-    instance_type =
-      cond do
-        Map.get(instance, "version") |> String.downcase() =~ "pleroma" -> :pleroma
-        is_gab?(instance) -> :gab
-        true -> :mastodon
-      end
-
     Map.merge(
       Map.merge(
         Map.take(instance, ["version", "description"]),
@@ -88,7 +81,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
         peers: peers,
         interactions: interactions,
         statuses_seen: statuses_seen,
-        instance_type: instance_type
+        instance_type: get_instance_type(instance)
       }
     )
   end
@@ -238,6 +231,14 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
       title_is_gab or has_gab_keys
     else
       title_is_gab
+    end
+  end
+
+  defp get_instance_type(instance_stats) do
+    cond do
+      Map.get(instance_stats, "version") |> String.downcase() =~ "pleroma" -> :pleroma
+      is_gab?(instance_stats) -> :gab
+      true -> :mastodon
     end
   end
 end

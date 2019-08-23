@@ -54,6 +54,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
             message: "Failed to load settings.",
             timeout: 0
           });
+          unsetAuthToken();
         });
     }
   }
@@ -158,6 +159,10 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
 
   private logout = () => {
     unsetAuthToken();
+    AppToaster.show({
+      icon: IconNames.LOG_OUT,
+      message: "Logged out."
+    });
     this.props.navigate("/admin/login");
   };
 }

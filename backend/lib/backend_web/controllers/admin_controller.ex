@@ -8,7 +8,7 @@ defmodule BackendWeb.AdminController do
     [token] = get_req_header(conn, "token")
 
     with {:ok, domain} <- Auth.verify_token(token) do
-      instance = Api.get_instance!(domain)
+      instance = Api.get_instance(domain)
       render(conn, "show.json", instance: instance)
     end
   end

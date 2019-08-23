@@ -64,7 +64,9 @@ defmodule Backend.MixProject do
       {:elasticsearch, "~> 1.0"},
       {:appsignal, "~> 1.10.1"},
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
-      {:nebulex, "~> 1.1"}
+      {:nebulex, "~> 1.1"},
+      {:hunter, "~> 0.5.1"},
+      {:poison, "~> 4.0", override: true}
     ]
   end
 
