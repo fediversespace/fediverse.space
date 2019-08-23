@@ -9,13 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add caching to graph + instance endpoints to better handle traffic spikes.
-
 ### Changed
 
 ### Deprecated
 
 ### Removed
+
+### Fixed
+
+## [2.7.1 - 2018-08-23]
+
+### Added
+
+- Add caching to graph + instance endpoints to better handle traffic spikes.
 
 ### Fixed
 
