@@ -6,6 +6,13 @@ defmodule Backend.Api do
   import Backend.Util
   import Ecto.Query
 
+  @spec get_instances(Integer.t() | nil) :: Scrivener.Page.t()
+  def get_instances(page \\ nil) do
+    Instance
+    |> where([i], not is_nil(i.type))
+    |> Repo.paginate(page: page)
+  end
+
   @spec get_instance(String.t()) :: Instance.t() | nil
   def get_instance(domain) do
     Instance

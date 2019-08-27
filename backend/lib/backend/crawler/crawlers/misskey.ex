@@ -35,22 +35,18 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   end
 
   @impl ApiCrawler
-  def crawl(domain, _result) do
+  def crawl(domain, nodeinfo) do
     with {:ok, %{"originalUsersCount" => user_count, "originalNotesCount" => status_count}} <-
            post_and_decode("https://#{domain}/api/stats") do
       if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
-        crawl_large_instance(domain, user_count, status_count)
+        Map.merge(nodeinfo, crawl_large_instance(domain, user_count, status_count))
       else
-        %{
-          instance_type: :misskey,
-          version: nil,
-          description: nil,
+        ApiCrawler.get_default()
+        |> Map.merge(nodeinfo)
+        |> Map.merge(%{
           user_count: user_count,
-          status_count: nil,
-          peers: [],
-          interactions: %{},
-          statuses_seen: 0
-        }
+          type: :misskey
+        })
       end
     end
   end

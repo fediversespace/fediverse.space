@@ -1,8 +1,29 @@
 defmodule BackendWeb.InstanceController do
   use BackendWeb, :controller
+  alias Backend.Api
   alias Graph.Cache
 
   action_fallback(BackendWeb.FallbackController)
+
+  def index(conn, params) do
+    page = Map.get(params, "page")
+
+    %{
+      entries: instances,
+      total_pages: total_pages,
+      page_number: page_number,
+      total_entries: total_entries,
+      page_size: page_size
+    } = Api.get_instances(page)
+
+    render(conn, "index.json",
+      instances: instances,
+      total_pages: total_pages,
+      page_number: page_number,
+      total_entries: total_entries,
+      page_size: page_size
+    )
+  end
 
   def show(conn, %{"id" => domain}) do
     instance = Cache.get_instance_with_peers(domain)

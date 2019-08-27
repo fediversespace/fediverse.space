@@ -56,7 +56,6 @@ defmodule Backend.MixProject do
       {:corsica, "~> 1.1.2"},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:gollum, "~> 0.3.2"},
-      {:paginator, "~> 0.6.0"},
       {:public_suffix, "~> 0.6.0"},
       {:idna, "~> 5.1.2", override: true},
       {:swoosh, "~> 0.23.3"},
@@ -66,7 +65,8 @@ defmodule Backend.MixProject do
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:nebulex, "~> 1.1"},
       {:hunter, "~> 0.5.1"},
-      {:poison, "~> 4.0", override: true}
+      {:poison, "~> 4.0", override: true},
+      {:scrivener_ecto, "~> 2.2"}
     ]
   end
 

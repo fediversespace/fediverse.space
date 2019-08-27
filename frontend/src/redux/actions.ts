@@ -48,6 +48,18 @@ const graphLoadFailed = () => {
   };
 };
 
+// Instance list
+const requestInstanceList = () => ({
+  type: ActionType.REQUEST_INSTANCES
+});
+const receiveInstanceList = (instances: IInstanceDetails[]) => ({
+  payload: instances,
+  type: ActionType.RECEIVE_INSTANCES
+});
+const instanceListLoadFailed = () => ({
+  type: ActionType.INSTANCE_LIST_LOAD_ERROR
+});
+
 // Search
 const requestSearchResult = (query: string, filters: ISearchFilter[]) => {
   return {
@@ -136,5 +148,19 @@ export const fetchGraph = () => {
     return getFromApi("graph")
       .then(graph => dispatch(receiveGraph(graph)))
       .catch(() => dispatch(graphLoadFailed()));
+  };
+};
+
+export const loadInstanceList = (page?: number) => {
+  return (dispatch: Dispatch) => {
+    dispatch(requestInstanceList());
+    let params = "";
+    if (!!page) {
+      params += `page=${page}`;
+    }
+    const path = !!params ? `instances?${params}` : "instances";
+    return getFromApi(path)
+      .then(instancesListResponse => dispatch(receiveInstanceList(instancesListResponse)))
+      .catch(() => dispatch(instanceListLoadFailed()));
   };
 };

@@ -62,12 +62,11 @@ defmodule Backend.Crawler.Crawlers.Friendica do
       end)
 
     if details |> Map.get(:user_count, 0) |> is_above_user_threshold?() do
-      Map.merge(
-        %{peers: peers, interactions: %{}, statuses_seen: 0, instance_type: :friendica},
-        Map.take(details, [:description, :version, :user_count, :status_count])
-      )
+      ApiCrawler.get_default()
+      |> Map.merge(%{peers: peers, instance_type: :friendica})
+      |> Map.merge(Map.take(details, [:description, :version, :user_count, :status_count]))
     else
-      nodeinfo_result
+      Map.merge(ApiCrawler.get_default(), nodeinfo_result)
     end
   end
 

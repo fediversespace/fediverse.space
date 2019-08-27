@@ -5,9 +5,11 @@ import { combineReducers } from "redux";
 import { History } from "history";
 import { ActionType, IAction, ICurrentInstanceState, IDataState, ISearchState } from "./types";
 
-const initialDataState = {
-  error: false,
-  isLoadingGraph: false
+const initialDataState: IDataState = {
+  graphLoadError: false,
+  instanceListLoadError: false,
+  isLoadingGraph: false,
+  isLoadingInstanceList: false
 };
 const data = (state: IDataState = initialDataState, action: IAction): IDataState => {
   switch (action.type) {
@@ -26,8 +28,27 @@ const data = (state: IDataState = initialDataState, action: IAction): IDataState
     case ActionType.GRAPH_LOAD_ERROR:
       return {
         ...state,
-        error: true,
+        graphLoadError: true,
         isLoadingGraph: false
+      };
+    case ActionType.REQUEST_INSTANCES:
+      return {
+        ...state,
+        instanceListLoadError: false,
+        instancesResponse: undefined,
+        isLoadingInstanceList: true
+      };
+    case ActionType.RECEIVE_INSTANCES:
+      return {
+        ...state,
+        instancesResponse: action.payload,
+        isLoadingInstanceList: false
+      };
+    case ActionType.INSTANCE_LIST_LOAD_ERROR:
+      return {
+        ...state,
+        instanceListLoadError: true,
+        isLoadingInstanceList: false
       };
     default:
       return state;

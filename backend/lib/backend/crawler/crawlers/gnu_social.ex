@@ -3,7 +3,6 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
   Crawler for GNU Social servers.
   """
   alias Backend.Crawler.ApiCrawler
-  alias Backend.Crawler.Crawlers.Nodeinfo
   import Backend.Crawler.Util
   import Backend.Util
   require Logger
@@ -32,17 +31,17 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
   end
 
   @impl ApiCrawler
-  def crawl(domain, nodeinfo_result) do
-    if nodeinfo_result == nil or
-         nodeinfo_result |> Map.get(:user_count) |> is_above_user_threshold?() do
-      crawl_large_instance(domain, nodeinfo_result)
+  def crawl(domain, nodeinfo) do
+    if nodeinfo == nil or
+         nodeinfo |> Map.get(:user_count) |> is_above_user_threshold?() do
+      Map.merge(crawl_large_instance(domain), nodeinfo)
     else
-      nodeinfo_result
+      Map.merge(ApiCrawler.get_default(), nodeinfo)
     end
   end
 
-  @spec crawl_large_instance(String.t(), Nodeinfo.t()) :: ApiCrawler.t()
-  defp crawl_large_instance(domain, nodeinfo_result) do
+  @spec crawl_large_instance(String.t()) :: ApiCrawler.t()
+  defp crawl_large_instance(domain) do
     status_datetime_threshold =
       NaiveDateTime.utc_now()
       |> NaiveDateTime.add(get_config(:status_age_limit_days) * 24 * 3600 * -1, :second)
@@ -52,24 +51,14 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
 
     {interactions, statuses_seen} = get_interactions(domain, min_timestamp)
 
-    if nodeinfo_result != nil do
-      Map.merge(nodeinfo_result, %{
-        interactions: interactions,
-        statuses_seen: statuses_seen,
-        peers: []
-      })
-    else
+    Map.merge(
+      ApiCrawler.get_default(),
       %{
-        version: nil,
-        description: nil,
-        user_count: nil,
-        status_count: nil,
-        peers: [],
         interactions: interactions,
         statuses_seen: statuses_seen,
         instance_type: :gnusocial
       }
-    end
+    )
   end
 
   @spec get_interactions(

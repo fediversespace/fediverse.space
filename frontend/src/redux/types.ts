@@ -10,6 +10,10 @@ export enum ActionType {
   REQUEST_GRAPH = "REQUEST_GRAPH",
   RECEIVE_GRAPH = "RECEIVE_GRAPH",
   GRAPH_LOAD_ERROR = "GRAPH_LOAD_ERROR",
+  // Instance list
+  REQUEST_INSTANCES = "REQUEST_INSTANCES",
+  RECEIVE_INSTANCES = "RECEIVE_INSTANCES",
+  INSTANCE_LIST_LOAD_ERROR = "INSTANCE_LIST_LOAD_ERROR",
   // Nav
   DESELECT_INSTANCE = "DESELECT_INSTANCE",
   // Search
@@ -26,7 +30,7 @@ export interface IAction {
   payload: any;
 }
 
-export interface IInstance {
+export interface IPeer {
   name: string;
 }
 
@@ -45,7 +49,7 @@ export interface IInstanceDetails {
   insularity?: number;
   statusCount?: number;
   domainCount?: number;
-  peers?: IInstance[];
+  peers?: IPeer[];
   lastUpdated?: string;
   status: string;
   type?: string;
@@ -93,6 +97,14 @@ export interface ISearchResponse {
   next: string | null;
 }
 
+export interface IInstanceListResponse {
+  pageNumber: number;
+  totalPages: number;
+  totalEntries: number;
+  pageSize: number;
+  instances: IInstanceDetails[];
+}
+
 // Redux state
 
 // The current instance name is stored in the URL. See state -> router -> location
@@ -104,8 +116,11 @@ export interface ICurrentInstanceState {
 
 export interface IDataState {
   graphResponse?: IGraphResponse;
+  instancesResponse?: IInstanceListResponse;
   isLoadingGraph: boolean;
-  error: boolean;
+  isLoadingInstanceList: boolean;
+  graphLoadError: boolean;
+  instanceListLoadError: boolean;
 }
 
 export interface ISearchState {

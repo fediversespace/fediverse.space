@@ -8,7 +8,7 @@ defmodule BackendWeb.Router do
   scope "/api", BackendWeb do
     pipe_through(:api)
 
-    resources("/instances", InstanceController, only: [:show])
+    resources("/instances", InstanceController, only: [:index, :show])
     resources("/graph", GraphController, only: [:index, :show])
     resources("/search", SearchController, only: [:index])
 

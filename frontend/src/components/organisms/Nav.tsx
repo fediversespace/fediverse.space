@@ -11,7 +11,7 @@ interface INavState {
   aboutIsOpen: boolean;
 }
 
-const linkIsActive = (currMatch: match<IInstanceDomainPath>, location: Location) => {
+const graphIsActive = (currMatch: match<IInstanceDomainPath>, location: Location) => {
   return location.pathname === "/" || location.pathname.startsWith("/instance/");
 };
 
@@ -31,9 +31,16 @@ class Nav extends React.Component<{}, INavState> {
             to="/"
             className={`${Classes.BUTTON} ${Classes.MINIMAL} bp3-icon-${IconNames.GLOBE_NETWORK}`}
             activeClassName={Classes.INTENT_PRIMARY}
-            isActive={linkIsActive as any}
+            isActive={graphIsActive as any}
           >
             Home
+          </NavLink>
+          <NavLink
+            to="/instances"
+            className={`${Classes.BUTTON} ${Classes.MINIMAL} bp3-icon-${IconNames.TH}`}
+            activeClassName={Classes.INTENT_PRIMARY}
+          >
+            Instances
           </NavLink>
           <NavLink
             to="/about"

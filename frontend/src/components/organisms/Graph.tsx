@@ -111,7 +111,7 @@ const mapStateToProps = (state: IAppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
-    graphLoadError: state.data.error,
+    graphLoadError: state.data.graphLoadError,
     graphResponse: state.data.graphResponse,
     hoveringOverResult: state.search.hoveringOverResult,
     isLoadingGraph: state.data.isLoadingGraph,

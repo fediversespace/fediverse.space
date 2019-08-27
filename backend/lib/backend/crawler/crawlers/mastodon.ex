@@ -34,26 +34,19 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   end
 
   @impl ApiCrawler
-  def crawl(domain, _current_result) do
+  def crawl(domain, nodeinfo) do
     instance = get_and_decode!("https://#{domain}/api/v1/instance")
     user_count = get_in(instance, ["stats", "user_count"])
 
     if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
-      crawl_large_instance(domain, instance)
+      Map.merge(nodeinfo, crawl_large_instance(domain, instance))
     else
-      Map.merge(
-        Map.take(instance["stats"], ["user_count"])
-        |> convert_keys_to_atoms(),
-        %{
-          instance_type: get_instance_type(instance),
-          peers: [],
-          interactions: %{},
-          statuses_seen: 0,
-          description: nil,
-          version: nil,
-          status_count: nil
-        }
-      )
+      ApiCrawler.get_default()
+      |> Map.merge(nodeinfo)
+      |> Map.merge(%{
+        instance_type: get_instance_type(instance),
+        user_count: get_in(instance, ["stats", "user_count"])
+      })
     end
   end
 

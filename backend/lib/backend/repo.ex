@@ -4,7 +4,7 @@ defmodule Backend.Repo do
     adapter: Ecto.Adapters.Postgres,
     timeout: 25_000
 
-  use Paginator
+  use Scrivener, page_size: 20
 
   def init(_type, config) do
     {:ok, Keyword.put(config, :url, System.get_env("DATABASE_URL"))}

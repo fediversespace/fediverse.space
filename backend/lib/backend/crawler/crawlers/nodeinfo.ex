@@ -1,34 +1,16 @@
 defmodule Backend.Crawler.Crawlers.Nodeinfo do
   @moduledoc """
-  This module is slightly different from the other crawlers.
-  It doesn't implement the ApiCrawler spec because it isn't run as a self-contained crawler.
-  Instead, it's run before all the other crawlers.
-
-  This is to get the user count. Some servers don't publish this in other places (e.g. GNU Social, PeerTube) so we need
-  nodeinfo to know whether it's a personal instance or not.
+  This module is slightly different from the other crawlers. It's run before all the others and its
+  result is included in theirs.
   """
+
   alias Backend.Crawler.ApiCrawler
   require Logger
   import Backend.Util
   import Backend.Crawler.Util
+  @behaviour ApiCrawler
 
-  defstruct [
-    :description,
-    :user_count,
-    :status_count,
-    :instance_type,
-    :version
-  ]
-
-  @type t() :: %__MODULE__{
-          description: String.t(),
-          user_count: integer,
-          status_count: integer,
-          instance_type: ApiCrawler.instance_type(),
-          version: String.t()
-        }
-
-  @spec allows_crawling?(String.t()) :: boolean()
+  @impl ApiCrawler
   def allows_crawling?(domain) do
     [
       ".well-known/nodeinfo"
@@ -37,13 +19,19 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
     |> urls_are_crawlable?()
   end
 
-  @spec crawl(String.t()) :: {:ok, t()} | {:error, nil}
-  def crawl(domain) do
+  @impl ApiCrawler
+  def is_instance_type?(_domain, _nodeinfo) do
+    # This crawler is used slightly differently from the others -- we always check for nodeinfo.
+    true
+  end
+
+  @impl ApiCrawler
+  def crawl(domain, _curr_result) do
     with {:ok, nodeinfo_url} <- get_nodeinfo_url(domain),
          {:ok, nodeinfo} <- get_nodeinfo(nodeinfo_url) do
-      {:ok, nodeinfo}
+      nodeinfo
     else
-      _other -> {:error, nil}
+      _other -> ApiCrawler.get_default()
     end
   end
 
@@ -65,8 +53,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
     |> Map.get("href")
   end
 
-  @spec get_nodeinfo(String.t()) ::
-          {:ok, t()} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
+  @spec get_nodeinfo(String.t()) :: ApiCrawler.t()
   defp get_nodeinfo(nodeinfo_url) do
     case get_and_decode(nodeinfo_url) do
       {:ok, nodeinfo} -> {:ok, process_nodeinfo(nodeinfo)}
@@ -74,7 +61,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
     end
   end
 
-  @spec process_nodeinfo(any()) :: t()
+  @spec process_nodeinfo(any()) :: ApiCrawler.t()
   defp process_nodeinfo(nodeinfo) do
     user_count = get_in(nodeinfo, ["usage", "users", "total"])
 
@@ -90,21 +77,33 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
 
       type = nodeinfo |> get_in(["software", "name"]) |> String.downcase() |> String.to_atom()
 
-      %__MODULE__{
-        description: description,
-        user_count: user_count,
-        status_count: get_in(nodeinfo, ["usage", "localPosts"]),
-        instance_type: type,
-        version: get_in(nodeinfo, ["software", "version"])
-      }
+      Map.merge(
+        ApiCrawler.get_default(),
+        %{
+          description: description,
+          user_count: user_count,
+          status_count: get_in(nodeinfo, ["usage", "localPosts"]),
+          instance_type: type,
+          version: get_in(nodeinfo, ["software", "version"]),
+          blocked_domains:
+            get_in(nodeinfo, ["metadata", "federation", "mrf_simple", "reject"])
+            |> (fn b ->
+                  if b == nil do
+                    []
+                  else
+                    b
+                  end
+                end).()
+            |> Enum.map(&clean_domain(&1))
+        }
+      )
     else
-      %{
-        description: nil,
-        user_count: user_count,
-        status_count: nil,
-        instance_type: nil,
-        version: nil
-      }
+      Map.merge(
+        ApiCrawler.get_default(),
+        %{
+          user_count: user_count
+        }
+      )
     end
   end
 

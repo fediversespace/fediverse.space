@@ -63,7 +63,9 @@ config :backend, :crawler,
   crawl_workers: 20,
   blacklist: [
     "gab.best",
-    "4chan.icu"
+    "4chan.icu",
+    "pleroma.site",
+    "pleroma.online"
   ],
   user_agent: "fediverse.space crawler",
   admin_phone: System.get_env("ADMIN_PHONE"),

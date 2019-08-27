@@ -26,25 +26,39 @@ defmodule Backend.Crawler.ApiCrawler do
     :peers,
     :interactions,
     :statuses_seen,
-    :instance_type
+    :instance_type,
+    :blocked_domains
   ]
 
   @type t() :: %__MODULE__{
-          version: String.t(),
-          description: String.t(),
+          version: String.t() | nil,
+          description: String.t() | nil,
           user_count: integer | nil,
           status_count: integer | nil,
           peers: [String.t()],
           interactions: instance_interactions,
           statuses_seen: integer,
-          instance_type: instance_type
+          instance_type: instance_type | nil,
+          blocked_domains: [String.t()]
         }
+
+  @empty_result %{
+    version: nil,
+    description: nil,
+    user_count: nil,
+    status_count: nil,
+    peers: [],
+    interactions: %{},
+    statuses_seen: 0,
+    instance_type: nil,
+    blocked_domains: []
+  }
 
   @doc """
   Check whether the instance at the given domain is of the type that this ApiCrawler implements.
   Arguments are the instance domain and the nodeinfo results.
   """
-  @callback is_instance_type?(String.t(), Nodeinfo.t()) :: boolean()
+  @callback is_instance_type?(String.t(), ApiCrawler.t()) :: boolean()
 
   @doc """
   Check whether the instance allows crawling according to its robots.txt or otherwise.
@@ -56,4 +70,11 @@ defmodule Backend.Crawler.ApiCrawler do
   Takes two arguments: the domain to crawl and the existing results (from nodeinfo).
   """
   @callback crawl(String.t(), Nodeinfo.t()) :: t()
+
+  @doc """
+  Returns the default, empty state
+  """
+  def get_default do
+    @empty_result
+  end
 end

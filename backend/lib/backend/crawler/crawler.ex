@@ -4,7 +4,17 @@ defmodule Backend.Crawler do
   """
 
   alias __MODULE__
-  alias Backend.{Crawl, CrawlInteraction, Instance, InstancePeer, MostRecentCrawl, Repo}
+
+  alias Backend.{
+    Crawl,
+    CrawlInteraction,
+    FederationRestriction,
+    Instance,
+    InstancePeer,
+    MostRecentCrawl,
+    Repo
+  }
+
   alias Backend.Crawler.ApiCrawler
   alias Backend.Crawler.Crawlers.{Friendica, GnuSocial, Mastodon, Misskey, Nodeinfo}
 
@@ -75,14 +85,24 @@ defmodule Backend.Crawler do
   # a) it should always be run first
   # b) it passes the results on to the next crawlers (e.g. user_count)
   defp crawl(%Crawler{api_crawlers: [Nodeinfo | remaining_crawlers], domain: domain} = state) do
-    with true <- Nodeinfo.allows_crawling?(domain), {:ok, nodeinfo} <- Nodeinfo.crawl(domain) do
-      Logger.debug("Found nodeinfo for #{domain}.")
-      result = Map.merge(nodeinfo, %{peers: [], interactions: %{}, statuses_seen: 0})
-      crawl(%Crawler{state | result: result, found_api?: true, api_crawlers: remaining_crawlers})
-    else
-      _ ->
+    if Nodeinfo.allows_crawling?(domain) do
+      nodeinfo = Nodeinfo.crawl(domain, nil)
+
+      if nodeinfo != nil do
+        Logger.debug("Found nodeinfo for #{domain}.")
+
+        crawl(%Crawler{
+          state
+          | result: nodeinfo,
+            found_api?: true,
+            api_crawlers: remaining_crawlers
+        })
+      else
         Logger.debug("Did not find nodeinfo for #{domain}.")
         crawl(%Crawler{state | api_crawlers: remaining_crawlers})
+      end
+    else
+      crawl(%Crawler{state | api_crawlers: remaining_crawlers, allows_crawling?: false})
     end
   end
 
@@ -165,7 +185,7 @@ defmodule Backend.Crawler do
 
     Elasticsearch.put_document!(Backend.Elasticsearch.Cluster, instance, "instances/_doc")
 
-    # Save details of a new crawl
+    ## Save details of a new crawl ##
     curr_crawl =
       Repo.insert!(%Crawl{
         instance_domain: domain,
@@ -196,18 +216,22 @@ defmodule Backend.Crawler do
       |> list_union(result.peers)
       |> Enum.filter(fn domain -> domain != nil and not is_blacklisted?(domain) end)
       |> Enum.map(&clean_domain(&1))
+      |> Enum.filter(fn peer_domain ->
+        if is_valid_domain?(peer_domain) do
+          true
+        else
+          Logger.info("Found invalid peer domain from #{domain}: #{peer_domain}")
+          false
+        end
+      end)
 
-    if not Enum.all?(peers_domains, &is_valid_domain?(&1)) do
-      invalid_peers = Enum.filter(peers_domains, fn d -> not is_valid_domain?(d) end)
-      raise "#{domain} has invalid peers: #{Enum.join(invalid_peers, ", ")}"
-    end
-
-    peers =
+    new_instances =
       peers_domains
+      |> list_union(result.blocked_domains)
       |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now, next_crawl: now})
 
     Instance
-    |> Repo.insert_all(peers, on_conflict: :nothing, conflict_target: :domain)
+    |> Repo.insert_all(new_instances, on_conflict: :nothing, conflict_target: :domain)
 
     Repo.transaction(fn ->
       ## Save peer relationships ##
@@ -247,6 +271,56 @@ defmodule Backend.Crawler do
 
       InstancePeer
       |> Repo.insert_all(new_instance_peers)
+    end)
+
+    ## Save federation restrictions ##
+    Repo.transaction(fn ->
+      current_restrictions =
+        FederationRestriction
+        |> select([fr], {fr.target_domain, fr.type})
+        |> where(source_domain: ^domain)
+        |> Repo.all()
+
+      wanted_restrictions_set =
+        result.blocked_domains
+        |> Enum.map(&{&1, "reject"})
+        |> MapSet.new()
+
+      current_restrictions_set = MapSet.new(current_restrictions)
+
+      # Delete the ones we don't want
+      restrictions_to_delete =
+        current_restrictions_set
+        |> MapSet.difference(wanted_restrictions_set)
+        |> MapSet.to_list()
+        |> Enum.map(fn {target_domain, _type} -> target_domain end)
+
+      if length(restrictions_to_delete) > 0 do
+        FederationRestriction
+        |> where(
+          [fr],
+          fr.source_domain == ^domain and fr.target_domain in ^restrictions_to_delete
+        )
+        |> Repo.delete_all()
+      end
+
+      # Save the new ones
+      new_restrictions =
+        wanted_restrictions_set
+        |> MapSet.difference(current_restrictions_set)
+        |> MapSet.to_list()
+        |> Enum.map(fn {target_domain, type} ->
+          %{
+            source_domain: domain,
+            target_domain: target_domain,
+            type: type,
+            inserted_at: now,
+            updated_at: now
+          }
+        end)
+
+      FederationRestriction
+      |> Repo.insert_all(new_restrictions)
     end)
 
     ## Save interactions ##

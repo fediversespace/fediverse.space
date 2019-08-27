@@ -128,6 +128,7 @@ defmodule Backend.Util do
     end
   end
 
+  @spec clean_domain(String.t()) :: String.t()
   def clean_domain(domain) do
     cleaned =
       domain
@@ -136,7 +137,7 @@ defmodule Backend.Util do
       |> String.trim()
       |> String.downcase()
 
-    Regex.replace(~r/:\d+/, cleaned, "")
+    Regex.replace(~r/(:\d+|\.)$/, cleaned, "")
   end
 
   def get_account(username, domain) do
@@ -209,6 +210,6 @@ defmodule Backend.Util do
 
   @spec is_valid_domain?(String.t()) :: boolean
   def is_valid_domain?(domain) do
-    Regex.match?(~r/^[\w\.\-_]+$/, domain)
+    Regex.match?(~r/^[\pL\d\.\-_]+\.[a-zA-Z]+$/, domain)
   end
 end

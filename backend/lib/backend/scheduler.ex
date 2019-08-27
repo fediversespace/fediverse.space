@@ -3,10 +3,9 @@ defmodule Backend.Scheduler do
   This module runs recurring tasks.
   """
 
-  use Appsignal.Instrumentation.Decorators
   use Quantum.Scheduler, otp_app: :backend
 
-  alias Backend.{Crawl, CrawlInteraction, Edge, Instance, Repo}
+  alias Backend.{Crawl, CrawlInteraction, Edge, FederationRestriction, Instance, Repo}
   alias Backend.Mailer.AdminEmail
 
   import Backend.Util
@@ -21,7 +20,6 @@ defmodule Backend.Scheduler do
   `unit` must singular, e.g. "second", "minute", "hour", "month", "year", etc...
   """
   @spec prune_crawls(integer, String.t()) :: any
-  @decorate transaction()
   def prune_crawls(amount, unit) do
     {deleted_num, _} =
       Crawl
@@ -39,7 +37,6 @@ defmodule Backend.Scheduler do
   Calculates every instance's "insularity score" -- that is, the percentage of mentions that are among users on the
   instance, rather than at other instances.
   """
-  @decorate transaction()
   def generate_insularity_scores do
     now = get_now()
 
@@ -85,7 +82,6 @@ defmodule Backend.Scheduler do
   @doc """
   This function calculates the average number of statuses per hour over the last month.
   """
-  @decorate transaction()
   def generate_status_rate do
     now = get_now()
     # We want the earliest sucessful crawl so that we can exclude it from the statistics.
@@ -143,9 +139,11 @@ defmodule Backend.Scheduler do
   @doc """
   This function aggregates statistics from the interactions in the database.
   It calculates the strength of edges between nodes. Self-edges are not generated.
-  Edges are only generated if both instances have been succesfully crawled.
+  Edges are only generated if
+  * both instances have been succesfully crawled
+  * neither of the instances have blocked each other
+  * there are interactions in each direction
   """
-  @decorate transaction()
   def generate_edges do
     now = get_now()
 
@@ -177,15 +175,30 @@ defmodule Backend.Scheduler do
       })
       |> Repo.all(timeout: :infinity)
 
+    federation_blocks =
+      FederationRestriction
+      |> select([fr], {fr.source_domain, fr.target_domain})
+      |> where([fr], fr.type == "reject")
+      |> Repo.all()
+      |> MapSet.new()
+
     # Get edges and their weights
     Repo.transaction(
       fn ->
         Edge
         |> Repo.delete_all(timeout: :infinity)
 
-        edges =
+        mentions =
           interactions
-          |> reduce_mention_count()
+          |> reduce_mention_count(federation_blocks)
+
+        # Filter down to mentions where there are interactions in both directions
+        filtered_mentions =
+          mentions
+          |> Enum.filter(&has_opposite_mention?(&1, mentions))
+
+        edges =
+          filtered_mentions
           |> Enum.map(fn {{source_domain, target_domain}, {mention_count, statuses_seen}} ->
             %{
               source_domain: source_domain,
@@ -207,7 +220,6 @@ defmodule Backend.Scheduler do
   This function checks to see if a lot of instances on the same base domain have been created recently. If so,
   notifies the server admin over SMS.
   """
-  @decorate transaction()
   def check_for_spam_instances do
     hour_range = 3
 
@@ -254,10 +266,9 @@ defmodule Backend.Scheduler do
     end
   end
 
-  # Takes a list of Interactions
+  # Takes a list of Interactions and a MapSet of blocks in the form {source_domain, target_domain}
   # Returns a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
-  @decorate transaction_event()
-  defp reduce_mention_count(interactions) do
+  defp reduce_mention_count(interactions, federation_blocks) do
     Enum.reduce(interactions, %{}, fn
       %{
         source_domain: source_domain,
@@ -278,9 +289,46 @@ defmodule Backend.Scheduler do
 
         statuses_seen = source_statuses_seen + target_statuses_seen
 
-        Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
-          {curr_mentions + mentions, curr_statuses_seen}
-        end)
+        maybe_update_map(
+          acc,
+          key,
+          source_domain,
+          target_domain,
+          mentions,
+          statuses_seen,
+          federation_blocks
+        )
     end)
+  end
+
+  defp maybe_update_map(
+         acc,
+         key,
+         source_domain,
+         target_domain,
+         mentions,
+         statuses_seen,
+         federation_blocks
+       ) do
+    if not MapSet.member?(federation_blocks, {source_domain, target_domain}) and
+         not MapSet.member?(federation_blocks, {target_domain, source_domain}) do
+      Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
+        {curr_mentions + mentions, curr_statuses_seen}
+      end)
+    end
+  end
+
+  defp has_opposite_mention?(mention, all_mentions) do
+    {{source_domain, target_domain}, {mention_count, _statuses_seen}} = mention
+    other_direction_key = {target_domain, source_domain}
+
+    if mention_count > 0 and Map.has_key?(all_mentions, other_direction_key) do
+      {other_direction_mentions, _other_statuses_seen} =
+        Map.get(all_mentions, other_direction_key)
+
+      other_direction_mentions > 0
+    else
+      false
+    end
   end
 end

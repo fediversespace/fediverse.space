@@ -98,7 +98,7 @@ const mapStateToProps = (state: IAppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
-    graphLoadError: state.data.error,
+    graphLoadError: state.data.graphLoadError,
     pathname: state.router.location.pathname
   };
 };
