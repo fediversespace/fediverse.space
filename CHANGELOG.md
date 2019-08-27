@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Edges are no longer shown between instances where one blocks the other (based on the federation list in nodeinfo).
+- Edges are only shown between timeline-crawlable instance types (Mastodon, Pleroma, Gab, Misskey, and GNU Social)
+  if there's a mention in each direction. This is to avoid edges between instances where one blocks the other.
+
 ### Deprecated
 
 ### Removed

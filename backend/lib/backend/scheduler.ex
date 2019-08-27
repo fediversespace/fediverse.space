@@ -163,16 +163,20 @@ defmodule Backend.Scheduler do
       |> join(:inner, [ci], c_target in subquery(crawls_subquery),
         on: ci.target_domain == c_target.instance_domain
       )
-      |> where([ci], ci.source_domain != ci.target_domain)
-      |> group_by([ci], [ci.source_domain, ci.target_domain])
-      |> select([ci, c_source, c_target], %{
+      |> join(:inner, [ci], i_source in Instance, on: ci.source_domain == i_source.domain)
+      |> join(:inner, [ci], i_target in Instance, on: ci.target_domain == i_target.domain)
+      |> select([ci, c_source, c_target, i_source, i_target], %{
         source_domain: ci.source_domain,
         target_domain: ci.target_domain,
         mentions: sum(ci.mentions),
         # we can take min() because every row is the same
+        source_type: min(i_source.type),
+        target_type: min(i_target.type),
         source_statuses_seen: min(c_source.statuses_seen),
         target_statuses_seen: min(c_target.statuses_seen)
       })
+      |> where([ci], ci.source_domain != ci.target_domain)
+      |> group_by([ci], [ci.source_domain, ci.target_domain])
       |> Repo.all(timeout: :infinity)
 
     federation_blocks =
@@ -182,35 +186,28 @@ defmodule Backend.Scheduler do
       |> Repo.all()
       |> MapSet.new()
 
+    new_edges =
+      interactions
+      |> filter_to_eligible_interactions(federation_blocks)
+      |> combine_mention_directions()
+      |> Enum.map(fn {{source_domain, target_domain}, {mention_count, statuses_seen}} ->
+        %{
+          source_domain: source_domain,
+          target_domain: target_domain,
+          weight: mention_count / statuses_seen,
+          inserted_at: now,
+          updated_at: now
+        }
+      end)
+
     # Get edges and their weights
     Repo.transaction(
       fn ->
         Edge
         |> Repo.delete_all(timeout: :infinity)
 
-        mentions =
-          interactions
-          |> reduce_mention_count(federation_blocks)
-
-        # Filter down to mentions where there are interactions in both directions
-        filtered_mentions =
-          mentions
-          |> Enum.filter(&has_opposite_mention?(&1, mentions))
-
-        edges =
-          filtered_mentions
-          |> Enum.map(fn {{source_domain, target_domain}, {mention_count, statuses_seen}} ->
-            %{
-              source_domain: source_domain,
-              target_domain: target_domain,
-              weight: mention_count / statuses_seen,
-              inserted_at: now,
-              updated_at: now
-            }
-          end)
-
         Edge
-        |> Repo.insert_all(edges, timeout: :infinity)
+        |> Repo.insert_all(new_edges, timeout: :infinity)
       end,
       timeout: :infinity
     )
@@ -266,9 +263,9 @@ defmodule Backend.Scheduler do
     end
   end
 
-  # Takes a list of Interactions and a MapSet of blocks in the form {source_domain, target_domain}
+  # Takes a list of Interactions
   # Returns a map of %{{source, target} => {total_mention_count, total_statuses_seen}}
-  defp reduce_mention_count(interactions, federation_blocks) do
+  defp combine_mention_directions(interactions) do
     Enum.reduce(interactions, %{}, fn
       %{
         source_domain: source_domain,
@@ -289,46 +286,58 @@ defmodule Backend.Scheduler do
 
         statuses_seen = source_statuses_seen + target_statuses_seen
 
-        maybe_update_map(
-          acc,
-          key,
-          source_domain,
-          target_domain,
-          mentions,
-          statuses_seen,
-          federation_blocks
-        )
+        Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
+          {curr_mentions + mentions, curr_statuses_seen}
+        end)
     end)
   end
 
-  defp maybe_update_map(
-         acc,
-         key,
-         source_domain,
-         target_domain,
-         mentions,
-         statuses_seen,
-         federation_blocks
-       ) do
-    if not MapSet.member?(federation_blocks, {source_domain, target_domain}) and
-         not MapSet.member?(federation_blocks, {target_domain, source_domain}) do
-      Map.update(acc, key, {mentions, statuses_seen}, fn {curr_mentions, curr_statuses_seen} ->
-        {curr_mentions + mentions, curr_statuses_seen}
+  defp filter_to_eligible_interactions(interactions, federation_blocks) do
+    # A map of {source_domain, target_domain} => mention_count. Used to find out whether a mention in the reverse
+    # direction has been seen.
+    mention_directions =
+      interactions
+      |> Enum.reduce(%{}, fn %{source_domain: source, target_domain: target, mentions: mentions},
+                             acc ->
+        Map.put(acc, {source, target}, mentions)
       end)
-    end
+
+    interactions
+    |> Enum.filter(&is_eligible_interaction?(&1, mention_directions, federation_blocks))
   end
 
-  defp has_opposite_mention?(mention, all_mentions) do
-    {{source_domain, target_domain}, {mention_count, _statuses_seen}} = mention
-    other_direction_key = {target_domain, source_domain}
+  # Returns true if
+  # * there's no federation block in either direction between the two instances
+  # * there are mentions in both directions
+  defp is_eligible_interaction?(
+         %{
+           source_domain: source,
+           target_domain: target,
+           mentions: mention_count,
+           source_type: source_type,
+           target_type: target_type
+         },
+         mention_directions,
+         federation_blocks
+       ) do
+    mentions_were_seen = mention_count > 0
 
-    if mention_count > 0 and Map.has_key?(all_mentions, other_direction_key) do
-      {other_direction_mentions, _other_statuses_seen} =
-        Map.get(all_mentions, other_direction_key)
+    opposite_mention_exists =
+      if is_timeline_crawlable_type?(source_type) and is_timeline_crawlable_type?(target_type) do
+        Map.has_key?(mention_directions, {target, source}) and
+          Map.get(mention_directions, {target, source}) > 0
+      else
+        true
+      end
 
-      other_direction_mentions > 0
-    else
-      false
-    end
+    federation_block_exists =
+      MapSet.member?(federation_blocks, {source, target}) or
+        MapSet.member?(federation_blocks, {target, source})
+
+    mentions_were_seen and opposite_mention_exists and not federation_block_exists
+  end
+
+  defp is_timeline_crawlable_type?(type) do
+    Enum.member?(["mastodon", "gab", "pleroma", "gnusocial", "misskey"], type)
   end
 end
