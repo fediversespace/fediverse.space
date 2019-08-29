@@ -161,13 +161,13 @@ defmodule Backend.Util do
   @doc """
   Gets and decodes a HTTP response.
   """
-  @spec get_and_decode(String.t()) ::
+  @spec get_and_decode(String.t(), Atom.t(), Integer.t()) ::
           {:ok, any()} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
-  def get_and_decode(url) do
+  def get_and_decode(url, pool \\ :crawler, timeout \\ 15_000) do
     case HTTPoison.get(url, [{"User-Agent", get_config(:user_agent)}],
-           hackney: [pool: :crawler],
-           recv_timeout: 15_000,
-           timeout: 15_000
+           hackney: [pool: pool],
+           recv_timeout: timeout,
+           timeout: timeout
          ) do
       {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
       {:ok, _} -> {:error, %HTTPoison.Error{reason: "Non-200 response"}}

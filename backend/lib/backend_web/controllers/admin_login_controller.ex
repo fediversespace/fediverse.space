@@ -38,7 +38,12 @@ defmodule BackendWeb.AdminLoginController do
 
   def create(conn, %{"domain" => domain, "type" => type}) do
     cleaned_domain = clean_domain(domain)
-    {data_state, instance_data} = get_and_decode("https://#{cleaned_domain}/api/v1/instance")
+
+    {data_state, instance_data} =
+      get_and_decode("https://#{cleaned_domain}/api/v1/instance",
+        pool: :admin_login,
+        timeout: 20_000
+      )
 
     error =
       cond do
