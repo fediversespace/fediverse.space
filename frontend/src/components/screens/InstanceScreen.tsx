@@ -67,6 +67,10 @@ const StyledCallout = styled(Callout)`
   margin: 10px 20px;
   width: auto;
 `;
+const NeighborsCallout = styled(Callout)`
+  margin: 10px 0;
+  width: auto;
+`;
 const StyledTabs = styled(Tabs)`
   width: 100%;
   padding: 0 20px;
@@ -383,9 +387,16 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     );
     return (
       <div>
+        <NeighborsCallout icon={IconNames.INFO_SIGN} title="Warning">
+          <p>
+            Instances that {this.props.instanceName} has blocked may appear on this list. This can happen if users on a
+            blocked instance attempted to mention someone on {this.props.instanceName}.
+          </p>
+        </NeighborsCallout>
         <p className={Classes.TEXT_MUTED}>
-          The mention ratio is the average of how many times the two instances mention each other per status. A mention
-          ratio of 1 would mean that every single status contained a mention of a user on the other instance.
+          The mention ratio is how often people on the two instances mention each other per status. A mention ratio of 1
+          would mean that every single status on {this.props.instanceName} contained a mention of someone on the other
+          instance, and vice versa.
         </p>
         <StyledHTMLTable small={true} striped={true} interactive={false}>
           <thead>
