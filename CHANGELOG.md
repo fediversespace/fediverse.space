@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [2.8.0 - 2019-08-29]
+
+### Added
+
 - Add support for logging in via an ActivityPub direct message to the instance admin.
 - Added option to hide edges between instances if there are only mentions in one direction (off by default).
 - Added note to neighbors tab to make it explicit that blocked instances may appear.
@@ -18,12 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Edges are no longer shown between instances where one blocks the other (based on the federation list in nodeinfo).
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ## [2.7.1 - 2018-08-23]
 
