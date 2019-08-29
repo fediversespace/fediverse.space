@@ -78,7 +78,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
         <PaginationContainer>
           <p>
             Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, totalEntries)} of{" "}
-            {totalEntries} known instances
+            {totalEntries} known active instances
           </p>
 
           <ButtonGroup>

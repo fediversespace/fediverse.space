@@ -9,7 +9,7 @@ defmodule Backend.Api do
   @spec get_instances(Integer.t() | nil) :: Scrivener.Page.t()
   def get_instances(page \\ nil) do
     Instance
-    |> where([i], not is_nil(i.type))
+    |> where([i], not is_nil(i.type) and not i.opt_out)
     |> Repo.paginate(page: page)
   end
 
