@@ -8,6 +8,7 @@ import { ActionType, IAction, ICurrentInstanceState, IDataState, ISearchState } 
 const initialDataState: IDataState = {
   graphLoadError: false,
   instanceListLoadError: false,
+  instanceListSort: { field: "userCount", direction: "desc" },
   isLoadingGraph: false,
   isLoadingInstanceList: false
 };
@@ -35,6 +36,7 @@ const data = (state: IDataState = initialDataState, action: IAction): IDataState
       return {
         ...state,
         instanceListLoadError: false,
+        instanceListSort: action.payload,
         instancesResponse: undefined,
         isLoadingInstanceList: true
       };

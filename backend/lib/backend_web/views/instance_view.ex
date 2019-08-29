@@ -20,8 +20,8 @@ defmodule BackendWeb.InstanceView do
   end
 
   @doc """
-  Used when rendering the index of all instances (the different from show.json is primarily that it does not
-  include peers).
+  Used when rendering the index of all instances (the difference from show.json is primarily that
+  it does not include peers).
   """
   def render("index_instance.json", %{instance: instance}) do
     %{
@@ -61,6 +61,10 @@ defmodule BackendWeb.InstanceView do
 
   def render("peer.json", %{instance: instance}) do
     %{name: instance.domain}
+  end
+
+  def render("error.json", %{error: error}) do
+    %{error: error}
   end
 
   defp render_personal_instance(instance) do

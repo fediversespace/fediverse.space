@@ -50,7 +50,10 @@ defmodule BackendWeb.InstanceControllerTest do
   describe "update instance" do
     setup [:create_instance]
 
-    test "renders instance when data is valid", %{conn: conn, instance: %Instance{id: id} = instance} do
+    test "renders instance when data is valid", %{
+      conn: conn,
+      instance: %Instance{id: id} = instance
+    } do
       conn = put(conn, Routes.instance_path(conn, :update, instance), instance: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 

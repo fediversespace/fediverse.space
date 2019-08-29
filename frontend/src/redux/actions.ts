@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 import { push } from "connected-react-router";
 import { ISearchFilter } from "../searchFilters";
 import { getFromApi } from "../util";
-import { ActionType, IAppState, IGraph, IInstanceDetails, ISearchResponse } from "./types";
+import { ActionType, IAppState, IGraph, IInstanceDetails, IInstanceSort, ISearchResponse } from "./types";
 
 // Instance details
 const requestInstanceDetails = (instanceName: string) => {
@@ -49,7 +49,8 @@ const graphLoadFailed = () => {
 };
 
 // Instance list
-const requestInstanceList = () => ({
+const requestInstanceList = (sort?: IInstanceSort) => ({
+  payload: sort,
   type: ActionType.REQUEST_INSTANCES
 });
 const receiveInstanceList = (instances: IInstanceDetails[]) => ({
@@ -151,14 +152,19 @@ export const fetchGraph = () => {
   };
 };
 
-export const loadInstanceList = (page?: number) => {
-  return (dispatch: Dispatch) => {
-    dispatch(requestInstanceList());
-    let params = "";
+export const loadInstanceList = (page?: number, sort?: IInstanceSort) => {
+  return (dispatch: Dispatch, getState: () => IAppState) => {
+    sort = sort ? sort : getState().data.instanceListSort;
+    dispatch(requestInstanceList(sort));
+    const params: string[] = [];
     if (!!page) {
-      params += `page=${page}`;
+      params.push(`page=${page}`);
     }
-    const path = !!params ? `instances?${params}` : "instances";
+    if (!!sort) {
+      params.push(`sortField=${sort.field}`);
+      params.push(`sortDirection=${sort.direction}`);
+    }
+    const path = !!params ? `instances?${params.join("&")}` : "instances";
     return getFromApi(path)
       .then(instancesListResponse => dispatch(receiveInstanceList(instancesListResponse)))
       .catch(() => dispatch(instanceListLoadFailed()));

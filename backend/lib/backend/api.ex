@@ -6,11 +6,37 @@ defmodule Backend.Api do
   import Backend.Util
   import Ecto.Query
 
-  @spec get_instances(Integer.t() | nil) :: Scrivener.Page.t()
-  def get_instances(page \\ nil) do
+  @type instance_sort_field :: :name | :user_count | :status_count | :insularity
+  @type sort_direction :: :asc | :desc
+  @spec get_instances(Integer.t() | nil, instance_sort_field | nil, sort_direction | nil) ::
+          Scrivener.Page.t()
+  def get_instances(page \\ nil, sort_field \\ nil, sort_direction \\ nil) do
     Instance
     |> where([i], not is_nil(i.type) and not i.opt_out)
+    |> maybe_order_by(sort_field, sort_direction)
     |> Repo.paginate(page: page)
+  end
+
+  defp maybe_order_by(query, sort_field, sort_direction) do
+    cond do
+      sort_field == nil and sort_direction != nil ->
+        query
+
+      sort_field != nil and sort_direction == nil ->
+        query
+        |> order_by(desc: ^sort_field)
+
+      sort_direction == :asc ->
+        query
+        |> order_by(asc_nulls_last: ^sort_field)
+
+      sort_direction == :desc ->
+        query
+        |> order_by(desc_nulls_last: ^sort_field)
+
+      true ->
+        query
+    end
   end
 
   @spec get_instance(String.t()) :: Instance.t() | nil
@@ -41,7 +67,8 @@ defmodule Backend.Api do
   * the user count is > the threshold
   * have x and y coordinates
 
-  If `domain` is passed, then this function only returns nodes that are neighbors of that instance.
+  If `domain` is passed, then this function only returns nodes that are neighbors of that
+  instance.
   """
   @spec list_nodes() :: [Instance.t()]
   def list_nodes(domain \\ nil) do

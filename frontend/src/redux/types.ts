@@ -30,6 +30,13 @@ export interface IAction {
   payload: any;
 }
 
+export type SortField = "domain" | "userCount" | "statusCount" | "insularity";
+export type SortDirection = "asc" | "desc";
+export interface IInstanceSort {
+  field: SortField;
+  direction: SortDirection;
+}
+
 export interface IPeer {
   name: string;
 }
@@ -129,6 +136,7 @@ export interface ICurrentInstanceState {
 export interface IDataState {
   graphResponse?: IGraphResponse;
   instancesResponse?: IInstanceListResponse;
+  instanceListSort: IInstanceSort;
   isLoadingGraph: boolean;
   isLoadingInstanceList: boolean;
   graphLoadError: boolean;

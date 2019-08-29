@@ -6,7 +6,7 @@ import { InstanceTable } from "../organisms";
 class TableScreen extends React.PureComponent {
   public render() {
     return (
-      <Page>
+      <Page fullWidth={true}>
         <H1>{"Instances"}</H1>
         <InstanceTable />
       </Page>

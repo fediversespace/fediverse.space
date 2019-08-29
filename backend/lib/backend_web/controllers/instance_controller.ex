@@ -6,24 +6,54 @@ defmodule BackendWeb.InstanceController do
 
   action_fallback(BackendWeb.FallbackController)
 
+  # sobelow_skip ["DOS.StringToAtom"]
   def index(conn, params) do
     page = Map.get(params, "page")
+    sort_field = Map.get(params, "sortField")
+    sort_direction = Map.get(params, "sortDirection")
 
-    %{
-      entries: instances,
-      total_pages: total_pages,
-      page_number: page_number,
-      total_entries: total_entries,
-      page_size: page_size
-    } = Api.get_instances(page)
+    cond do
+      not Enum.member?([nil, "domain", "userCount", "statusCount", "insularity"], sort_field) ->
+        render(conn, "error.json", error: "Invalid sort field")
 
-    render(conn, "index.json",
-      instances: instances,
-      total_pages: total_pages,
-      page_number: page_number,
-      total_entries: total_entries,
-      page_size: page_size
-    )
+      not Enum.member?([nil, "asc", "desc"], sort_direction) ->
+        render(conn, "error.json", error: "Invalid sort direction")
+
+      true ->
+        sort_field =
+          if sort_field != nil do
+            sort_field
+            |> Recase.to_snake()
+            |> String.to_atom()
+          else
+            nil
+          end
+
+        sort_direction =
+          if sort_direction != nil do
+            sort_direction
+            |> Recase.to_snake()
+            |> String.to_atom()
+          else
+            nil
+          end
+
+        %{
+          entries: instances,
+          total_pages: total_pages,
+          page_number: page_number,
+          total_entries: total_entries,
+          page_size: page_size
+        } = Api.get_instances(page, sort_field, sort_direction)
+
+        render(conn, "index.json",
+          instances: instances,
+          total_pages: total_pages,
+          page_number: page_number,
+          total_entries: total_entries,
+          page_size: page_size
+        )
+    end
   end
 
   def show(conn, %{"id" => domain}) do
