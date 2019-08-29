@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Code, HTMLTable, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
 import { push } from "connected-react-router";
-import { range } from "lodash";
+import { range, sortBy, sortedUniq, zip } from "lodash";
 import * as numeral from "numeral";
 import React from "react";
 import { connect } from "react-redux";
@@ -45,7 +45,8 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
       return <NonIdealState icon={<Spinner />} />;
     }
 
-    const { instances, pageNumber, totalPages, totalEntries, pageSize } = instancesResponse!;
+    const { instances, pageNumber: currentPage, totalPages, totalEntries, pageSize } = instancesResponse!;
+    const pagesToDisplay = this.getPagesToDisplay(totalPages, currentPage);
 
     return (
       <>
@@ -76,22 +77,34 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
 
         <PaginationContainer>
           <p>
-            Showing {(pageNumber - 1) * pageSize + 1}-{Math.min(pageNumber * pageSize, totalEntries)} of {totalEntries}{" "}
-            known instances
+            Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, totalEntries)} of{" "}
+            {totalEntries} known instances
           </p>
 
           <ButtonGroup>
-            {range(totalPages).map(n => {
-              const isCurrentPage = pageNumber === n + 1;
+            {zip(pagesToDisplay, pagesToDisplay.slice(1)).map(([page, nextPage], idx) => {
+              if (page === undefined) {
+                return;
+              }
+              const isCurrentPage = currentPage === page;
+              const isEndOfSection = nextPage !== undefined && page + 1 !== nextPage && page !== totalPages;
+
               return (
-                <Button
-                  key={n}
-                  onClick={this.loadPageFactory(n + 1)}
-                  disabled={isCurrentPage}
-                  intent={isCurrentPage ? Intent.PRIMARY : undefined}
-                >
-                  {n + 1}
-                </Button>
+                <>
+                  <Button
+                    key={page}
+                    onClick={this.loadPageFactory(page)}
+                    disabled={isCurrentPage}
+                    intent={isCurrentPage ? Intent.PRIMARY : undefined}
+                  >
+                    {page}
+                  </Button>
+                  {isEndOfSection && (
+                    <Button disabled={true} key={"..."}>
+                      {"..."}
+                    </Button>
+                  )}
+                </>
               );
             })}
           </ButtonGroup>
@@ -106,6 +119,20 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
 
   private goToInstanceFactory = (domain: string) => () => {
     this.props.navigate(`/instance/${domain}`);
+  };
+
+  private getPagesToDisplay = (totalPages: number, currentPage: number) => {
+    if (totalPages < 10) {
+      return range(1, totalPages + 1);
+    }
+
+    const firstPages = range(1, 3);
+    const surroundingPages = range(Math.max(currentPage - 1, 1), Math.min(currentPage + 2, totalPages));
+    const lastPages = range(totalPages - 1, totalPages + 1);
+
+    const pagesToDisplay = firstPages.concat(surroundingPages).concat(lastPages);
+
+    return sortedUniq(sortBy(pagesToDisplay, n => n));
   };
 }
 
