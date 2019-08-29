@@ -68,6 +68,7 @@ config :backend, :crawler,
     "pleroma.online"
   ],
   user_agent: "fediverse.space crawler",
+  require_bidirectional_mentions: false,
   admin_phone: System.get_env("ADMIN_PHONE"),
   twilio_phone: System.get_env("TWILIO_PHONE"),
   admin_email: System.get_env("ADMIN_EMAIL")

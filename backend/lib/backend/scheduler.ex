@@ -308,7 +308,7 @@ defmodule Backend.Scheduler do
 
   # Returns true if
   # * there's no federation block in either direction between the two instances
-  # * there are mentions in both directions
+  # * there are mentions in both directions (if enabled in configuration)
   defp is_eligible_interaction?(
          %{
            source_domain: source,
@@ -322,8 +322,11 @@ defmodule Backend.Scheduler do
        ) do
     mentions_were_seen = mention_count > 0
 
+    # If :require_bidirectional_edges is set to `true` in the config, then an edge is only created if both instances
+    # have mentioned each other
     opposite_mention_exists =
-      if is_timeline_crawlable_type?(source_type) and is_timeline_crawlable_type?(target_type) do
+      if get_config(:require_bidirectional_mentions) and is_timeline_crawlable_type?(source_type) and
+           is_timeline_crawlable_type?(target_type) do
         Map.has_key?(mention_directions, {target, source}) and
           Map.get(mention_directions, {target, source}) > 0
       else
