@@ -37,7 +37,11 @@ defmodule BackendWeb.InstanceView do
     }
   end
 
-  def render("show.json", %{instance: instance, crawl: crawl}) do
+  def render("show.json", %{
+        instance: instance,
+        crawl: crawl,
+        federation_restrictions: federation_restrictions
+      }) do
     user_threshold = get_config(:personal_instance_threshold)
 
     cond do
@@ -51,7 +55,7 @@ defmodule BackendWeb.InstanceView do
         render_domain_and_error(instance)
 
       true ->
-        render_instance(instance, crawl)
+        render_instance(instance, crawl, federation_restrictions)
     end
   end
 
@@ -73,19 +77,12 @@ defmodule BackendWeb.InstanceView do
     }
   end
 
-  defp render_instance(instance, crawl) do
+  defp render_instance(instance, crawl, federation_restrictions) do
     last_updated = max_datetime(crawl.inserted_at, instance.updated_at)
 
     filtered_peers =
       instance.peers
       |> Enum.filter(fn peer -> not peer.opt_out end)
-
-    federation_restrictions =
-      instance.federation_restrictions
-      |> Enum.reduce(%{}, fn %{target_domain: domain, type: type}, acc ->
-        Map.update(acc, type, [domain], fn curr_domains -> [domain | curr_domains] end)
-      end)
-      |> Recase.Enumerable.convert_keys(&Recase.to_camel(&1))
 
     %{
       name: instance.domain,
