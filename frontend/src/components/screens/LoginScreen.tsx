@@ -75,10 +75,15 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
       <Page>
         <H1>Login</H1>
         <p className={Classes.RUNNING_TEXT}>
-          To manage how fediverse.space interacts with your instance, you must be the instance admin.
+          You must be the instance admin to manage how fediverse.space interacts with your instance.
         </p>
         <p className={Classes.RUNNING_TEXT}>
-          Note that it's currently only possible to administrate Mastodon and Pleroma instances.
+          It's currently only possible to administrate Mastodon and Pleroma instances. If you want to login with a
+          direct message, your instance must federate with cursed.technology and vice versa.
+        </p>
+        <p className={Classes.RUNNING_TEXT}>
+          If you run another server type, you can manually opt in or out by writing to{" "}
+          <a href="https://cursed.technology/@fediversespace">@fediversespace</a>.
         </p>
         <FormContainer error={this.state.error}>{content}</FormContainer>
       </Page>
@@ -178,7 +183,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     if (domain.startsWith("https://")) {
       domain = domain.slice(8);
     }
-    getFromApi(`admin/login/${domain}`)
+    getFromApi(`admin/login/${domain.trim()}`)
       .then(response => {
         if (!!response.error) {
           // Go to catch() below
