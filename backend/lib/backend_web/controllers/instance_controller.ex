@@ -26,7 +26,7 @@ defmodule BackendWeb.InstanceController do
   end
 
   def show(conn, %{"id" => domain}) do
-    instance = Cache.get_instance_with_peers(domain)
+    instance = Cache.get_instance_with_relationships(domain)
 
     if instance == nil or instance.opt_out == true do
       send_resp(conn, 404, "Not found")

@@ -80,6 +80,13 @@ defmodule BackendWeb.InstanceView do
       instance.peers
       |> Enum.filter(fn peer -> not peer.opt_out end)
 
+    federation_restrictions =
+      instance.federation_restrictions
+      |> Enum.reduce(%{}, fn %{target_domain: domain, type: type}, acc ->
+        Map.update(acc, type, [domain], fn curr_domains -> [domain | curr_domains] end)
+      end)
+      |> Recase.Enumerable.convert_keys(&Recase.to_camel(&1))
+
     %{
       name: instance.domain,
       description: instance.description,
@@ -89,6 +96,7 @@ defmodule BackendWeb.InstanceView do
       statusCount: instance.status_count,
       domainCount: length(instance.peers),
       peers: render_many(filtered_peers, InstanceView, "peer.json"),
+      federationRestrictions: federation_restrictions,
       lastUpdated: last_updated,
       status: "success",
       type: instance.type,

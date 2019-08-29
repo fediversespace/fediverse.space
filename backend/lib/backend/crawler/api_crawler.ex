@@ -15,6 +15,8 @@ defmodule Backend.Crawler.ApiCrawler do
 
   # {domain_mentioned, count}
   @type instance_interactions :: %{String.t() => integer}
+  # {domain, type} e.g. {"gab.com", "reject"}
+  @type federation_restriction :: {String.t(), String.t()}
 
   @type instance_type :: :mastodon | :pleroma | :gab | :misskey | :gnusocial
 
@@ -27,7 +29,7 @@ defmodule Backend.Crawler.ApiCrawler do
     :interactions,
     :statuses_seen,
     :instance_type,
-    :blocked_domains
+    :federation_restrictions
   ]
 
   @type t() :: %__MODULE__{
@@ -39,7 +41,7 @@ defmodule Backend.Crawler.ApiCrawler do
           interactions: instance_interactions,
           statuses_seen: integer,
           instance_type: instance_type | nil,
-          blocked_domains: [String.t()]
+          federation_restrictions: [federation_restriction]
         }
 
   @empty_result %{
@@ -51,7 +53,7 @@ defmodule Backend.Crawler.ApiCrawler do
     interactions: %{},
     statuses_seen: 0,
     instance_type: nil,
-    blocked_domains: []
+    federation_restrictions: []
   }
 
   @doc """

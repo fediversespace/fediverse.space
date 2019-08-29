@@ -41,6 +41,17 @@ export interface ISearchResultInstance {
   type?: string;
 }
 
+export interface IFederationRestrictions {
+  reportRemoval?: string[];
+  reject?: string[];
+  mediaRemoval?: string[];
+  mediaNsfw?: string[];
+  federatedTimelineRemoval?: string[];
+  bannerRemoval?: string[];
+  avatarRemoval?: string[];
+  accept?: string[];
+}
+
 export interface IInstanceDetails {
   name: string;
   description?: string;
@@ -50,6 +61,7 @@ export interface IInstanceDetails {
   statusCount?: number;
   domainCount?: number;
   peers?: IPeer[];
+  federationRestrictions: IFederationRestrictions;
   lastUpdated?: string;
   status: string;
   type?: string;

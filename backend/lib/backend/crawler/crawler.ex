@@ -227,7 +227,9 @@ defmodule Backend.Crawler do
 
     new_instances =
       peers_domains
-      |> list_union(result.blocked_domains)
+      |> list_union(
+        Enum.map(result.federation_restrictions, fn {domain, _restriction_type} -> domain end)
+      )
       |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now, next_crawl: now})
 
     Instance
@@ -282,8 +284,7 @@ defmodule Backend.Crawler do
         |> Repo.all()
 
       wanted_restrictions_set =
-        result.blocked_domains
-        |> Enum.map(&{&1, "reject"})
+        result.federation_restrictions
         |> MapSet.new()
 
       current_restrictions_set = MapSet.new(current_restrictions)

@@ -32,6 +32,7 @@ import { IAppState, IGraph, IGraphResponse, IInstanceDetails } from "../../redux
 import { domainMatchSelector, getFromApi, isSmallScreen } from "../../util";
 import { InstanceType } from "../atoms";
 import { Cytoscape, ErrorState } from "../molecules/";
+import { FederationTab } from "../organisms";
 
 const InstanceScreenContainer = styled.div`
   margin-bottom: auto;
@@ -192,6 +193,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
 
   private renderTabs = () => {
     const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
+    const federationRestrictions = this.props.instanceDetails && this.props.instanceDetails.federationRestrictions;
 
     const hasLocalGraph =
       !!this.state.localGraph && this.state.localGraph.nodes.length > 0 && this.state.localGraph.edges.length > 0;
@@ -212,6 +214,13 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
             <Tab id="description" title="Description" panel={this.renderDescription()} />
           )}
           {this.shouldRenderStats() && <Tab id="stats" title="Details" panel={this.renderVersionAndCounts()} />}
+          {federationRestrictions && Object.keys(federationRestrictions).length > 0 && (
+            <Tab
+              id="federationRestrictions"
+              title="Federation"
+              panel={<FederationTab restrictions={federationRestrictions} />}
+            />
+          )}
           <Tab id="neighbors" title="Neighbors" panel={this.renderNeighbors()} />
           <Tab id="peers" title="Known peers" panel={this.renderPeers()} />
         </StyledTabs>
@@ -389,8 +398,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
       <div>
         <NeighborsCallout icon={IconNames.INFO_SIGN} title="Warning">
           <p>
-            Instances that {this.props.instanceName} has blocked may appear on this list. This can happen if users on a
-            blocked instance attempted to mention someone on {this.props.instanceName}.
+            Instances that {this.props.instanceName} has blocked may appear on this list and vice versa. This can happen
+            if users attempt to mention someone on an instance that has blocked them.
           </p>
         </NeighborsCallout>
         <p className={Classes.TEXT_MUTED}>

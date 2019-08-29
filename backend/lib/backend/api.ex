@@ -19,10 +19,11 @@ defmodule Backend.Api do
     |> Repo.get_by(domain: domain)
   end
 
-  @spec get_instance_with_peers(String.t()) :: Instance.t() | nil
-  def get_instance_with_peers(domain) do
+  @spec get_instance_with_relationships(String.t()) :: Instance.t() | nil
+  def get_instance_with_relationships(domain) do
     Instance
     |> preload(:peers)
+    |> preload(:federation_restrictions)
     |> Repo.get_by(domain: domain)
   end
 

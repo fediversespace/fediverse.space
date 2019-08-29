@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add support for logging in via an ActivityPub direct message to the instance admin.
 - Added option to hide edges between instances if there are only mentions in one direction (off by default).
-- Added note to neighbors tab to make it explicit that blocked instances _may_ appear.
+- Added note to neighbors tab to make it explicit that blocked instances may appear.
+- Added federation tab that shows federation restrictions (only available for some Pleroma instances).
 
 ### Changed
 

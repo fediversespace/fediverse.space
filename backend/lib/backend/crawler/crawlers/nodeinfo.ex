@@ -85,16 +85,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
           status_count: get_in(nodeinfo, ["usage", "localPosts"]),
           instance_type: type,
           version: get_in(nodeinfo, ["software", "version"]),
-          blocked_domains:
-            get_in(nodeinfo, ["metadata", "federation", "mrf_simple", "reject"])
-            |> (fn b ->
-                  if b == nil do
-                    []
-                  else
-                    b
-                  end
-                end).()
-            |> Enum.map(&clean_domain(&1))
+          federation_restrictions: get_federation_restrictions(nodeinfo)
         }
       )
     else
@@ -111,5 +102,38 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
   defp is_compatible_nodeinfo_version?(schema_url) do
     version = String.slice(schema_url, (String.length(schema_url) - 3)..-1)
     Enum.member?(["1.0", "1.1", "2.0"], version)
+  end
+
+  @spec get_federation_restrictions(any()) :: [ApiCrawler.federation_restriction()]
+  defp get_federation_restrictions(nodeinfo) do
+    mrf_simple = get_in(nodeinfo, ["metadata", "federation", "mrf_simple"])
+    quarantined_domains = get_in(nodeinfo, ["metadata", "federation", "quarantined_instances"])
+
+    quarantined_domains =
+      if quarantined_domains == nil do
+        []
+      else
+        Enum.map(quarantined_domains, fn domain -> {domain, "quarantine"} end)
+      end
+
+    if mrf_simple != nil do
+      mrf_simple
+      |> Map.take([
+        "report_removal",
+        "reject",
+        "media_removal",
+        "media_nsfw",
+        "federated_timeline_removal",
+        "banner_removal",
+        "avatar_removal",
+        "accept"
+      ])
+      |> Enum.flat_map(fn {type, domains} ->
+        Enum.map(domains, fn domain -> {domain, type} end)
+      end)
+      |> Enum.concat(quarantined_domains)
+    else
+      quarantined_domains
+    end
   end
 end

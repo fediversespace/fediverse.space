@@ -32,6 +32,10 @@ defmodule Backend.Instance do
       foreign_key: :source_domain,
       references: :domain
 
+    has_many :federation_restrictions, Backend.FederationRestriction,
+      foreign_key: :source_domain,
+      references: :domain
+
     timestamps()
   end
 

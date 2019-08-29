@@ -21,7 +21,7 @@ defmodule BackendWeb.AdminController do
 
       # Make sure to update ElasticSearch so that the instance is no longer returned in search results
       es_instance =
-        Api.get_instance_with_peers(domain)
+        Api.get_instance(domain)
         |> Map.put(:opt_in, opt_in)
         |> Map.put(:opt_out, opt_out)
 

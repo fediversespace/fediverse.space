@@ -38,17 +38,17 @@ defmodule Graph.Cache do
     end
   end
 
-  @spec get_instance_with_peers(String.t()) :: Instance.t()
-  def get_instance_with_peers(domain) do
+  @spec get_instance_with_relationships(String.t()) :: Instance.t()
+  def get_instance_with_relationships(domain) do
     key = "instance_" <> domain
 
     case Cache.get(key) do
       nil ->
         Appsignal.increment_counter("instance_cache.misses", 1)
         Logger.debug("Instance cache: miss")
-        instance = Api.get_instance_with_peers(domain)
-        # Cache for one minute
-        Cache.set(key, instance, ttl: 60)
+        instance = Api.get_instance_with_relationships(domain)
+        # Cache for five minutes
+        Cache.set(key, instance, ttl: 300)
         instance
 
       data ->
@@ -81,8 +81,8 @@ defmodule Graph.Cache do
           )
           |> Repo.one()
 
-        # Cache for one minute
-        Cache.set(key, crawl, ttl: 60)
+        # Cache for five minutes
+        Cache.set(key, crawl, ttl: 300)
 
       data ->
         Appsignal.increment_counter("most_recent_crawl_cache.hits", 1)
