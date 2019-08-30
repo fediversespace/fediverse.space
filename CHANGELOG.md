@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed error when viewing some uncrawlable instances
+
 ### Security
 
 ## [2.8.0 - 2019-08-29]

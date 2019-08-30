@@ -54,6 +54,9 @@ defmodule BackendWeb.InstanceView do
       instance.crawl_error != nil and instance.type == nil ->
         render_domain_and_error(instance)
 
+      crawl == nil ->
+        render_domain_and_error(instance)
+
       true ->
         render_instance(instance, crawl, federation_restrictions)
     end

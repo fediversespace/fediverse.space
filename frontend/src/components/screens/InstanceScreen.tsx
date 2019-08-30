@@ -109,7 +109,12 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     let content;
     if (this.props.isLoadingInstanceDetails || this.state.isProcessingNeighbors || this.state.isLoadingLocalGraph) {
       content = this.renderLoadingState();
-    } else if (this.props.instanceLoadError || this.state.localGraphLoadError || !this.props.instanceDetails) {
+    } else if (
+      this.props.instanceLoadError ||
+      this.state.localGraphLoadError ||
+      !this.props.instanceDetails ||
+      !this.props.instanceDetails.status
+    ) {
       content = <ErrorState />;
     } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
       content = this.renderPersonalInstanceErrorState();
