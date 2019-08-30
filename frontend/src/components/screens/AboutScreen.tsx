@@ -1,7 +1,18 @@
 import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
 import * as React from "react";
+import styled from "styled-components";
+import appsignalLogo from "../../assets/appsignal.svg";
+import gitlabLogo from "../../assets/gitlab.png";
 import nlnetLogo from "../../assets/nlnet.png";
 import { Page } from "../atoms/";
+
+const SponsorContainer = styled.div`
+  margin-bottom: 20px;
+`;
+const Sponsor = styled.div`
+  margin: 10px;
+  display: inline-block;
+`;
 
 const AboutScreen: React.FC = () => (
   <Page>
@@ -54,20 +65,26 @@ const AboutScreen: React.FC = () => (
     </p>
 
     <br />
-    <H2>Credits</H2>
+    <H2>Special thanks</H2>
 
-    <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
-      <img src={nlnetLogo} alt="NLnet logo" width={160} height={60} />
-    </a>
-    <br />
-    <br />
-    <p className={Classes.RUNNING_TEXT}>
-      This project is proudly supported by{" "}
-      <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
-        NLnet
-      </a>
-      .
-    </p>
+    <SponsorContainer>
+      <Sponsor>
+        <a href="https://nlnet.nl/project/fediverse_space/" target="_blank" rel="noopener noreferrer">
+          <img src={nlnetLogo} alt="NLnet logo" height={80} />
+        </a>
+      </Sponsor>
+      <br />
+      <Sponsor>
+        <a href="https://appsignal.com" target="_blank" rel="noopener noreferrer">
+          <img src={appsignalLogo} alt="Appsignal logo" height={40} />
+        </a>
+      </Sponsor>
+      <Sponsor>
+        <a href="https://gitlab.com" target="_blank" rel="noopener noreferrer">
+          <img src={gitlabLogo} alt="GitLab logo" height={40} />
+        </a>
+      </Sponsor>
+    </SponsorContainer>
 
     <p className={Classes.RUNNING_TEXT}>Inspiration for this site comes from several places:</p>
     <ul className={Classes.LIST}>
