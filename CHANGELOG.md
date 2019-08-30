@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed error when viewing some uncrawlable instances
+- Fix navbar z-index
 
 ### Security
 

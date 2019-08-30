@@ -8,7 +8,7 @@ const Backdrop = styled.div`
   left: 0;
   right: 0;
   background-color: #293742;
-  z-index: 100;
+  z-index: 3;
 `;
 
 interface IContainerProps {

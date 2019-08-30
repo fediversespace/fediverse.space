@@ -8,7 +8,7 @@ const FloatingCardRow = styled.div`
 `;
 const FloatingCardElement = styled(Card)`
   margin: 0 0 10px 10px;
-  z-index: 20;
+  z-index: 2;
 `;
 
 const FloatingCard: React.FC<ICardProps> = props => (
