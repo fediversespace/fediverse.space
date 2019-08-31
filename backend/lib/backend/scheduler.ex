@@ -44,28 +44,51 @@ defmodule Backend.Scheduler do
       Crawl
       |> select([c], %{
         instance_domain: c.instance_domain,
+        statuses_seen: sum(c.statuses_seen),
         interactions_seen: sum(c.interactions_seen)
       })
       |> group_by([c], c.instance_domain)
 
-    scores =
+    self_mentions_subquery =
       CrawlInteraction
-      |> join(:left, [ci], c in subquery(crawls_subquery),
-        on: ci.source_domain == c.instance_domain
-      )
       |> where([ci], ci.source_domain == ci.target_domain)
-      |> group_by([ci], ci.source_domain)
-      |> select([ci, c], %{
+      |> select([ci], %{
         domain: ci.source_domain,
-        mentions: sum(ci.mentions),
-        # we can take min() because every row is the same
-        interactions: min(c.interactions_seen)
+        self_mentions: sum(ci.mentions)
+      })
+      |> group_by([ci], ci.source_domain)
+
+    scores =
+      Instance
+      |> join(:inner, [i], c in subquery(crawls_subquery), on: i.domain == c.instance_domain)
+      |> join(:left, [i, c], ci in subquery(self_mentions_subquery), on: i.domain == ci.domain)
+      # don't generate insularity scores for instances where we haven't seen any activity
+      # (e.g. server types where the timeline isn't crawled)
+      |> where([i, c, ci], c.statuses_seen > 0)
+      |> select([i, c, ci], %{
+        domain: i.domain,
+        mentions: ci.self_mentions,
+        interactions: c.interactions_seen
       })
       |> Repo.all(timeout: :infinity)
       |> Enum.map(fn %{domain: domain, mentions: mentions, interactions: interactions} ->
+        insularity =
+          cond do
+            # if we haven't seen any self mentions, but there are interactions, it means that users on the instance
+            # only mentions others, i.e. insularity is 0
+            mentions == nil and interactions != 0 ->
+              0.0
+
+            interactions > 0 ->
+              mentions / interactions
+
+            true ->
+              nil
+          end
+
         %{
           domain: domain,
-          insularity: mentions / interactions,
+          insularity: insularity,
           inserted_at: now,
           updated_at: now
         }
