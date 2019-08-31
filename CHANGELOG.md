@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.8.2 - 2019-08-31]
+
+### Fixed
+
+- Fix insularity score only working for > 0
+
 ## [2.8.1 - 2019-08-31]
 
 ### Fixed
@@ -26,7 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed error when viewing some uncrawlable instances
 - Fix navbar z-index
 - Optimize query used for generating status rate
-- Fix insularity score only working for > 0
 
 ## [2.8.0 - 2019-08-29]
 
