@@ -96,23 +96,24 @@ defmodule Backend.Scheduler do
       })
 
     instances =
-      Crawl
-      |> join(:inner, [c], c2 in subquery(earliest_crawl_subquery),
-        on: c.instance_domain == c2.instance_domain
+      Instance
+      |> join(:inner, [i], c in Crawl, on: i.domain == c.instance_domain)
+      |> join(:inner, [i], c2 in subquery(earliest_crawl_subquery),
+        on: i.domain == c2.instance_domain
       )
       |> where(
-        [c, c2],
-        c.inserted_at > c2.earliest_crawl and not is_nil(c.statuses_seen)
+        [i, c, c2],
+        c.inserted_at > c2.earliest_crawl and c.statuses_seen > 0
       )
-      |> select([c], %{
-        instance_domain: c.instance_domain,
+      |> select([i, c], %{
+        domain: i.domain,
         status_count: sum(c.statuses_seen),
         second_earliest_crawl: min(c.inserted_at)
       })
-      |> group_by([c], c.instance_domain)
+      |> group_by([i], i.domain)
       |> Repo.all(timeout: :infinity)
       |> Enum.map(fn %{
-                       instance_domain: domain,
+                       domain: domain,
                        status_count: status_count,
                        second_earliest_crawl: oldest_timestamp
                      } ->
