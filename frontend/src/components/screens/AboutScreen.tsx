@@ -1,7 +1,7 @@
 import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
 import * as React from "react";
 import styled from "styled-components";
-import appsignalLogo from "../../assets/appsignal.svg";
+// import appsignalLogo from "../../assets/appsignal.svg";
 import gitlabLogo from "../../assets/gitlab.png";
 import nlnetLogo from "../../assets/nlnet.png";
 import { Page } from "../atoms/";
@@ -74,11 +74,11 @@ const AboutScreen: React.FC = () => (
         </a>
       </Sponsor>
       <br />
-      <Sponsor>
+      {/* <Sponsor>
         <a href="https://appsignal.com" target="_blank" rel="noopener noreferrer">
           <img src={appsignalLogo} alt="Appsignal logo" height={40} />
         </a>
-      </Sponsor>
+      </Sponsor> */}
       <Sponsor>
         <a href="https://gitlab.com" target="_blank" rel="noopener noreferrer">
           <img src={gitlabLogo} alt="GitLab logo" height={40} />
