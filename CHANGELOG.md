@@ -18,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Display plain Pleroma version rather than the Mastodon-compatible string
-- Fix some insular instances appearing on the graph
 
 ### Security
 

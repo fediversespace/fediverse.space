@@ -75,8 +75,6 @@ defmodule Backend.Api do
     user_threshold = get_config(:personal_instance_threshold)
 
     Instance
-    # filter down to instances that have edges
-    |> join(:inner, [i], e in Edge, on: i.domain == e.source_domain or i.domain == e.target_domain)
     |> where(
       [i],
       not is_nil(i.x) and not is_nil(i.y) and not is_nil(i.user_count) and
