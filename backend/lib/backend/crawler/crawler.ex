@@ -134,7 +134,13 @@ defmodule Backend.Crawler do
     end
   end
 
-  # Save the state (after crawling) to the database.
+  ## Save the state (after crawling) to the database. ##
+
+  # If we didn't get a server type, the crawl wasn't successful.
+  defp save(%Crawler{result: %{type: nil}} = state) do
+    save_error(state)
+  end
+
   defp save(%Crawler{
          domain: domain,
          result: result,
@@ -345,7 +351,11 @@ defmodule Backend.Crawler do
     Appsignal.increment_counter("crawler.success", 1)
   end
 
-  defp save(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
+  defp save(state) do
+    save_error(state)
+  end
+
+  defp save_error(%{domain: domain, error: error, allows_crawling?: allows_crawling}) do
     now = get_now()
 
     error =
