@@ -39,7 +39,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     user_count = get_in(instance, ["stats", "user_count"])
 
     if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
-      Map.merge(crawl_large_instance(domain, instance), nodeinfo)
+      Map.merge(nodeinfo, crawl_large_instance(domain, instance))
     else
       ApiCrawler.get_default()
       |> Map.merge(nodeinfo)
