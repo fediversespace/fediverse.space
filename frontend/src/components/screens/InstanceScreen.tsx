@@ -72,7 +72,7 @@ const NeighborsCallout = styled(Callout)`
   margin: 10px 0;
   width: auto;
 `;
-const StyledTabs = styled(Tabs)`
+const StyledTabs = (styled as any)(Tabs)`
   width: 100%;
   padding: 0 20px;
 `;
