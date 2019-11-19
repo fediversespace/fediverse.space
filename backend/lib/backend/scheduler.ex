@@ -166,7 +166,7 @@ defmodule Backend.Scheduler do
   Edges are only generated if
   * both instances have been succesfully crawled
   * neither of the instances have blocked each other
-  * there are interactions in each direction
+  * there are interactions in each direction (if :require_bidirectional_edges is true in config)
   """
   def generate_edges do
     now = get_now()

@@ -34,7 +34,7 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
   def crawl(domain, nodeinfo) do
     if nodeinfo == nil or
          nodeinfo |> Map.get(:user_count) |> is_above_user_threshold?() do
-      Map.merge(crawl_large_instance(domain), nodeinfo)
+      Map.merge(nodeinfo, crawl_large_instance(domain))
     else
       Map.merge(ApiCrawler.get_default(), nodeinfo)
     end

@@ -62,9 +62,13 @@ config :backend, :crawler,
   crawl_interval_mins: 60,
   crawl_workers: 20,
   blacklist: [
+    # spam
     "gab.best",
+    # spam
     "4chan.icu",
+    # *really* doesn't want to be listed on fediverse.space
     "pleroma.site",
+    # dummy instances used for pleroma CI
     "pleroma.online"
   ],
   user_agent: "fediverse.space crawler",
