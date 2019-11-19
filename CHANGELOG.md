@@ -11,17 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update dependencies
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Fixed some unsuccessful crawls being saved without their errors
-
 ### Security
+
+## [2.8.3 - 2019-11-19]
+
+### Changed
+
+- Update dependencies
+
+### Fixed
+
+- Fixed some unsuccessful crawls being saved without their errors
 
 ## [2.8.2 - 2019-08-31]
 
