@@ -79,11 +79,11 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
         </p>
         <p className={Classes.RUNNING_TEXT}>
           It's currently only possible to administrate Mastodon and Pleroma instances. If you want to login with a
-          direct message, your instance must federate with cursed.technology and vice versa.
+          direct message, your instance must federate with mastodon.social and vice versa.
         </p>
         <p className={Classes.RUNNING_TEXT}>
           If you run another server type, you can manually opt in or out by writing to{" "}
-          <a href="https://cursed.technology/@fediversespace">@fediversespace</a>.
+          <a href="https://mastodon.social/@fediversespace">@fediversespace</a>.
         </p>
         <FormContainer error={this.state.error}>{content}</FormContainer>
       </Page>
