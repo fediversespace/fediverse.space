@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
 ### Removed
+ - Remove staging backend server
 
 ### Fixed
  - Fixed frontend crash when instance node missing
