@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.8.4 - 2019-11-21]
+
+### Changed
+- Update links to @fediversespace Mastodon account
+
+### Removed
+ - Remove staging backend server
+
+### Fixed
+ - Fixed frontend crash when instance node missing
+
 ## [2.8.3 - 2019-11-19]
 
 ### Changed

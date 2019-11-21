@@ -2,16 +2,21 @@
 
 The map of the fediverse that you always wanted.
 
-Read the latest updates on Mastodon: [@fediversespace](https://cursed.technology/@fediversespace)
+Read the latest updates on Mastodon: [@fediversespace](https://mastodon.social/@fediversespace)
 
 ![A screenshot of fediverse.space](screenshot.png)
 
-1. [Requirements](#requirements)
-2. [Running it](#running-it)
-3. [Commands](#commands)
-4. [Privacy](#privacy)
-5. [Deployment](#deployment)
-6. [Acknowledgements](#acknowledgements)
+- [fediverse.space 🌐](#fediversespace-%f0%9f%8c%90)
+  - [Requirements](#requirements)
+  - [Running it](#running-it)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+  - [Commands](#commands)
+    - [Backend](#backend-1)
+    - [Frontend](#frontend-1)
+  - [Privacy](#privacy)
+  - [Deployment](#deployment)
+  - [Acknowledgements](#acknowledgements)
 
 ## Requirements
 

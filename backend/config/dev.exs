@@ -57,8 +57,8 @@ config :backend, Backend.Repo,
   pool_size: 10
 
 config :backend, :crawler,
-  status_age_limit_days: 28,
-  status_count_limit: 1000,
+  status_age_limit_days: 14,
+  status_count_limit: 500,
   personal_instance_threshold: 5,
   crawl_interval_mins: 60,
   crawl_workers: 10,

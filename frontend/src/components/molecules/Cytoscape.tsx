@@ -40,7 +40,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     this.cy = cytoscape({
       autoungrabify: true,
       container: container as any,
-      elements: this.props.elements,
+      elements: this.cleanElements(this.props.elements),
       hideEdgesOnViewport: true,
       hideLabelsOnViewport: true,
       layout: {
@@ -340,6 +340,16 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       throw new Error("Expected cytoscape, but there wasn't one!");
     }
     this.cy.edges().addClass("hidden");
+  };
+
+  /* Helper function to remove edges if source or target node is missing */
+  private cleanElements = (elements: cytoscape.ElementsDefinition): cytoscape.ElementsDefinition => {
+    const domains = new Set(elements.nodes.map(n => n.data.id));
+    const edges = elements.edges.filter(e => domains.has(e.data.source) && domains.has(e.data.target));
+    return {
+      edges,
+      nodes: elements.nodes
+    };
   };
 }
 
