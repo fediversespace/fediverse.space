@@ -19,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.8.5 - 2019-12-25]
+
+### Fixed
+ - Fixed link to Mastodon account
+
 ## [2.8.4 - 2019-11-21]
 
 ### Changed

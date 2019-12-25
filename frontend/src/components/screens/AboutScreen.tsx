@@ -27,7 +27,7 @@ const AboutScreen: React.FC = () => (
 
     <p>
       You can follow the project on{" "}
-      <a href="https://x0r.be/@fediversespace" target="_blank" rel="noopener noreferrer">
+      <a href="https://mastodon.social/@fediversespace" target="_blank" rel="noopener noreferrer">
         Mastodon
       </a>
       .
