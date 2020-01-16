@@ -11,9 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update default number of concurrent crawlers
-- Crawl every 30 minutes instead of every hour
-
 ### Deprecated
 
 ### Removed
@@ -21,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [2.8.6 - 2020-01-16]
+
+### Changed
+
+- Update default number of concurrent crawlers
+- Crawl every 30 minutes instead of every hour
 
 ## [2.8.5 - 2019-12-25]
 
