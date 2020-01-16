@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update default number of concurrent crawlers
+- Crawl every 30 minutes instead of every hour
+
 ### Deprecated
 
 ### Removed
@@ -22,18 +25,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.8.5 - 2019-12-25]
 
 ### Fixed
- - Fixed link to Mastodon account
+
+- Fixed link to Mastodon account
 
 ## [2.8.4 - 2019-11-21]
 
 ### Changed
+
 - Update links to @fediversespace Mastodon account
 
 ### Removed
- - Remove staging backend server
+
+- Remove staging backend server
 
 ### Fixed
- - Fixed frontend crash when instance node missing
+
+- Fixed frontend crash when instance node missing
 
 ## [2.8.3 - 2019-11-19]
 
