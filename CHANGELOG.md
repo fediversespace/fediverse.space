@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Bring back `develop` staging backup (now managed in DNS)
+- Increase default number of concurrent crawlers to 100
 
 ### Deprecated
 

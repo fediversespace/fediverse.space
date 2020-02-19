@@ -60,7 +60,7 @@ config :backend, :crawler,
   status_count_limit: 5000,
   personal_instance_threshold: 10,
   crawl_interval_mins: 30,
-  crawl_workers: 50,
+  crawl_workers: 100,
   blacklist: [
     # spam
     "gab.best",
