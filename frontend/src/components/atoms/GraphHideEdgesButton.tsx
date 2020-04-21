@@ -13,7 +13,7 @@ interface IGraphHideEdgesButtonProps {
 }
 const GraphHideEdgesButton: React.FC<IGraphHideEdgesButtonProps> = ({ isShowingEdges, toggleEdges }) => (
   <FloatingCard>
-    <StyledSwitch checked={isShowingEdges} label="Show connections" onChange={toggleEdges} />
+    <StyledSwitch checked={isShowingEdges} label="Show connections" onChange={toggleEdges} tabIndex={-1} />
   </FloatingCard>
 );
 export default GraphHideEdgesButton;

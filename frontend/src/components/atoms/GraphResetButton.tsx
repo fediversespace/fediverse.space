@@ -7,7 +7,7 @@ interface IGraphResetButtonProps {
 }
 const GraphResetButton: React.FC<IGraphResetButtonProps> = ({ onClick }) => (
   <FloatingCard>
-    <Button icon="compass" title="Reset graph view" onClick={onClick} />
+    <Button icon="compass" title="Reset graph view" onClick={onClick} tabIndex={-1} />
   </FloatingCard>
 );
 export default GraphResetButton;

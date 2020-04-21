@@ -74,8 +74,15 @@ const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, ranges, onI
           text={(current && current.name) || "Select..."}
           icon={IconNames.TINT}
           rightIcon={IconNames.CARET_DOWN}
+          tabIndex={-1}
         />
-        <Button icon={IconNames.SMALL_CROSS} minimal={true} onClick={unsetColorScheme} disabled={!current} />
+        <Button
+          icon={IconNames.SMALL_CROSS}
+          minimal={true}
+          onClick={unsetColorScheme}
+          disabled={!current}
+          tabIndex={-1}
+        />
       </ColorSchemeSelect>
       <br />
       {!!current && !!key && (

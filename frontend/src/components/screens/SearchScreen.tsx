@@ -104,7 +104,9 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
     if (isLoadingResults) {
       rightSearchBarElement = <Spinner size={Spinner.SIZE_SMALL} />;
     } else if (query || error) {
-      rightSearchBarElement = <Button minimal={true} icon={IconNames.CROSS} onClick={this.clearQuery} />;
+      rightSearchBarElement = (
+        <Button minimal={true} icon={IconNames.CROSS} onClick={this.clearQuery} aria-label="Search" />
+      );
     } else {
       rightSearchBarElement = (
         <Button
@@ -127,6 +129,7 @@ class SearchScreen extends React.PureComponent<ISearchScreenProps, ISearchScreen
             rightElement={rightSearchBarElement}
             large={true}
             placeholder="Search instance names and descriptions"
+            aria-label="Search instance names and descriptions"
             type="search"
             value={this.state.currentQuery}
             onChange={this.handleInputChange}

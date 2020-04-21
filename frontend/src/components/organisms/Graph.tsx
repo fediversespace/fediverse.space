@@ -76,7 +76,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
       );
     }
 
-    return <GraphDiv>{content}</GraphDiv>;
+    return <GraphDiv aria-hidden={true}>{content}</GraphDiv>;
   }
 
   private loadGraph = () => {
