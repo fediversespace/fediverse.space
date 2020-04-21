@@ -20,7 +20,9 @@ Read the latest updates on Mastodon: [@fediversespace](https://mastodon.social/@
 
 ## Requirements
 
-Though dockerized, backend development is easiest if you have the following installed.
+Note: examples here use `podman`. In most cases you should be able to replace `podman` with `docker`, `podman-compose` with `docker-compose`, and so on.
+
+Though containerized, backend development is easiest if you have the following installed.
 
 - For the scraper + API:
   - Elixir
@@ -36,9 +38,8 @@ Though dockerized, backend development is easiest if you have the following inst
 ### Backend
 
 - `cp example.env .env` and modify environment variables as required
-- `docker-compose build`
-- `docker-compose up -d phoenix`
-  - if you don't specify `phoenix`, it'll also start `gephi` which should only be run as a regular one-off job
+- `podman-compose build`
+- `podman-compose -f compose.backend-services.yml -f compose.phoenix.yml`
 - Create the elasticsearch index:
   - `iex -S mix app.start`
   - `Elasticsearch.Index.hot_swap(Backend.Elasticsearch.Cluster, :instances)`
