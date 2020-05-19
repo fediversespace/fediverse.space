@@ -37,6 +37,31 @@ test-backend:
       - backend/deps/
       - backend/_build/
 
+deploy-backend-develop:
+  stage: deploy
+  environment:
+    name: develop
+    url: https://phoenix.api-develop.fediverse.space
+  image: ilyasemenov/gitlab-ci-git-push
+  only:
+    - develop
+  except:
+    - schedules
+  script:
+    - git-push dokku@api-develop.fediverse.space:phoenix develop
+
+deploy-gephi-develop:
+  stage: deploy
+  image: ilyasemenov/gitlab-ci-git-push
+  environment:
+    name: develop
+  only:
+    - develop
+  except:
+    - schedules
+  script:
+    - git-push dokku@api-develop.fediverse.space:gephi develop
+    
 deploy-backend-production:
   stage: deploy
   environment:
