@@ -39,7 +39,7 @@ const AboutScreen: React.FC = () => (
     <H4>Why can&apos;t I see details about my instance?</H4>
     <p className={Classes.RUNNING_TEXT}>
       fediverse.space only supports servers using the Mastodon API, the Misskey API, the GNU Social API, or Nodeinfo.
-      Instances with 10 or fewer users won&apos;t be scraped -- it&apos;s a tool for understanding communities, not
+      Instances with 10 or fewer users won&apos;t be crawled -- it&apos;s a tool for understanding communities, not
       individuals.
     </p>
 

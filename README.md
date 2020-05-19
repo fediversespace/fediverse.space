@@ -20,11 +20,11 @@ Read the latest updates on Mastodon: [@fediversespace](https://mastodon.social/@
 
 ## Requirements
 
-Note: examples here use `podman`. In most cases you should be able to replace `podman` with `docker`, `podman-compose` with `docker-compose`, and so on.
+Note: examples here use `podman`. In most cases you should be able to replace `podman` with `docker`.
 
 Though containerized, backend development is easiest if you have the following installed.
 
-- For the scraper + API:
+- For the crawler + API:
   - Elixir
   - Postgres
 - For laying out the graph:
@@ -38,7 +38,10 @@ Though containerized, backend development is easiest if you have the following i
 ### Backend
 
 - `cp example.env .env` and modify environment variables as required
-- `podman-compose build`
+- `podman build gephi && podman build phoenix`
+- `podman run --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:6.8.9`
+  - If you've `run` this container previously, use `podman start elasticsearch`
+- `podman run --name postgres -e "POSTGRES_USER=postgres" -e "POSTGRES_PASSWORD=postgres" -p 5432:5432 postgres:12`
 - `podman-compose -f compose.backend-services.yml -f compose.phoenix.yml`
 - Create the elasticsearch index:
   - `iex -S mix app.start`
@@ -54,10 +57,6 @@ Though containerized, backend development is easiest if you have the following i
 ### Backend
 
 `./gradlew shadowJar` compiles the graph layout program. `java -Xmx1g -jar build/libs/graphBuilder.jar` runs it.
-If running in docker, this means you run
-
-- `docker-compose build gephi`
-- `docker-compose run gephi java -Xmx1g -jar build/libs/graphBuilder.jar` lays out the graph
 
 ### Frontend
 
@@ -102,8 +101,6 @@ You don't have to follow these instructions, but it's one way to set up a contin
 SHELL=/bin/bash
 0 2 * * * /usr/bin/dokku run gephi java -Xmx1g -jar build/libs/graphBuilder.jar
 ```
-
-10. (Optional) Set up caching with something like [dokku-nginx-cache](https://github.com/Aluxian/dokku-nginx-cache)
 
 Before the app starts running, make sure that the Elasticsearch index exists -- otherwise it'll create one called
 `instances`, which should be the name of the alias. Then it won't be able to hot swap if you reindex in the future.
