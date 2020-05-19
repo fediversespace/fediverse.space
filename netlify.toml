@@ -2,6 +2,9 @@
   base = "frontend/"
   publish = "frontend/build/"
 
+[build.environment]
+  INLINE_RUNTIME_CHUNK = "false"
+
 [context.develop.environment]
   REACT_APP_STAGING = "true"
 
@@ -15,4 +18,12 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+  X-Content-Type-Options = "nosniff"
+  X-Frame-Options = "DENY"
+  X-XSS-Protection = "1"
+  Content-Security-Policy = "default-src 'self' https://*.fediverse.space; style-src 'self' 'unsafe-inline'"
 
