@@ -20,7 +20,7 @@ import {
   Spinner,
   Tab,
   Tabs,
-  Tooltip
+  Tooltip,
 } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
@@ -28,10 +28,10 @@ import { push } from "connected-react-router";
 import { Link } from "react-router-dom";
 import { Dispatch } from "redux";
 import styled from "styled-components";
-import { IAppState, IGraph, IGraphResponse, IInstanceDetails } from "../../redux/types";
+import { AppState, Graph, GraphResponse, InstanceDetails, Peer } from "../../redux/types";
 import { domainMatchSelector, getFromApi, isSmallScreen } from "../../util";
 import { InstanceType } from "../atoms";
-import { Cytoscape, ErrorState } from "../molecules/";
+import { Cytoscape, ErrorState } from "../molecules";
 import { FederationTab } from "../organisms";
 
 const InstanceScreenContainer = styled.div`
@@ -82,25 +82,25 @@ const StyledGraphContainer = styled.div`
   flex-direction: column;
   margin-bottom: 10px;
 `;
-interface IInstanceScreenProps {
-  graph?: IGraph;
+interface InstanceScreenProps {
+  graph?: Graph;
   instanceName: string | null;
   instanceLoadError: boolean;
-  instanceDetails: IInstanceDetails | null;
+  instanceDetails: InstanceDetails | null;
   isLoadingInstanceDetails: boolean;
   navigateToRoot: () => void;
   navigateToInstance: (domain: string) => void;
 }
-interface IInstanceScreenState {
+interface InstanceScreenState {
   neighbors?: string[];
   isProcessingNeighbors: boolean;
   // Local (neighborhood) graph. Used only on small screens (mobile devices).
   isLoadingLocalGraph: boolean;
-  localGraph?: IGraph;
+  localGraph?: Graph;
   localGraphLoadError?: boolean;
 }
-class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInstanceScreenState> {
-  public constructor(props: IInstanceScreenProps) {
+class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, InstanceScreenState> {
+  public constructor(props: InstanceScreenProps) {
     super(props);
     this.state = { isProcessingNeighbors: false, isLoadingLocalGraph: false, localGraphLoadError: false };
   }
@@ -116,9 +116,9 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
       !this.props.instanceDetails.status
     ) {
       content = <ErrorState />;
-    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("personal instance") > -1) {
+    } else if (this.props.instanceDetails.status.toLowerCase().includes("personal instance")) {
       content = this.renderPersonalInstanceErrorState();
-    } else if (this.props.instanceDetails.status.toLowerCase().indexOf("robots.txt") > -1) {
+    } else if (this.props.instanceDetails.status.toLowerCase().includes("robots.txt")) {
       content = this.renderRobotsTxtState();
     } else if (this.props.instanceDetails.status !== "success") {
       content = this.renderMissingDataState();
@@ -130,7 +130,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
         <HeadingContainer>
           <StyledHeadingH2>{this.props.instanceName}</StyledHeadingH2>
           <StyledHeadingTooltip content="Open link in new tab" position={Position.TOP} className={Classes.DARK}>
-            <AnchorButton icon={IconNames.LINK} minimal={true} onClick={this.openInstanceLink} />
+            <AnchorButton icon={IconNames.LINK} minimal onClick={this.openInstanceLink} />
           </StyledHeadingTooltip>
           <StyledCloseButton icon={IconNames.CROSS} onClick={this.props.navigateToRoot} />
         </HeadingContainer>
@@ -145,7 +145,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     this.processEdgesToFindNeighbors();
   }
 
-  public componentDidUpdate(prevProps: IInstanceScreenProps, prevState: IInstanceScreenState) {
+  public componentDidUpdate(prevProps: InstanceScreenProps, prevState: InstanceScreenState) {
     const isNewInstance = prevProps.instanceName !== this.props.instanceName;
     const receivedNewEdges = !!this.props.graph && !this.state.isProcessingNeighbors && !this.state.neighbors;
     const receivedNewLocalGraph = !!this.state.localGraph && !prevState.localGraph;
@@ -164,10 +164,13 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     }
     this.setState({ isProcessingNeighbors: true });
 
-    const graphToUse = !!graph ? graph : localGraph;
-    const edges = graphToUse!.edges.filter(e => [e.data.source, e.data.target].indexOf(instanceName!) > -1);
+    const graphToUse = graph || localGraph;
+    if (!graphToUse) {
+      return;
+    }
+    const edges = graphToUse.edges.filter((e) => [e.data.source, e.data.target].includes(instanceName));
     const neighbors: any[] = [];
-    edges.forEach(e => {
+    edges.forEach((e) => {
       if (e.data.source === instanceName) {
         neighbors.push({ neighbor: e.data.target, weight: e.data.weight });
       } else {
@@ -183,39 +186,38 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
     }
     this.setState({ isLoadingLocalGraph: true });
     getFromApi(`graph/${this.props.instanceName}`)
-      .then((response: IGraphResponse) => {
+      .then((response: GraphResponse) => {
         // We do some processing of edges here to make sure that every edge's source and target are in the neighborhood
         // We could (and should) be doing this in the backend, but I don't want to mess around with complex SQL
         // queries.
         // TODO: think more about moving the backend to a graph database that would make this easier.
-        const graph = response.graph;
-        const nodeIds = new Set(graph.nodes.map(n => n.data.id));
-        const edges = graph.edges.filter(e => nodeIds.has(e.data.source) && nodeIds.has(e.data.target));
+        const { graph } = response;
+        const nodeIds = new Set(graph.nodes.map((n) => n.data.id));
+        const edges = graph.edges.filter((e) => nodeIds.has(e.data.source) && nodeIds.has(e.data.target));
         this.setState({ isLoadingLocalGraph: false, localGraph: { ...graph, edges } });
       })
       .catch(() => this.setState({ isLoadingLocalGraph: false, localGraphLoadError: true }));
   };
 
   private renderTabs = () => {
+    const { instanceDetails } = this.props;
     const hasNeighbors = this.state.neighbors && this.state.neighbors.length > 0;
-    const federationRestrictions = this.props.instanceDetails && this.props.instanceDetails.federationRestrictions;
+    const federationRestrictions = instanceDetails && instanceDetails.federationRestrictions;
 
     const hasLocalGraph =
       !!this.state.localGraph && this.state.localGraph.nodes.length > 0 && this.state.localGraph.edges.length > 0;
     const insularCallout =
       this.props.graph && !this.state.isProcessingNeighbors && !hasNeighbors && !hasLocalGraph ? (
         <StyledCallout icon={IconNames.INFO_SIGN} title="Insular instance">
-          <p>This instance doesn't have any neighbors that we know of, so it's hidden from the graph.</p>
+          <p>This instance doesn&apos;t have any neighbors that we know of, so it&apos;s hidden from the graph.</p>
         </StyledCallout>
-      ) : (
-        undefined
-      );
+      ) : undefined;
     return (
       <>
         {insularCallout}
         {this.maybeRenderLocalGraph()}
         <StyledTabs>
-          {this.props.instanceDetails!.description && (
+          {instanceDetails && instanceDetails.description && (
             <Tab id="description" title="Description" panel={this.renderDescription()} />
           )}
           {this.shouldRenderStats() && <Tab id="stats" title="Details" panel={this.renderVersionAndCounts()} />}
@@ -232,7 +234,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
         <StyledLinkToFdNetwork>
           <AnchorButton
             href={`https://fediverse.network/${this.props.instanceName}`}
-            minimal={true}
+            minimal
             rightIcon={IconNames.SHARE}
             target="_blank"
             text="See more statistics at fediverse.network"
@@ -244,18 +246,17 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
 
   private maybeRenderLocalGraph = () => {
     const { localGraph } = this.state;
-    const hasLocalGraph =
-      !!this.state.localGraph && this.state.localGraph.nodes.length > 0 && this.state.localGraph.edges.length > 0;
-    if (!hasLocalGraph) {
+    const hasLocalGraph = !!localGraph && localGraph.nodes.length > 0 && localGraph.edges.length > 0;
+    if (!hasLocalGraph || !localGraph) {
       return;
     }
     return (
-      <StyledGraphContainer aria-hidden={true}>
+      <StyledGraphContainer aria-hidden>
         <Cytoscape
-          elements={localGraph!}
+          elements={localGraph}
           currentNodeId={this.props.instanceName}
           navigateToInstancePath={this.props.navigateToInstance}
-          showEdges={true}
+          showEdges
         />
         <Divider />
       </StyledGraphContainer>
@@ -268,7 +269,11 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
   };
 
   private renderDescription = () => {
-    const description = this.props.instanceDetails!.description;
+    const { instanceDetails } = this.props;
+    if (!instanceDetails) {
+      return;
+    }
+    const { description } = instanceDetails;
     if (!description) {
       return;
     }
@@ -288,10 +293,10 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
       insularity,
       type,
       statusesPerDay,
-      statusesPerUserPerDay
+      statusesPerUserPerDay,
     } = this.props.instanceDetails;
     return (
-      <StyledHTMLTable small={true} striped={true}>
+      <StyledHTMLTable small striped>
         <tbody>
           <tr>
             <td>Version</td>
@@ -299,7 +304,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>Instance type</td>
-            <td>{(type && <InstanceType type={type} colorAfterName={true} />) || "Unknown"}</td>
+            <td>{(type && <InstanceType type={type} colorAfterName />) || "Unknown"}</td>
           </tr>
           <tr>
             <td>Users</td>
@@ -311,7 +316,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>
-              Insularity{"  "}
+              Insularity
+              {"  "}
               <Tooltip
                 content={
                   <span>
@@ -330,7 +336,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>
-              Statuses / day{"  "}
+              Statuses / day
+              {"  "}
               <Tooltip
                 content={
                   <span>
@@ -349,7 +356,8 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>
-              Statuses / person / day{"  "}
+              Statuses / person / day
+              {"  "}
               <Tooltip
                 content={
                   <span>
@@ -372,7 +380,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           </tr>
           <tr>
             <td>Last updated</td>
-            <td>{moment(lastUpdated + "Z").fromNow() || "Unknown"}</td>
+            <td>{moment(`${lastUpdated}Z`).fromNow() || "Unknown"}</td>
           </tr>
         </tbody>
       </StyledHTMLTable>
@@ -412,7 +420,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
           would mean that every single status on {this.props.instanceName} contained a mention of someone on the other
           instance, and vice versa.
         </p>
-        <StyledHTMLTable small={true} striped={true} interactive={false}>
+        <StyledHTMLTable small striped interactive={false}>
           <thead>
             <tr>
               <th>Instance</th>
@@ -426,11 +434,15 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
   };
 
   private renderPeers = () => {
-    const peers = this.props.instanceDetails!.peers;
+    const { instanceDetails } = this.props;
+    if (!instanceDetails) {
+      return;
+    }
+    const { peers } = instanceDetails;
     if (!peers || peers.length === 0) {
       return;
     }
-    const peerRows = peers.map(instance => (
+    const peerRows = peers.map((instance: Peer) => (
       <tr key={instance.name}>
         <td>
           <Link to={`/instance/${instance.name}`} className={`${Classes.BUTTON} ${Classes.MINIMAL}`} role="button">
@@ -444,7 +456,7 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
         <p className={Classes.TEXT_MUTED}>
           All the instances, past and present, that {this.props.instanceName} knows about.
         </p>
-        <StyledHTMLTable small={true} striped={true} interactive={false} className="fediverse-sidebar-table">
+        <StyledHTMLTable small striped interactive={false} className="fediverse-sidebar-table">
           <tbody>{peerRows}</tbody>
         </StyledHTMLTable>
       </div>
@@ -453,71 +465,62 @@ class InstanceScreenImpl extends React.PureComponent<IInstanceScreenProps, IInst
 
   private renderLoadingState = () => <NonIdealState icon={<Spinner />} />;
 
-  private renderPersonalInstanceErrorState = () => {
-    return (
-      <NonIdealState
-        icon={IconNames.BLOCKED_PERSON}
-        title="No data"
-        description="This instance has fewer than 10 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
-        action={
-          <Link to={"/admin"} className={Classes.BUTTON} role="button">
-            {"Opt in"}
-          </Link>
-        }
-      />
-    );
-  };
+  private renderPersonalInstanceErrorState = () => (
+    <NonIdealState
+      icon={IconNames.BLOCKED_PERSON}
+      title="No data"
+      description="This instance has fewer than 10 users. It was not crawled in order to protect their privacy, but if it's your instance you can opt in."
+      action={
+        <Link to="/admin" className={Classes.BUTTON} role="button">
+          Opt in
+        </Link>
+      }
+    />
+  );
 
-  private renderMissingDataState = () => {
-    return (
-      <>
-        <NonIdealState
-          icon={IconNames.ERROR}
-          title="No data"
-          description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
-        />
-        <span className="sidebar-hidden-instance-status" style={{ display: "none" }}>
-          {this.props.instanceDetails && this.props.instanceDetails.status}
+  private renderMissingDataState = () => (
+    <>
+      <NonIdealState
+        icon={IconNames.ERROR}
+        title="No data"
+        description="This instance could not be crawled. Either it was down or it's an instance type we don't support yet."
+      />
+      <span className="sidebar-hidden-instance-status" style={{ display: "none" }}>
+        {this.props.instanceDetails && this.props.instanceDetails.status}
+      </span>
+    </>
+  );
+
+  private renderRobotsTxtState = () => (
+    <NonIdealState
+      icon={
+        <span role="img" aria-label="robot">
+          🤖
         </span>
-      </>
-    );
-  };
-
-  private renderRobotsTxtState = () => {
-    return (
-      <NonIdealState
-        icon={
-          <span role="img" aria-label="robot">
-            🤖
-          </span>
-        }
-        title="No data"
-        description="This instance was not crawled because its robots.txt did not allow us to."
-      />
-    );
-  };
+      }
+      title="No data"
+      description="This instance was not crawled because its robots.txt did not allow us to."
+    />
+  );
 
   private openInstanceLink = () => {
-    window.open("https://" + this.props.instanceName, "_blank");
+    window.open(`https://${this.props.instanceName}`, "_blank");
   };
 }
 
-const mapStateToProps = (state: IAppState) => {
+const mapStateToProps = (state: AppState) => {
   const match = domainMatchSelector(state);
   return {
     graph: state.data.graphResponse && state.data.graphResponse.graph,
     instanceDetails: state.currentInstance.currentInstanceDetails,
     instanceLoadError: state.currentInstance.error,
     instanceName: match && match.params.domain,
-    isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails
+    isLoadingInstanceDetails: state.currentInstance.isLoadingInstanceDetails,
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   navigateToInstance: (domain: string) => dispatch(push(`/instance/${domain}`)),
-  navigateToRoot: () => dispatch(push("/"))
+  navigateToRoot: () => dispatch(push("/")),
 });
-const InstanceScreen = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(InstanceScreenImpl);
+const InstanceScreen = connect(mapStateToProps, mapDispatchToProps)(InstanceScreenImpl);
 export default InstanceScreen;

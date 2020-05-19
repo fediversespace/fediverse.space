@@ -6,33 +6,33 @@ import { push } from "connected-react-router";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import { fetchGraph } from "../../redux/actions";
-import { IAppState, IGraphResponse } from "../../redux/types";
-import { colorSchemes, IColorScheme } from "../../types";
+import { AppState, GraphResponse } from "../../redux/types";
+import { colorSchemes, ColorScheme } from "../../types";
 import { domainMatchSelector } from "../../util";
-import { Cytoscape, ErrorState, GraphTools } from "../molecules/";
+import { Cytoscape, ErrorState, GraphTools } from "../molecules";
 
 const GraphDiv = styled.div`
   flex: 2;
 `;
 
-interface IGraphProps {
+interface GraphProps {
   currentInstanceName: string | null;
   fetchGraph: () => void;
-  graphResponse?: IGraphResponse;
+  graphResponse?: GraphResponse;
   graphLoadError: boolean;
   hoveringOverResult?: string;
   isLoadingGraph: boolean;
   searchResultDomains: string[];
   navigate: (path: string) => void;
 }
-interface IGraphState {
-  colorScheme?: IColorScheme;
+interface GraphState {
+  colorScheme?: ColorScheme;
   isShowingEdges: boolean;
 }
-class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
+class GraphImpl extends React.PureComponent<GraphProps, GraphState> {
   private cytoscapeComponent: React.RefObject<Cytoscape>;
 
-  public constructor(props: IGraphProps) {
+  public constructor(props: GraphProps) {
     super(props);
     this.cytoscapeComponent = React.createRef();
     this.state = { colorScheme: undefined, isShowingEdges: true };
@@ -76,7 +76,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
       );
     }
 
-    return <GraphDiv aria-hidden={true}>{content}</GraphDiv>;
+    return <GraphDiv aria-hidden>{content}</GraphDiv>;
   }
 
   private loadGraph = () => {
@@ -95,7 +95,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
     this.setState({ isShowingEdges: !this.state.isShowingEdges });
   };
 
-  private setColorScheme = (colorScheme?: IColorScheme) => {
+  private setColorScheme = (colorScheme?: ColorScheme) => {
     this.setState({ colorScheme });
   };
 
@@ -107,7 +107,7 @@ class GraphImpl extends React.PureComponent<IGraphProps, IGraphState> {
     this.props.navigate("/");
   };
 }
-const mapStateToProps = (state: IAppState) => {
+const mapStateToProps = (state: AppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
@@ -115,15 +115,12 @@ const mapStateToProps = (state: IAppState) => {
     graphResponse: state.data.graphResponse,
     hoveringOverResult: state.search.hoveringOverResult,
     isLoadingGraph: state.data.isLoadingGraph,
-    searchResultDomains: state.search.results.map(r => r.name)
+    searchResultDomains: state.search.results.map((r) => r.name),
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   fetchGraph: () => dispatch(fetchGraph() as any),
-  navigate: (path: string) => dispatch(push(path))
+  navigate: (path: string) => dispatch(push(path)),
 });
-const Graph = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(GraphImpl);
+const Graph = connect(mapStateToProps, mapDispatchToProps)(GraphImpl);
 export default Graph;

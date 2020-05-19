@@ -1,6 +1,6 @@
 import { INSTANCE_TYPES } from "./constants";
 
-interface IColorSchemeBase {
+interface ColorSchemeBase {
   // The name of the coloring, e.g. "Instance type"
   name: string;
   // The name of the key in a cytoscape node's `data` field to color by.
@@ -9,30 +9,30 @@ interface IColorSchemeBase {
   description?: string;
   type: "qualitative" | "quantitative";
 }
-interface IQualitativeColorScheme extends IColorSchemeBase {
+interface QualitativeColorScheme extends ColorSchemeBase {
   // The values the color scheme is used for. E.g. ["mastodon", "pleroma", "misskey"].
   values: string[];
   type: "qualitative";
 }
-interface IQuantitativeColorScheme extends IColorSchemeBase {
+interface QuantitativeColorScheme extends ColorSchemeBase {
   type: "quantitative";
   exponential: boolean;
 }
 
-export type IColorScheme = IQualitativeColorScheme | IQuantitativeColorScheme;
+export type ColorScheme = QualitativeColorScheme | QuantitativeColorScheme;
 
-export const typeColorScheme: IQualitativeColorScheme = {
+export const typeColorScheme: QualitativeColorScheme = {
   cytoscapeDataKey: "type",
   name: "Instance type",
   type: "qualitative",
-  values: INSTANCE_TYPES
+  values: INSTANCE_TYPES,
 };
-export const activityColorScheme: IQuantitativeColorScheme = {
+export const activityColorScheme: QuantitativeColorScheme = {
   cytoscapeDataKey: "statusesPerDay",
   description: "The average number of statuses posted per day. This is an exponential scale.",
   exponential: true,
   name: "Activity",
-  type: "quantitative"
+  type: "quantitative",
 };
 
-export const colorSchemes: IColorScheme[] = [typeColorScheme, activityColorScheme];
+export const colorSchemes: ColorScheme[] = [typeColorScheme, activityColorScheme];

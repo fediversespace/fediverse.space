@@ -6,9 +6,9 @@ import React from "react";
 import styled from "styled-components";
 import { FloatingCard, InstanceType } from ".";
 import { QUANTITATIVE_COLOR_SCHEME } from "../../constants";
-import { IColorScheme } from "../../types";
+import { ColorScheme } from "../../types";
 
-const ColorSchemeSelect = Select.ofType<IColorScheme>();
+const ColorSchemeSelect = Select.ofType<ColorScheme>();
 
 const StyledLi = styled.li`
   margin-top: 2px;
@@ -27,12 +27,12 @@ const ColorBarContainer = styled.div`
   flex-direction: column;
   margin-right: 10px;
 `;
-interface IColorBarProps {
+interface ColorBarProps {
   color: string;
 }
-const ColorBar = styled.div<IColorBarProps>`
+const ColorBar = styled.div<ColorBarProps>`
   width: 10px;
-  background-color: ${props => props.color};
+  background-color: ${(props) => props.color};
   flex: 1;
 `;
 const TextContainer = styled.div`
@@ -41,13 +41,46 @@ const TextContainer = styled.div`
   justify-content: space-between;
 `;
 
-interface IGraphKeyProps {
-  current?: IColorScheme;
-  colorSchemes: IColorScheme[];
+const renderItem: ItemRenderer<ColorScheme> = (colorScheme, { handleClick, modifiers }) => {
+  if (!modifiers.matchesPredicate) {
+    return null;
+  }
+  return <MenuItem active={modifiers.active} key={colorScheme.name} onClick={handleClick} text={colorScheme.name} />;
+};
+
+const renderQualitativeKey = (values: string[]) => (
+  <ul className={Classes.LIST_UNSTYLED}>
+    {values.map((v) => (
+      <StyledLi key={v}>
+        <InstanceType type={v} />
+      </StyledLi>
+    ))}
+  </ul>
+);
+
+const renderQuantitativeKey = (range: number[]) => {
+  const [min, max] = range;
+  return (
+    <ColorKeyContainer>
+      <ColorBarContainer>
+        {QUANTITATIVE_COLOR_SCHEME.map((color) => (
+          <ColorBar color={color} key={color} />
+        ))}
+      </ColorBarContainer>
+      <TextContainer>
+        <span className={Classes.TEXT_SMALL}>{numeral.default(min).format("0")}</span>
+        <span className={Classes.TEXT_SMALL}>{numeral.default(max).format("0")}</span>
+      </TextContainer>
+    </ColorKeyContainer>
+  );
+};
+interface GraphKeyProps {
+  current?: ColorScheme;
+  colorSchemes: ColorScheme[];
   ranges?: { [key: string]: [number, number] };
-  onItemSelect: (colorScheme?: IColorScheme) => void;
+  onItemSelect: (colorScheme?: ColorScheme) => void;
 }
-const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, ranges, onItemSelect }) => {
+const GraphKey: React.FC<GraphKeyProps> = ({ current, colorSchemes, ranges, onItemSelect }) => {
   const unsetColorScheme = () => {
     onItemSelect(undefined);
   };
@@ -76,13 +109,7 @@ const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, ranges, onI
           rightIcon={IconNames.CARET_DOWN}
           tabIndex={-1}
         />
-        <Button
-          icon={IconNames.SMALL_CROSS}
-          minimal={true}
-          onClick={unsetColorScheme}
-          disabled={!current}
-          tabIndex={-1}
-        />
+        <Button icon={IconNames.SMALL_CROSS} minimal onClick={unsetColorScheme} disabled={!current} tabIndex={-1} />
       </ColorSchemeSelect>
       <br />
       {!!current && !!key && (
@@ -92,40 +119,6 @@ const GraphKey: React.FC<IGraphKeyProps> = ({ current, colorSchemes, ranges, onI
         </>
       )}
     </FloatingCard>
-  );
-};
-
-const renderItem: ItemRenderer<IColorScheme> = (colorScheme, { handleClick, modifiers }) => {
-  if (!modifiers.matchesPredicate) {
-    return null;
-  }
-  return <MenuItem active={modifiers.active} key={colorScheme.name} onClick={handleClick} text={colorScheme.name} />;
-};
-
-const renderQualitativeKey = (values: string[]) => (
-  <ul className={Classes.LIST_UNSTYLED}>
-    {values.map(v => (
-      <StyledLi key={v}>
-        <InstanceType type={v} />
-      </StyledLi>
-    ))}
-  </ul>
-);
-
-const renderQuantitativeKey = (range: number[]) => {
-  const [min, max] = range;
-  return (
-    <ColorKeyContainer>
-      <ColorBarContainer>
-        {QUANTITATIVE_COLOR_SCHEME.map((color, idx) => (
-          <ColorBar color={color} key={color} />
-        ))}
-      </ColorBarContainer>
-      <TextContainer>
-        <span className={Classes.TEXT_SMALL}>{numeral.default(min).format("0")}</span>
-        <span className={Classes.TEXT_SMALL}>{numeral.default(max).format("0")}</span>
-      </TextContainer>
-    </ColorKeyContainer>
   );
 };
 

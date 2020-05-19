@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { IColorScheme } from "../../types";
+import { ColorScheme } from "../../types";
 import { GraphHideEdgesButton, GraphKey, GraphResetButton } from "../atoms";
 
 const GraphToolsContainer = styled.div`
@@ -11,35 +11,33 @@ const GraphToolsContainer = styled.div`
   flex-direction: column;
 `;
 
-interface IGraphToolsProps {
-  currentColorScheme?: IColorScheme;
-  colorSchemes: IColorScheme[];
+interface GraphToolsProps {
+  currentColorScheme?: ColorScheme;
+  colorSchemes: ColorScheme[];
   isShowingEdges: boolean;
   ranges?: { [key: string]: [number, number] };
-  onColorSchemeSelect: (colorScheme?: IColorScheme) => void;
+  onColorSchemeSelect: (colorScheme?: ColorScheme) => void;
   onResetButtonClick: () => void;
   toggleEdges: () => void;
 }
-const GraphTools: React.FC<IGraphToolsProps> = ({
+const GraphTools: React.FC<GraphToolsProps> = ({
   currentColorScheme,
   colorSchemes,
   isShowingEdges,
   ranges,
   onColorSchemeSelect,
   onResetButtonClick,
-  toggleEdges
-}) => {
-  return (
-    <GraphToolsContainer>
-      <GraphResetButton onClick={onResetButtonClick} />
-      <GraphHideEdgesButton isShowingEdges={isShowingEdges} toggleEdges={toggleEdges} />
-      <GraphKey
-        current={currentColorScheme}
-        colorSchemes={colorSchemes}
-        onItemSelect={onColorSchemeSelect}
-        ranges={ranges}
-      />
-    </GraphToolsContainer>
-  );
-};
+  toggleEdges,
+}) => (
+  <GraphToolsContainer>
+    <GraphResetButton onClick={onResetButtonClick} />
+    <GraphHideEdgesButton isShowingEdges={isShowingEdges} toggleEdges={toggleEdges} />
+    <GraphKey
+      current={currentColorScheme}
+      colorSchemes={colorSchemes}
+      onItemSelect={onColorSchemeSelect}
+      ranges={ranges}
+    />
+  </GraphToolsContainer>
+);
 export default GraphTools;

@@ -10,9 +10,9 @@ import {
   QUALITATIVE_COLOR_SCHEME,
   QUANTITATIVE_COLOR_SCHEME,
   SEARCH_RESULT_COLOR,
-  SELECTED_NODE_COLOR
+  SELECTED_NODE_COLOR,
 } from "../../constants";
-import { IColorScheme } from "../../types";
+import { ColorScheme } from "../../types";
 import { getBuckets, getTypeDisplayString } from "../../util";
 
 const CytoscapeContainer = styled.div`
@@ -21,8 +21,8 @@ const CytoscapeContainer = styled.div`
   flex: 1;
 `;
 
-interface ICytoscapeProps {
-  colorScheme?: IColorScheme;
+interface CytoscapeProps {
+  colorScheme?: ColorScheme;
   currentNodeId: string | null;
   elements: cytoscape.ElementsDefinition;
   hoveringOver?: string;
@@ -32,10 +32,11 @@ interface ICytoscapeProps {
   navigateToInstancePath?: (domain: string) => void;
   navigateToRoot?: () => void;
 }
-class Cytoscape extends React.PureComponent<ICytoscapeProps> {
+class Cytoscape extends React.PureComponent<CytoscapeProps> {
   private cy?: cytoscape.Core;
 
   public componentDidMount() {
+    // eslint-disable-next-line react/no-find-dom-node
     const container = ReactDOM.findDOMNode(this);
     this.cy = cytoscape({
       autoungrabify: true,
@@ -44,16 +45,16 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       hideEdgesOnViewport: true,
       hideLabelsOnViewport: true,
       layout: {
-        name: "preset"
+        name: "preset",
       },
       maxZoom: 2,
       minZoom: 0.01,
       pixelRatio: 1.0,
-      selectionType: "single"
+      selectionType: "single",
     });
 
     // Setup node tooltip on hover
-    this.cy.nodes().forEach(n => {
+    this.cy.nodes().forEach((n) => {
       const tooltipContent = `${n.data("id")} (${getTypeDisplayString(n.data("type"))})`;
       const ref = (n as any).popperRef();
       const t = tippy(ref, {
@@ -61,12 +62,12 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         animation: "fade",
         content: tooltipContent,
         duration: 100,
-        trigger: "manual"
+        trigger: "manual",
       });
-      n.on("mouseover", e => {
+      n.on("mouseover", () => {
         (t as Instance).show();
       });
-      n.on("mouseout", e => {
+      n.on("mouseout", () => {
         (t as Instance).hide();
       });
     });
@@ -78,25 +79,25 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       .style({
         "curve-style": "haystack", // fast edges
         "line-color": DEFAULT_NODE_COLOR,
-        width: "mapData(weight, 0, 0.5, 1, 20)"
+        width: "mapData(weight, 0, 0.5, 1, 20)",
       })
       .selector("node[label]")
       .style({
         color: DEFAULT_NODE_COLOR,
         "font-size": "mapData(size, 1, 6, 10, 100)",
-        "min-zoomed-font-size": 16
+        "min-zoomed-font-size": 16,
       })
       .selector(".hidden") // used to hide nodes not in the neighborhood of the selected, or to hide edges
       .style({
-        display: "none"
+        display: "none",
       })
       .selector(".thickEdge") // when a node is selected, make edges thicker so you can actually see them
       .style({
-        width: 2
+        width: 2,
       });
     this.resetNodeColorScheme(style); // this function also called `update()`
 
-    this.cy.nodes().on("select", e => {
+    this.cy.nodes().on("select", (e) => {
       const instanceId = e.target.data("id");
       if (instanceId && instanceId !== this.props.currentNodeId) {
         if (this.props.navigateToInstancePath) {
@@ -110,21 +111,19 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         this.cy!.nodes().removeClass("hidden");
         this.cy!.edges().removeClass("thickEdge");
         // Then hide everything except neighborhood
-        this.cy!.nodes()
-          .diff(neighborhood)
-          .left.addClass("hidden");
+        this.cy!.nodes().diff(neighborhood).left.addClass("hidden");
         neighborhood.connectedEdges().addClass("thickEdge");
       });
     });
-    this.cy.nodes().on("unselect", e => {
+    this.cy.nodes().on("unselect", () => {
       this.cy!.batch(() => {
         this.cy!.nodes().removeClass("hidden");
         this.cy!.edges().removeClass("thickEdge");
       });
     });
-    this.cy.on("click", e => {
+    this.cy.on("click", (e) => {
       // Clicking on the background should also deselect
-      const target = e.target;
+      const { target } = e;
       if (!target || target === this.cy || target.isEdge()) {
         if (this.props.navigateToRoot) {
           // Go to the URL "/"
@@ -136,7 +135,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     this.setNodeSelection();
   }
 
-  public componentDidUpdate(prevProps: ICytoscapeProps) {
+  public componentDidUpdate(prevProps: CytoscapeProps) {
     this.setNodeSelection(prevProps.currentNodeId);
     if (prevProps.colorScheme !== this.props.colorScheme) {
       this.updateColorScheme();
@@ -174,12 +173,12 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     if (currentNodeId) {
       this.cy.zoom({
         level: 0.2,
-        position: this.cy.$id(currentNodeId).position()
+        position: this.cy.$id(currentNodeId).position(),
       });
     } else {
       this.cy.zoom({
         level: 0.2,
-        position: { x: 0, y: 0 }
+        position: { x: 0, y: 0 },
       });
     }
   }
@@ -221,7 +220,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       // quite good as it is, so...
       height: "mapData(size, 1, 6, 20, 200)",
       label: "data(id)",
-      width: "mapData(size, 1, 6, 20, 200)"
+      width: "mapData(size, 1, 6, 20, 200)",
     });
 
     this.setNodeSearchColorScheme(style);
@@ -240,16 +239,16 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         "background-color": SEARCH_RESULT_COLOR,
         "border-color": SEARCH_RESULT_COLOR,
         "border-opacity": 0.7,
-        "border-width": 250
+        "border-width": 250,
       })
       .selector("node.hovered")
       .style({
         "border-color": HOVERED_NODE_COLOR,
-        "border-width": 1000
+        "border-width": 1000,
       })
       .selector("node:selected")
       .style({
-        "background-color": SELECTED_NODE_COLOR
+        "background-color": SELECTED_NODE_COLOR,
       })
       .update();
   };
@@ -263,10 +262,11 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     if (!colorScheme) {
       this.resetNodeColorScheme();
       return;
-    } else if (colorScheme.type === "qualitative") {
+    }
+    if (colorScheme.type === "qualitative") {
       colorScheme.values.forEach((v, idx) => {
         style = style.selector(`node[${colorScheme.cytoscapeDataKey} = '${v}']`).style({
-          "background-color": QUALITATIVE_COLOR_SCHEME[idx]
+          "background-color": QUALITATIVE_COLOR_SCHEME[idx],
         });
       });
     } else if (colorScheme.type === "quantitative") {
@@ -284,7 +284,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
         const max = idx === QUANTITATIVE_COLOR_SCHEME.length - 1 ? maxVal + 1 : buckets[idx + 1];
         const selector = `node[${dataKey} >= ${min}][${dataKey} < ${max}]`;
         style = style.selector(selector).style({
-          "background-color": color
+          "background-color": color,
         });
       });
     }
@@ -304,10 +304,10 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
     }
     const { hoveringOver } = this.props;
 
-    if (!!prevHoveredId) {
+    if (prevHoveredId) {
       this.cy.$id(prevHoveredId).removeClass("hovered");
     }
-    if (!!hoveringOver) {
+    if (hoveringOver) {
       this.cy.$id(hoveringOver).addClass("hovered");
     }
   };
@@ -322,7 +322,7 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
       this.cy!.nodes().removeClass("searchResult");
 
       if (!!searchResultIds && searchResultIds.length > 0) {
-        const currentResultSelector = searchResultIds.map(id => `node[id = "${id}"]`).join(", ");
+        const currentResultSelector = searchResultIds.map((id) => `node[id = "${id}"]`).join(", ");
         this.cy!.$(currentResultSelector).addClass("searchResult");
       }
     });
@@ -344,11 +344,11 @@ class Cytoscape extends React.PureComponent<ICytoscapeProps> {
 
   /* Helper function to remove edges if source or target node is missing */
   private cleanElements = (elements: cytoscape.ElementsDefinition): cytoscape.ElementsDefinition => {
-    const domains = new Set(elements.nodes.map(n => n.data.id));
-    const edges = elements.edges.filter(e => domains.has(e.data.source) && domains.has(e.data.target));
+    const domains = new Set(elements.nodes.map((n) => n.data.id));
+    const edges = elements.edges.filter((e) => domains.has(e.data.source) && domains.has(e.data.target));
     return {
       edges,
-      nodes: elements.nodes
+      nodes: elements.nodes,
     };
   };
 }

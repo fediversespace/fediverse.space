@@ -3,7 +3,7 @@ import { IconNames } from "@blueprintjs/icons";
 import React, { MouseEvent } from "react";
 import styled from "styled-components";
 import { INSTANCE_TYPES } from "../../constants";
-import { getSearchFilterDisplayValue, ISearchFilter } from "../../searchFilters";
+import { getSearchFilterDisplayValue, SearchFilter } from "../../searchFilters";
 import { getTypeDisplayString } from "../../util";
 
 const SearchFilterContainer = styled.div`
@@ -19,30 +19,30 @@ const StyledTag = styled(Tag)`
   margin-left: 5px;
 `;
 
-interface ISearchFiltersProps {
-  selectedFilters: ISearchFilter[];
-  selectFilter: (filter: ISearchFilter) => void;
+interface SearchFiltersProps {
+  selectedFilters: SearchFilter[];
+  selectFilter: (filter: SearchFilter) => void;
   deselectFilter: (e: MouseEvent<HTMLButtonElement>, props: ITagProps) => void;
 }
-const SearchFilters: React.FC<ISearchFiltersProps> = ({ selectedFilters, selectFilter, deselectFilter }) => {
-  const hasInstanceTypeFilter = selectedFilters.some(sf => sf.field === "type");
+const SearchFilters: React.FC<SearchFiltersProps> = ({ selectedFilters, selectFilter, deselectFilter }) => {
+  const hasInstanceTypeFilter = selectedFilters.some((sf) => sf.field === "type");
 
   const handleSelectInstanceType = (e: MouseEvent<HTMLElement>) => {
     const field = "type";
     const relation = "eq";
     const value = e.currentTarget.innerText.toLowerCase().replace(" ", "");
-    const filter: ISearchFilter = {
+    const filter: SearchFilter = {
       displayValue: getSearchFilterDisplayValue(field, relation, value),
       field,
       relation,
-      value
+      value,
     };
     selectFilter(filter);
   };
   const renderMenu = () => (
     <Menu>
       <MenuItem icon={IconNames.SYMBOL_CIRCLE} text="Instance type" disabled={hasInstanceTypeFilter}>
-        {INSTANCE_TYPES.map(t => (
+        {INSTANCE_TYPES.map((t) => (
           <MenuItem key={t} text={getTypeDisplayString(t)} onClick={handleSelectInstanceType} />
         ))}
       </MenuItem>
@@ -51,15 +51,15 @@ const SearchFilters: React.FC<ISearchFiltersProps> = ({ selectedFilters, selectF
   return (
     <SearchFilterContainer>
       <TagContainer>
-        {selectedFilters.map(filter => (
-          <StyledTag key={filter.displayValue} minimal={true} onRemove={deselectFilter}>
+        {selectedFilters.map((filter) => (
+          <StyledTag key={filter.displayValue} minimal onRemove={deselectFilter}>
             {filter.displayValue}
           </StyledTag>
         ))}
       </TagContainer>
       <Popover autoFocus={false} content={renderMenu()} position={Position.BOTTOM}>
-        <Button minimal={true} icon={IconNames.FILTER}>
-          {"Add filter"}
+        <Button minimal icon={IconNames.FILTER}>
+          Add filter
         </Button>
       </Popover>
     </SearchFilterContainer>

@@ -2,10 +2,10 @@ import { Button } from "@blueprintjs/core";
 import * as React from "react";
 import FloatingCard from "./FloatingCard";
 
-interface IGraphResetButtonProps {
+interface GraphResetButtonProps {
   onClick: () => void;
 }
-const GraphResetButton: React.FC<IGraphResetButtonProps> = ({ onClick }) => (
+const GraphResetButton: React.FC<GraphResetButtonProps> = ({ onClick }) => (
   <FloatingCard>
     <Button icon="compass" title="Reset graph view" onClick={onClick} tabIndex={-1} />
   </FloatingCard>

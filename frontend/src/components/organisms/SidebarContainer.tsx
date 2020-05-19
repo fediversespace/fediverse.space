@@ -17,11 +17,9 @@ const StyledCard = styled(Card)`
   display: flex;
   flex-direction: column;
 `;
-const SidebarContainer: React.FC = ({ children }) => {
-  return (
-    <RightDiv>
-      <StyledCard elevation={Elevation.TWO}>{children}</StyledCard>
-    </RightDiv>
-  );
-};
+const SidebarContainer: React.FC = ({ children }) => (
+  <RightDiv>
+    <StyledCard elevation={Elevation.TWO}>{children}</StyledCard>
+  </RightDiv>
+);
 export default SidebarContainer;

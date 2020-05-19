@@ -2,9 +2,9 @@ import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
 import * as React from "react";
 import styled from "styled-components";
 // import appsignalLogo from "../../assets/appsignal.svg";
-import gitlabLogo from "../../assets/gitlab.png";
-import nlnetLogo from "../../assets/nlnet.png";
-import { Page } from "../atoms/";
+import * as gitlabLogo from "../../assets/gitlab.png";
+import * as nlnetLogo from "../../assets/nlnet.png";
+import { Page } from "../atoms";
 
 const SponsorContainer = styled.div`
   margin-bottom: 20px;
@@ -36,10 +36,11 @@ const AboutScreen: React.FC = () => (
     <br />
     <H2>FAQ</H2>
 
-    <H4>Why can't I see details about my instance?</H4>
+    <H4>Why can&apos;t I see details about my instance?</H4>
     <p className={Classes.RUNNING_TEXT}>
       fediverse.space only supports servers using the Mastodon API, the Misskey API, the GNU Social API, or Nodeinfo.
-      Instances with 10 or fewer users won't be scraped -- it's a tool for understanding communities, not individuals.
+      Instances with 10 or fewer users won&apos;t be scraped -- it&apos;s a tool for understanding communities, not
+      individuals.
     </p>
 
     <H4>

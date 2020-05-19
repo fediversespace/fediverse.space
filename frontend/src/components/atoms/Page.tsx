@@ -11,19 +11,19 @@ const Backdrop = styled.div`
   z-index: 3;
 `;
 
-interface IContainerProps {
+interface ContainerProps {
   fullWidth?: boolean;
 }
-const Container = styled.div<IContainerProps>`
-  max-width: ${props => (props.fullWidth ? "100%" : "800px")};
+const Container = styled.div<ContainerProps>`
+  max-width: ${(props) => (props.fullWidth ? "100%" : "800px")};
   margin: auto;
   padding: 2em;
 `;
 
-interface IPageProps {
+interface PageProps {
   fullWidth?: boolean;
 }
-const Page: React.FC<IPageProps> = ({ children, fullWidth }) => (
+const Page: React.FC<PageProps> = ({ children, fullWidth }) => (
   <Backdrop>
     <Container fullWidth={fullWidth}>{children}</Container>
   </Backdrop>

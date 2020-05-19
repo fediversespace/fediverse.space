@@ -1,5 +1,5 @@
 import { RouterState } from "connected-react-router";
-import { ISearchFilter } from "../searchFilters";
+import { SearchFilter } from "../searchFilters";
 
 export enum ActionType {
   // Instance details
@@ -22,33 +22,33 @@ export enum ActionType {
   SEARCH_RESULTS_ERROR = "SEARCH_RESULTS_ERROR",
   RESET_SEARCH = "RESET_SEARCH",
   // Search -- hovering over results
-  SET_SEARCH_RESULT_HOVER = "SET_SEARCH_RESULT_HOVER"
+  SET_SEARCH_RESULT_HOVER = "SET_SEARCH_RESULT_HOVER",
 }
 
-export interface IAction {
+export interface Action {
   type: ActionType;
   payload: any;
 }
 
 export type SortField = "domain" | "userCount" | "statusCount" | "insularity";
 export type SortDirection = "asc" | "desc";
-export interface IInstanceSort {
+export interface InstanceSort {
   field: SortField;
   direction: SortDirection;
 }
 
-export interface IPeer {
+export interface Peer {
   name: string;
 }
 
-export interface ISearchResultInstance {
+export interface SearchResultInstance {
   name: string;
   description?: string;
   userCount?: number;
   type?: string;
 }
 
-export interface IFederationRestrictions {
+export interface FederationRestrictions {
   reportRemoval?: string[];
   reject?: string[];
   mediaRemoval?: string[];
@@ -59,7 +59,7 @@ export interface IFederationRestrictions {
   accept?: string[];
 }
 
-export interface IInstanceDetails {
+export interface InstanceDetails {
   name: string;
   description?: string;
   version?: string;
@@ -67,8 +67,8 @@ export interface IInstanceDetails {
   insularity?: number;
   statusCount?: number;
   domainCount?: number;
-  peers?: IPeer[];
-  federationRestrictions: IFederationRestrictions;
+  peers?: Peer[];
+  federationRestrictions: FederationRestrictions;
   lastUpdated?: string;
   status: string;
   type?: string;
@@ -76,7 +76,7 @@ export interface IInstanceDetails {
   statusesPerUserPerDay?: number;
 }
 
-interface IGraphNode {
+interface GraphNode {
   data: {
     id: string;
     label: string;
@@ -88,7 +88,7 @@ interface IGraphNode {
   };
 }
 
-interface IGraphEdge {
+interface GraphEdge {
   data: {
     source: string;
     target: string;
@@ -97,65 +97,65 @@ interface IGraphEdge {
   };
 }
 
-interface IGraphMetadata {
+interface GraphMetadata {
   ranges: { [key: string]: [number, number] };
 }
 
-export interface IGraph {
-  nodes: IGraphNode[];
-  edges: IGraphEdge[];
+export interface Graph {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
 }
 
-export interface IGraphResponse {
-  graph: IGraph;
-  metadata: IGraphMetadata;
+export interface GraphResponse {
+  graph: Graph;
+  metadata: GraphMetadata;
 }
 
-export interface ISearchResponse {
-  results: ISearchResultInstance[];
+export interface SearchResponse {
+  results: SearchResultInstance[];
   next: string | null;
 }
 
-export interface IInstanceListResponse {
+export interface InstanceListResponse {
   pageNumber: number;
   totalPages: number;
   totalEntries: number;
   pageSize: number;
-  instances: IInstanceDetails[];
+  instances: InstanceDetails[];
 }
 
 // Redux state
 
 // The current instance name is stored in the URL. See state -> router -> location
-export interface ICurrentInstanceState {
-  currentInstanceDetails: IInstanceDetails | null;
+export interface CurrentInstanceState {
+  currentInstanceDetails: InstanceDetails | null;
   isLoadingInstanceDetails: boolean;
   error: boolean;
 }
 
-export interface IDataState {
-  graphResponse?: IGraphResponse;
-  instancesResponse?: IInstanceListResponse;
-  instanceListSort: IInstanceSort;
+export interface DataState {
+  graphResponse?: GraphResponse;
+  instancesResponse?: InstanceListResponse;
+  instanceListSort: InstanceSort;
   isLoadingGraph: boolean;
   isLoadingInstanceList: boolean;
   graphLoadError: boolean;
   instanceListLoadError: boolean;
 }
 
-export interface ISearchState {
+export interface SearchState {
   error: boolean;
   isLoadingResults: boolean;
   next: string;
   query: string;
-  results: ISearchResultInstance[];
-  filters: ISearchFilter[];
+  results: SearchResultInstance[];
+  filters: SearchFilter[];
   hoveringOverResult?: string;
 }
 
-export interface IAppState {
+export interface AppState {
   router: RouterState;
-  currentInstance: ICurrentInstanceState;
-  data: IDataState;
-  search: ISearchState;
+  currentInstance: CurrentInstanceState;
+  data: DataState;
+  search: SearchState;
 }

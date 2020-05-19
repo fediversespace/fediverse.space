@@ -21,7 +21,7 @@ export const QUALITATIVE_COLOR_SCHEME = [
   "#0E5A8A",
   "#0A6640",
   "#A66321",
-  "#A82A2A"
+  "#A82A2A",
 ];
 
 // From https://blueprintjs.com/docs/#core/colors.sequential-color-schemes
@@ -35,11 +35,11 @@ export const QUANTITATIVE_COLOR_SCHEME = [
   "#C15B3F",
   "#B64C2F",
   "#AA3C1F",
-  "#9E2B0E"
+  "#9E2B0E",
 ];
 
 export const INSTANCE_DOMAIN_PATH = "/instance/:domain";
-export interface IInstanceDomainPath {
+export interface InstanceDomainPath {
   domain: string;
 }
 
@@ -55,5 +55,5 @@ export const INSTANCE_TYPES = [
   "friendica",
   "hubzilla",
   "plume",
-  "wordpress"
+  "wordpress",
 ];

@@ -7,9 +7,9 @@ import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
 import { InstanceScreen, SearchScreen } from ".";
 import { INSTANCE_DOMAIN_PATH } from "../../constants";
 import { loadInstance } from "../../redux/actions";
-import { IAppState } from "../../redux/types";
+import { AppState } from "../../redux/types";
 import { domainMatchSelector, isSmallScreen } from "../../util";
-import { Graph, SidebarContainer } from "../organisms/";
+import { Graph, SidebarContainer } from "../organisms";
 
 const GraphContainer = styled.div`
   display: flex;
@@ -24,13 +24,13 @@ const FullDiv = styled.div`
   right: 0;
 `;
 
-interface IGraphScreenProps extends RouteComponentProps {
+interface GraphScreenProps extends RouteComponentProps {
   currentInstanceName: string | null;
   pathname: string;
   graphLoadError: boolean;
   loadInstance: (domain: string | null) => void;
 }
-interface IGraphScreenState {
+interface GraphScreenState {
   hasBeenViewed: boolean;
 }
 /**
@@ -41,8 +41,8 @@ interface IGraphScreenState {
  * However, if it's not the first page viewed (e.g. if someone opens directly on /about) we don't want to render the
  * graph since it slows down everything else!
  */
-class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenState> {
-  public constructor(props: IGraphScreenProps) {
+class GraphScreenImpl extends React.Component<GraphScreenProps, GraphScreenState> {
+  public constructor(props: GraphScreenProps) {
     super(props);
     this.state = { hasBeenViewed: false };
   }
@@ -56,7 +56,7 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenSta
     this.loadCurrentInstance();
   }
 
-  public componentDidUpdate(prevProps: IGraphScreenProps) {
+  public componentDidUpdate(prevProps: GraphScreenProps) {
     this.setHasBeenViewed();
     this.loadCurrentInstance(prevProps.currentInstanceName);
   }
@@ -72,7 +72,7 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenSta
     }
   };
 
-  private renderRoutes = ({ location }: RouteComponentProps) => (
+  private renderRoutes = () => (
     <FullDiv>
       <GraphContainer>
         {/* Smaller screens never load the entire graph. Instead, `InstanceScreen` shows only the neighborhood. */}
@@ -80,7 +80,7 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenSta
         <SidebarContainer>
           <Switch>
             <Route path={INSTANCE_DOMAIN_PATH} component={InstanceScreen} />
-            <Route exact={true} path="/" component={SearchScreen} />
+            <Route exact path="/" component={SearchScreen} />
           </Switch>
         </SidebarContainer>
       </GraphContainer>
@@ -94,19 +94,16 @@ class GraphScreenImpl extends React.Component<IGraphScreenProps, IGraphScreenSta
   };
 }
 
-const mapStateToProps = (state: IAppState) => {
+const mapStateToProps = (state: AppState) => {
   const match = domainMatchSelector(state);
   return {
     currentInstanceName: match && match.params.domain,
     graphLoadError: state.data.graphLoadError,
-    pathname: state.router.location.pathname
+    pathname: state.router.location.pathname,
   };
 };
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  loadInstance: (domain: string | null) => dispatch(loadInstance(domain) as any)
+  loadInstance: (domain: string | null) => dispatch(loadInstance(domain) as any),
 });
-const GraphScreen = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(GraphScreenImpl);
+const GraphScreen = connect(mapStateToProps, mapDispatchToProps)(GraphScreenImpl);
 export default withRouter(GraphScreen);

@@ -2,171 +2,145 @@ import { isEqual } from "lodash";
 import { Dispatch } from "redux";
 
 import { push } from "connected-react-router";
-import { ISearchFilter } from "../searchFilters";
+import { SearchFilter } from "../searchFilters";
 import { getFromApi } from "../util";
-import { ActionType, IAppState, IGraph, IInstanceDetails, IInstanceSort, ISearchResponse } from "./types";
+import { ActionType, AppState, Graph, InstanceDetails, InstanceSort, SearchResponse } from "./types";
 
 // Instance details
-const requestInstanceDetails = (instanceName: string) => {
-  return {
-    payload: instanceName,
-    type: ActionType.REQUEST_INSTANCE_DETAILS
-  };
-};
-const receiveInstanceDetails = (instanceDetails: IInstanceDetails) => {
-  return {
-    payload: instanceDetails,
-    type: ActionType.RECEIVE_INSTANCE_DETAILS
-  };
-};
-const instanceLoadFailed = () => {
-  return {
-    type: ActionType.INSTANCE_LOAD_ERROR
-  };
-};
-const deselectInstance = () => {
-  return {
-    type: ActionType.DESELECT_INSTANCE
-  };
-};
+const requestInstanceDetails = (instanceName: string) => ({
+  payload: instanceName,
+  type: ActionType.REQUEST_INSTANCE_DETAILS,
+});
+const receiveInstanceDetails = (instanceDetails: InstanceDetails) => ({
+  payload: instanceDetails,
+  type: ActionType.RECEIVE_INSTANCE_DETAILS,
+});
+const instanceLoadFailed = () => ({
+  type: ActionType.INSTANCE_LOAD_ERROR,
+});
+const deselectInstance = () => ({
+  type: ActionType.DESELECT_INSTANCE,
+});
 
 // Graph
-const requestGraph = () => {
-  return {
-    type: ActionType.REQUEST_GRAPH
-  };
-};
-const receiveGraph = (graph: IGraph) => {
-  return {
-    payload: graph,
-    type: ActionType.RECEIVE_GRAPH
-  };
-};
-const graphLoadFailed = () => {
-  return {
-    type: ActionType.GRAPH_LOAD_ERROR
-  };
-};
+const requestGraph = () => ({
+  type: ActionType.REQUEST_GRAPH,
+});
+const receiveGraph = (graph: Graph) => ({
+  payload: graph,
+  type: ActionType.RECEIVE_GRAPH,
+});
+const graphLoadFailed = () => ({
+  type: ActionType.GRAPH_LOAD_ERROR,
+});
 
 // Instance list
-const requestInstanceList = (sort?: IInstanceSort) => ({
+const requestInstanceList = (sort?: InstanceSort) => ({
   payload: sort,
-  type: ActionType.REQUEST_INSTANCES
+  type: ActionType.REQUEST_INSTANCES,
 });
-const receiveInstanceList = (instances: IInstanceDetails[]) => ({
+const receiveInstanceList = (instances: InstanceDetails[]) => ({
   payload: instances,
-  type: ActionType.RECEIVE_INSTANCES
+  type: ActionType.RECEIVE_INSTANCES,
 });
 const instanceListLoadFailed = () => ({
-  type: ActionType.INSTANCE_LIST_LOAD_ERROR
+  type: ActionType.INSTANCE_LIST_LOAD_ERROR,
 });
 
 // Search
-const requestSearchResult = (query: string, filters: ISearchFilter[]) => {
-  return {
-    payload: { query, filters },
-    type: ActionType.REQUEST_SEARCH_RESULTS
-  };
-};
-const receiveSearchResults = (result: ISearchResponse) => {
-  return {
-    payload: result,
-    type: ActionType.RECEIVE_SEARCH_RESULTS
-  };
-};
-const searchFailed = () => {
-  return {
-    type: ActionType.SEARCH_RESULTS_ERROR
-  };
-};
+const requestSearchResult = (query: string, filters: SearchFilter[]) => ({
+  payload: { query, filters },
+  type: ActionType.REQUEST_SEARCH_RESULTS,
+});
+const receiveSearchResults = (result: SearchResponse) => ({
+  payload: result,
+  type: ActionType.RECEIVE_SEARCH_RESULTS,
+});
+const searchFailed = () => ({
+  type: ActionType.SEARCH_RESULTS_ERROR,
+});
 
-const resetSearch = () => {
-  return {
-    type: ActionType.RESET_SEARCH
-  };
-};
+const resetSearch = () => ({
+  type: ActionType.RESET_SEARCH,
+});
 
-export const setResultHover = (domain?: string) => {
-  return {
-    payload: domain,
-    type: ActionType.SET_SEARCH_RESULT_HOVER
-  };
-};
+export const setResultHover = (domain?: string) => ({
+  payload: domain,
+  type: ActionType.SET_SEARCH_RESULT_HOVER,
+});
 
 /** Async actions: https://redux.js.org/advanced/asyncactions */
 
-export const loadInstance = (instanceName: string | null) => {
-  return (dispatch: Dispatch, getState: () => IAppState) => {
-    if (!instanceName) {
-      dispatch(deselectInstance());
-      if (getState().router.location.pathname.startsWith("/instance/")) {
-        dispatch(push("/"));
-      }
-      return;
+export const loadInstance = (instanceName: string | null) => (dispatch: Dispatch, getState: () => AppState) => {
+  if (!instanceName) {
+    dispatch(deselectInstance());
+    if (getState().router.location.pathname.startsWith("/instance/")) {
+      dispatch(push("/"));
     }
-    dispatch(requestInstanceDetails(instanceName));
-    return getFromApi("instances/" + instanceName)
-      .then(details => dispatch(receiveInstanceDetails(details)))
-      .catch(() => dispatch(instanceLoadFailed()));
-  };
+    return;
+  }
+  dispatch(requestInstanceDetails(instanceName));
+  return getFromApi(`instances/${instanceName}`)
+    .then((details) => dispatch(receiveInstanceDetails(details)))
+    .catch(() => dispatch(instanceLoadFailed()));
 };
 
-export const updateSearch = (query: string, filters: ISearchFilter[]) => {
-  return (dispatch: Dispatch, getState: () => IAppState) => {
-    query = query.trim();
+export const updateSearch = (query: string, filters: SearchFilter[]) => (
+  dispatch: Dispatch,
+  getState: () => AppState
+) => {
+  query = query.trim();
 
-    if (!query) {
-      dispatch(resetSearch());
-      return;
-    }
+  if (!query) {
+    dispatch(resetSearch());
+    return;
+  }
 
-    const prevQuery = getState().search.query;
-    const prevFilters = getState().search.filters;
-    const isNewQuery = prevQuery !== query || !isEqual(prevFilters, filters);
+  const prevQuery = getState().search.query;
+  const prevFilters = getState().search.filters;
+  const isNewQuery = prevQuery !== query || !isEqual(prevFilters, filters);
 
-    const next = getState().search.next;
-    let url = `search/?query=${query}`;
-    if (!isNewQuery && next) {
-      url += `&after=${next}`;
-    }
+  const { next } = getState().search;
+  let url = `search/?query=${query}`;
+  if (!isNewQuery && next) {
+    url += `&after=${next}`;
+  }
 
-    // Add filters
-    // The format is e.g. type_eq=mastodon or user_count_gt=1000
-    filters.forEach(filter => {
-      url += `&${filter.field}_${filter.relation}=${filter.value}`;
-    });
+  // Add filters
+  // The format is e.g. type_eq=mastodon or user_count_gt=1000
+  filters.forEach((filter) => {
+    url += `&${filter.field}_${filter.relation}=${filter.value}`;
+  });
 
-    dispatch(requestSearchResult(query, filters));
-    return getFromApi(url)
-      .then(result => dispatch(receiveSearchResults(result)))
-      .catch(() => dispatch(searchFailed()));
-  };
+  dispatch(requestSearchResult(query, filters));
+  return getFromApi(url)
+    .then((result) => dispatch(receiveSearchResults(result)))
+    .catch(() => dispatch(searchFailed()));
 };
 
-export const fetchGraph = () => {
-  return (dispatch: Dispatch) => {
-    dispatch(requestGraph());
-    return getFromApi("graph")
-      .then(graph => dispatch(receiveGraph(graph)))
-      .catch(() => dispatch(graphLoadFailed()));
-  };
+export const fetchGraph = () => (dispatch: Dispatch) => {
+  dispatch(requestGraph());
+  return getFromApi("graph")
+    .then((graph) => dispatch(receiveGraph(graph)))
+    .catch(() => dispatch(graphLoadFailed()));
 };
 
-export const loadInstanceList = (page?: number, sort?: IInstanceSort) => {
-  return (dispatch: Dispatch, getState: () => IAppState) => {
-    sort = sort ? sort : getState().data.instanceListSort;
-    dispatch(requestInstanceList(sort));
-    const params: string[] = [];
-    if (!!page) {
-      params.push(`page=${page}`);
-    }
-    if (!!sort) {
-      params.push(`sortField=${sort.field}`);
-      params.push(`sortDirection=${sort.direction}`);
-    }
-    const path = !!params ? `instances?${params.join("&")}` : "instances";
-    return getFromApi(path)
-      .then(instancesListResponse => dispatch(receiveInstanceList(instancesListResponse)))
-      .catch(() => dispatch(instanceListLoadFailed()));
-  };
+export const loadInstanceList = (page?: number, sort?: InstanceSort) => (
+  dispatch: Dispatch,
+  getState: () => AppState
+) => {
+  sort = sort || getState().data.instanceListSort;
+  dispatch(requestInstanceList(sort));
+  const params: string[] = [];
+  if (page) {
+    params.push(`page=${page}`);
+  }
+  if (sort) {
+    params.push(`sortField=${sort.field}`);
+    params.push(`sortDirection=${sort.direction}`);
+  }
+  const path = params ? `instances?${params.join("&")}` : "instances";
+  return getFromApi(path)
+    .then((instancesListResponse) => dispatch(receiveInstanceList(instancesListResponse)))
+    .catch(() => dispatch(instanceListLoadFailed()));
 };

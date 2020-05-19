@@ -25,8 +25,7 @@ FocusStyleManager.onlyShowFocusOnTabs();
 export const history = createBrowserHistory();
 
 // Initialize redux
-// @ts-ignore
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   createRootReducer(history),
   composeEnhancers(applyMiddleware(routerMiddleware(history), thunk))

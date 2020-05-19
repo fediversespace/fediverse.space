@@ -7,11 +7,11 @@ const StyledSwitch = styled(Switch)`
   margin: 0;
 `;
 
-interface IGraphHideEdgesButtonProps {
+interface GraphHideEdgesButtonProps {
   isShowingEdges: boolean;
   toggleEdges: () => void;
 }
-const GraphHideEdgesButton: React.FC<IGraphHideEdgesButtonProps> = ({ isShowingEdges, toggleEdges }) => (
+const GraphHideEdgesButton: React.FC<GraphHideEdgesButtonProps> = ({ isShowingEdges, toggleEdges }) => (
   <FloatingCard>
     <StyledSwitch checked={isShowingEdges} label="Show connections" onChange={toggleEdges} tabIndex={-1} />
   </FloatingCard>

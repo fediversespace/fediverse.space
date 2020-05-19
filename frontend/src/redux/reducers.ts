@@ -3,34 +3,34 @@ import { isEqual } from "lodash";
 import { combineReducers } from "redux";
 
 import { History } from "history";
-import { ActionType, IAction, ICurrentInstanceState, IDataState, ISearchState } from "./types";
+import { ActionType, Action, CurrentInstanceState, DataState, SearchState } from "./types";
 
-const initialDataState: IDataState = {
+const initialDataState: DataState = {
   graphLoadError: false,
   instanceListLoadError: false,
   instanceListSort: { field: "userCount", direction: "desc" },
   isLoadingGraph: false,
-  isLoadingInstanceList: false
+  isLoadingInstanceList: false,
 };
-const data = (state: IDataState = initialDataState, action: IAction): IDataState => {
+const data = (state: DataState = initialDataState, action: Action): DataState => {
   switch (action.type) {
     case ActionType.REQUEST_GRAPH:
       return {
         ...state,
         graphResponse: undefined,
-        isLoadingGraph: true
+        isLoadingGraph: true,
       };
     case ActionType.RECEIVE_GRAPH:
       return {
         ...state,
         graphResponse: action.payload,
-        isLoadingGraph: false
+        isLoadingGraph: false,
       };
     case ActionType.GRAPH_LOAD_ERROR:
       return {
         ...state,
         graphLoadError: true,
-        isLoadingGraph: false
+        isLoadingGraph: false,
       };
     case ActionType.REQUEST_INSTANCES:
       return {
@@ -38,71 +38,71 @@ const data = (state: IDataState = initialDataState, action: IAction): IDataState
         instanceListLoadError: false,
         instanceListSort: action.payload,
         instancesResponse: undefined,
-        isLoadingInstanceList: true
+        isLoadingInstanceList: true,
       };
     case ActionType.RECEIVE_INSTANCES:
       return {
         ...state,
         instancesResponse: action.payload,
-        isLoadingInstanceList: false
+        isLoadingInstanceList: false,
       };
     case ActionType.INSTANCE_LIST_LOAD_ERROR:
       return {
         ...state,
         instanceListLoadError: true,
-        isLoadingInstanceList: false
+        isLoadingInstanceList: false,
       };
     default:
       return state;
   }
 };
 
-const initialCurrentInstanceState: ICurrentInstanceState = {
+const initialCurrentInstanceState: CurrentInstanceState = {
   currentInstanceDetails: null,
   error: false,
-  isLoadingInstanceDetails: false
+  isLoadingInstanceDetails: false,
 };
-const currentInstance = (state = initialCurrentInstanceState, action: IAction): ICurrentInstanceState => {
+const currentInstance = (state = initialCurrentInstanceState, action: Action): CurrentInstanceState => {
   switch (action.type) {
     case ActionType.REQUEST_INSTANCE_DETAILS:
       return {
         ...state,
         error: false,
-        isLoadingInstanceDetails: true
+        isLoadingInstanceDetails: true,
       };
     case ActionType.RECEIVE_INSTANCE_DETAILS:
       return {
         ...state,
         currentInstanceDetails: action.payload,
         error: false,
-        isLoadingInstanceDetails: false
+        isLoadingInstanceDetails: false,
       };
     case ActionType.DESELECT_INSTANCE:
       return {
         ...state,
         currentInstanceDetails: null,
-        error: false
+        error: false,
       };
     case ActionType.INSTANCE_LOAD_ERROR:
       return {
         ...state,
         error: true,
-        isLoadingInstanceDetails: false
+        isLoadingInstanceDetails: false,
       };
     default:
       return state;
   }
 };
 
-const initialSearchState: ISearchState = {
+const initialSearchState: SearchState = {
   error: false,
   filters: [],
   isLoadingResults: false,
   next: "",
   query: "",
-  results: []
+  results: [],
 };
-const search = (state = initialSearchState, action: IAction): ISearchState => {
+const search = (state = initialSearchState, action: Action): SearchState => {
   switch (action.type) {
     case ActionType.REQUEST_SEARCH_RESULTS:
       const { query, filters } = action.payload;
@@ -114,7 +114,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
         isLoadingResults: true,
         next: isNewQuery ? "" : state.next,
         query,
-        results: isNewQuery ? [] : state.results
+        results: isNewQuery ? [] : state.results,
       };
     case ActionType.RECEIVE_SEARCH_RESULTS:
       return {
@@ -122,7 +122,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
         error: false,
         isLoadingResults: false,
         next: action.payload.next,
-        results: state.results.concat(action.payload.results)
+        results: state.results.concat(action.payload.results),
       };
     case ActionType.SEARCH_RESULTS_ERROR:
       return { ...initialSearchState, error: true };
@@ -131,7 +131,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
     case ActionType.SET_SEARCH_RESULT_HOVER:
       return {
         ...state,
-        hoveringOverResult: action.payload
+        hoveringOverResult: action.payload,
       };
     default:
       return state;
@@ -141,8 +141,7 @@ const search = (state = initialSearchState, action: IAction): ISearchState => {
 export default (history: History) =>
   combineReducers({
     router: connectRouter(history),
-    // tslint:disable-next-line:object-literal-sort-keys
     currentInstance,
     data,
-    search
+    search,
   });

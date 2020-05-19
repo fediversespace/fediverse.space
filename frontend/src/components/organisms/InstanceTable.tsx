@@ -8,7 +8,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 import { loadInstanceList } from "../../redux/actions";
-import { IAppState, IInstanceListResponse, IInstanceSort, SortField } from "../../redux/types";
+import { AppState, InstanceListResponse, InstanceSort, SortField, InstanceDetails } from "../../redux/types";
 import { InstanceType } from "../atoms";
 import { ErrorState } from "../molecules";
 
@@ -41,15 +41,15 @@ const InsularityColumn = styled.th`
   width: 15%;
 `;
 
-interface IInstanceTableProps {
+interface InstanceTableProps {
   loadError: boolean;
-  instancesResponse?: IInstanceListResponse;
-  instanceListSort: IInstanceSort;
+  instancesResponse?: InstanceListResponse;
+  instanceListSort: InstanceSort;
   isLoading: boolean;
-  loadInstanceList: (page?: number, sort?: IInstanceSort) => void;
+  loadInstanceList: (page?: number, sort?: InstanceSort) => void;
   navigate: (path: string) => void;
 }
-class InstanceTable extends React.PureComponent<IInstanceTableProps> {
+class InstanceTable extends React.PureComponent<InstanceTableProps> {
   public componentDidMount() {
     const { isLoading, instancesResponse, loadError } = this.props;
     if (!isLoading && !instancesResponse && !loadError) {
@@ -61,22 +61,23 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
     const { isLoading, instancesResponse, loadError } = this.props;
     if (loadError) {
       return <ErrorState />;
-    } else if (isLoading || !instancesResponse) {
+    }
+    if (isLoading || !instancesResponse) {
       return <NonIdealState icon={<Spinner />} />;
     }
 
-    const { instances, pageNumber: currentPage, totalPages, totalEntries, pageSize } = instancesResponse!;
+    const { instances, pageNumber: currentPage, totalPages, totalEntries, pageSize } = instancesResponse;
     const pagesToDisplay = this.getPagesToDisplay(totalPages, currentPage);
 
     return (
       <>
-        <StyledTable striped={true} bordered={true} interactive={true}>
+        <StyledTable striped bordered interactive>
           <thead>
             <tr>
               <InstanceColumn>
                 Instance
                 <Button
-                  minimal={true}
+                  minimal
                   icon={this.getSortIcon("domain")}
                   onClick={this.sortByFactory("domain")}
                   intent={this.getSortIntent("domain")}
@@ -87,7 +88,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
               <UserCountColumn>
                 Users
                 <Button
-                  minimal={true}
+                  minimal
                   icon={this.getSortIcon("userCount")}
                   onClick={this.sortByFactory("userCount")}
                   intent={this.getSortIntent("userCount")}
@@ -96,7 +97,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
               <StatusCountColumn>
                 Statuses
                 <Button
-                  minimal={true}
+                  minimal
                   icon={this.getSortIcon("statusCount")}
                   onClick={this.sortByFactory("statusCount")}
                   intent={this.getSortIntent("statusCount")}
@@ -105,7 +106,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
               <InsularityColumn>
                 Insularity
                 <Button
-                  minimal={true}
+                  minimal
                   icon={this.getSortIcon("insularity")}
                   onClick={this.sortByFactory("insularity")}
                   intent={this.getSortIntent("insularity")}
@@ -114,7 +115,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
             </tr>
           </thead>
           <tbody>
-            {instances.map(i => (
+            {instances.map((i: InstanceDetails) => (
               <tr key={i.name} onClick={this.goToInstanceFactory(i.name)}>
                 <td>{i.name}</td>
                 <td>{i.type && <InstanceType type={i.type} />}</td>
@@ -134,7 +135,7 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
           </p>
 
           <ButtonGroup>
-            {zip(pagesToDisplay, pagesToDisplay.slice(1)).map(([page, nextPage], idx) => {
+            {zip(pagesToDisplay, pagesToDisplay.slice(1)).map(([page, nextPage]) => {
               if (page === undefined) {
                 return null;
               }
@@ -152,8 +153,8 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
                     {page}
                   </Button>
                   {isEndOfSection && (
-                    <Button disabled={true} key={"..."}>
-                      {"..."}
+                    <Button disabled key="...">
+                      ...
                     </Button>
                   )}
                 </>
@@ -187,20 +188,19 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
     const { instanceListSort } = this.props;
     if (instanceListSort.field !== field) {
       return IconNames.SORT;
-    } else if (instanceListSort.direction === "asc") {
-      return IconNames.SORT_ASC;
-    } else {
-      return IconNames.SORT_DESC;
     }
+    if (instanceListSort.direction === "asc") {
+      return IconNames.SORT_ASC;
+    }
+    return IconNames.SORT_DESC;
   };
 
   private getSortIntent = (field: SortField) => {
     const { instanceListSort } = this.props;
     if (instanceListSort.field === field) {
       return Intent.PRIMARY;
-    } else {
-      return Intent.NONE;
     }
+    return Intent.NONE;
   };
 
   private getPagesToDisplay = (totalPages: number, currentPage: number) => {
@@ -214,24 +214,19 @@ class InstanceTable extends React.PureComponent<IInstanceTableProps> {
 
     const pagesToDisplay = firstPages.concat(surroundingPages).concat(lastPages);
 
-    return sortedUniq(sortBy(pagesToDisplay, n => n));
+    return sortedUniq(sortBy(pagesToDisplay, (n) => n));
   };
 }
 
-const mapStateToProps = (state: IAppState) => {
-  return {
-    instanceListSort: state.data.instanceListSort,
-    instancesResponse: state.data.instancesResponse,
-    isLoading: state.data.isLoadingInstanceList,
-    loadError: state.data.instanceListLoadError
-  };
-};
+const mapStateToProps = (state: AppState) => ({
+  instanceListSort: state.data.instanceListSort,
+  instancesResponse: state.data.instancesResponse,
+  isLoading: state.data.isLoadingInstanceList,
+  loadError: state.data.instanceListLoadError,
+});
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  loadInstanceList: (page?: number, sort?: IInstanceSort) => dispatch(loadInstanceList(page, sort) as any),
-  navigate: (path: string) => dispatch(push(path))
+  loadInstanceList: (page?: number, sort?: InstanceSort) => dispatch(loadInstanceList(page, sort) as any),
+  navigate: (path: string) => dispatch(push(path)),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(InstanceTable);
+export default connect(mapStateToProps, mapDispatchToProps)(InstanceTable);

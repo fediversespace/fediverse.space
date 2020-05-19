@@ -8,11 +8,11 @@ import { getAuthToken, getFromApi, postToApi } from "../../util";
 import { Page } from "../atoms";
 import { ErrorState } from "../molecules";
 
-interface IFormContainerProps {
+interface FormContainerProps {
   error: boolean;
 }
-const FormContainer = styled.div<IFormContainerProps>`
-  ${props => (props.error ? "margin: 20px auto 0 auto;" : "margin-top: 20px;")}
+const FormContainer = styled.div<FormContainerProps>`
+  ${(props) => (props.error ? "margin: 20px auto 0 auto;" : "margin-top: 20px;")}
 `;
 const LoginTypeContainer = styled.div`
   display: flex;
@@ -31,23 +31,28 @@ const StyledIcon = styled(Icon)`
   margin-bottom: 10px;
 `;
 
-interface ILoginTypes {
+interface LoginTypes {
   domain: string;
   email?: string;
   fediverseAccount?: string;
 }
-interface ILoginScreenState {
+interface LoginScreenState {
   domain: string;
   isGettingLoginTypes: boolean;
   isSendingLoginRequest: boolean;
-  loginTypes?: ILoginTypes;
+  loginTypes?: LoginTypes;
   selectedLoginType?: "email" | "fediverseAccount";
   error: boolean;
 }
-class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
+class LoginScreen extends React.PureComponent<{}, LoginScreenState> {
   public constructor(props: any) {
     super(props);
-    this.state = { domain: "", error: false, isGettingLoginTypes: false, isSendingLoginRequest: false };
+    this.state = {
+      domain: "",
+      error: false,
+      isGettingLoginTypes: false,
+      isSendingLoginRequest: false,
+    };
   }
 
   public render() {
@@ -59,13 +64,13 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     const { error, loginTypes, isSendingLoginRequest, selectedLoginType } = this.state;
 
     let content;
-    if (!!error) {
+    if (error) {
       content = (
         <ErrorState description="This could be because the instance is down. If not, please reload the page and try again." />
       );
     } else if (!!selectedLoginType && !isSendingLoginRequest) {
       content = this.renderPostLogin();
-    } else if (!!loginTypes) {
+    } else if (loginTypes) {
       content = this.renderChooseLoginType();
     } else {
       content = this.renderChooseInstance();
@@ -78,7 +83,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
           You must be the instance admin to manage how fediverse.space interacts with your instance.
         </p>
         <p className={Classes.RUNNING_TEXT}>
-          It's currently only possible to administrate Mastodon and Pleroma instances. If you want to login with a
+          It&apos;s currently only possible to administrate Mastodon and Pleroma instances. If you want to login with a
           direct message, your instance must federate with mastodon.social and vice versa.
         </p>
         <p className={Classes.RUNNING_TEXT}>
@@ -95,7 +100,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
     const onButtonClick = () => this.getLoginTypes();
     return (
       <form onSubmit={this.getLoginTypes}>
-        <FormGroup label="Instance domain" labelFor="domain-input" disabled={isGettingLoginTypes} inline={true}>
+        <FormGroup label="Instance domain" labelFor="domain-input" disabled={isGettingLoginTypes} inline>
           <InputGroup
             disabled={isGettingLoginTypes}
             id="domain-input"
@@ -104,7 +109,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
             rightElement={
               <Button
                 intent={Intent.PRIMARY}
-                minimal={true}
+                minimal
                 rightIcon={IconNames.ARROW_RIGHT}
                 title="submit"
                 loading={isGettingLoginTypes}
@@ -130,18 +135,13 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
         <H4>Choose an authentication method</H4>
         <LoginTypeContainer>
           {loginTypes.email && (
-            <LoginTypeButton
-              large={true}
-              icon={IconNames.ENVELOPE}
-              onClick={loginWithEmail}
-              loading={!!isSendingLoginRequest}
-            >
+            <LoginTypeButton large icon={IconNames.ENVELOPE} onClick={loginWithEmail} loading={!!isSendingLoginRequest}>
               {`Email ${loginTypes.email}`}
             </LoginTypeButton>
           )}
           {loginTypes.fediverseAccount && (
             <LoginTypeButton
-              large={true}
+              large
               icon={IconNames.GLOBE_NETWORK}
               onClick={loginWithDm}
               loading={!!isSendingLoginRequest}
@@ -175,7 +175,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
   };
 
   private getLoginTypes = (e?: React.FormEvent<HTMLFormElement>) => {
-    if (!!e) {
+    if (e) {
       e.preventDefault();
     }
     this.setState({ isGettingLoginTypes: true });
@@ -184,8 +184,8 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
       domain = domain.slice(8);
     }
     getFromApi(`admin/login/${domain.trim()}`)
-      .then(response => {
-        if (!!response.error) {
+      .then((response) => {
+        if (response.error) {
           // Go to catch() below
           throw new Error(response.error);
         } else {
@@ -196,7 +196,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
         AppToaster.show({
           icon: IconNames.ERROR,
           intent: Intent.DANGER,
-          message: err.message
+          message: err.message,
         });
         this.setState({ isGettingLoginTypes: false });
       });
@@ -205,7 +205,7 @@ class LoginScreen extends React.PureComponent<{}, ILoginScreenState> {
   private login = (type: "email" | "fediverseAccount") => {
     this.setState({ isSendingLoginRequest: true, selectedLoginType: type });
     postToApi("admin/login", { domain: this.state.loginTypes!.domain, type })
-      .then(response => {
+      .then((response) => {
         if ("error" in response || "errors" in response) {
           // Go to catch() below
           throw new Error();

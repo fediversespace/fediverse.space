@@ -11,7 +11,7 @@ const FloatingCardElement = styled(Card)`
   z-index: 2;
 `;
 
-const FloatingCard: React.FC<ICardProps> = props => (
+const FloatingCard: React.FC<ICardProps> = (props) => (
   <FloatingCardRow>
     <FloatingCardElement elevation={Elevation.ONE} {...props} />
   </FloatingCardRow>

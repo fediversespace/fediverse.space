@@ -1,21 +1,19 @@
 import * as React from "react";
 
-import { Alignment, Navbar } from "@blueprintjs/core";
+import { Alignment, Navbar, Classes } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 
-import { Classes } from "@blueprintjs/core";
 import { match, NavLink } from "react-router-dom";
-import { IInstanceDomainPath } from "../../constants";
+import { InstanceDomainPath } from "../../constants";
 
-interface INavState {
+interface NavState {
   aboutIsOpen: boolean;
 }
 
-const graphIsActive = (currMatch: match<IInstanceDomainPath>, location: Location) => {
-  return location.pathname === "/" || location.pathname.startsWith("/instance/");
-};
+const graphIsActive = (currMatch: match<InstanceDomainPath>, location: Location) =>
+  location.pathname === "/" || location.pathname.startsWith("/instance/");
 
-class Nav extends React.Component<{}, INavState> {
+class Nav extends React.Component<{}, NavState> {
   constructor(props: any) {
     super(props);
     this.state = { aboutIsOpen: false };
@@ -23,7 +21,7 @@ class Nav extends React.Component<{}, INavState> {
 
   public render() {
     return (
-      <Navbar fixedToTop={true}>
+      <Navbar fixedToTop>
         <Navbar.Group align={Alignment.LEFT}>
           <Navbar.Heading>fediverse.space</Navbar.Heading>
           <Navbar.Divider />
@@ -46,7 +44,7 @@ class Nav extends React.Component<{}, INavState> {
             to="/about"
             className={`${Classes.BUTTON} ${Classes.MINIMAL} bp3-icon-${IconNames.INFO_SIGN}`}
             activeClassName={Classes.INTENT_PRIMARY}
-            exact={true}
+            exact
           >
             About
           </NavLink>

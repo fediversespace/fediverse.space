@@ -17,7 +17,7 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-interface IAdminSettings {
+interface AdminSettings {
   domain: string;
   optIn: boolean;
   optOut: boolean;
@@ -25,26 +25,26 @@ interface IAdminSettings {
   statusCount: number;
 }
 
-interface IAdminScreenProps {
+interface AdminScreenProps {
   navigate: (path: string) => void;
 }
-interface IAdminScreenState {
-  settings?: IAdminSettings;
+interface AdminScreenState {
+  settings?: AdminSettings;
   isUpdating: boolean;
 }
-class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenState> {
+class AdminScreen extends React.PureComponent<AdminScreenProps, AdminScreenState> {
   private authToken = getAuthToken();
 
-  public constructor(props: IAdminScreenProps) {
+  public constructor(props: AdminScreenProps) {
     super(props);
     this.state = { isUpdating: false };
   }
 
   public componentDidMount() {
     // Load instance settings from server
-    if (!!this.authToken) {
-      getFromApi(`admin`, this.authToken!)
-        .then(response => {
+    if (this.authToken) {
+      getFromApi(`admin`, this.authToken)
+        .then((response) => {
           this.setState({ settings: response });
         })
         .catch(() => {
@@ -52,7 +52,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
             icon: IconNames.ERROR,
             intent: Intent.DANGER,
             message: "Failed to load settings.",
-            timeout: 0
+            timeout: 0,
           });
           unsetAuthToken();
         });
@@ -78,7 +78,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
                 <Switch
                   id="opt-in-switch"
                   checked={!!settings.optIn}
-                  large={true}
+                  large
                   label="Opt in"
                   disabled={!!isUpdating}
                   onChange={this.updateOptIn}
@@ -89,7 +89,7 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
               <Switch
                 id="opt-out-switch"
                 checked={!!settings.optOut}
-                large={true}
+                large
                 label="Opt out"
                 disabled={!!isUpdating}
                 onChange={this.updateOptOut}
@@ -116,9 +116,9 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
   }
 
   private updateOptIn = (e: React.FormEvent<HTMLInputElement>) => {
-    const settings = this.state.settings as IAdminSettings;
+    const settings = this.state.settings as AdminSettings;
     const optIn = e.currentTarget.checked;
-    let optOut = settings.optOut;
+    let { optOut } = settings;
     if (optIn) {
       optOut = false;
     }
@@ -126,9 +126,9 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
   };
 
   private updateOptOut = (e: React.FormEvent<HTMLInputElement>) => {
-    const settings = this.state.settings as IAdminSettings;
+    const settings = this.state.settings as AdminSettings;
     const optOut = e.currentTarget.checked;
-    let optIn = settings.optIn;
+    let { optIn } = settings;
     if (optOut) {
       optIn = false;
     }
@@ -140,15 +140,15 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
     this.setState({ isUpdating: true });
     const body = {
       optIn: this.state.settings!.optIn,
-      optOut: this.state.settings!.optOut
+      optOut: this.state.settings!.optOut,
     };
     postToApi(`admin`, body, this.authToken!)
-      .then(response => {
+      .then((response) => {
         this.setState({ settings: response, isUpdating: false });
         AppToaster.show({
           icon: IconNames.TICK,
           intent: Intent.SUCCESS,
-          message: "Successfully updated settings."
+          message: "Successfully updated settings.",
         });
       })
       .catch(() => {
@@ -161,16 +161,13 @@ class AdminScreen extends React.PureComponent<IAdminScreenProps, IAdminScreenSta
     unsetAuthToken();
     AppToaster.show({
       icon: IconNames.LOG_OUT,
-      message: "Logged out."
+      message: "Logged out.",
     });
     this.props.navigate("/admin/login");
   };
 }
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-  navigate: (path: string) => dispatch(push(path))
+  navigate: (path: string) => dispatch(push(path)),
 });
-export default connect(
-  undefined,
-  mapDispatchToProps
-)(AdminScreen);
+export default connect(undefined, mapDispatchToProps)(AdminScreen);

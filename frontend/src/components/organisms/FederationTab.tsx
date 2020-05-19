@@ -1,12 +1,12 @@
 import { Classes, H3 } from "@blueprintjs/core";
 import React from "react";
 import { Link } from "react-router-dom";
-import { IFederationRestrictions } from "../../redux/types";
+import { FederationRestrictions } from "../../redux/types";
 
 const maybeGetList = (domains?: string[]) =>
   domains && (
     <ul>
-      {domains.sort().map(domain => (
+      {domains.sort().map((domain) => (
         <li key={domain}>
           <Link to={`/instance/${domain}`} className={`${Classes.BUTTON} ${Classes.MINIMAL}`} role="button">
             {domain}
@@ -16,10 +16,10 @@ const maybeGetList = (domains?: string[]) =>
     </ul>
   );
 
-interface IFederationTabProps {
-  restrictions?: IFederationRestrictions;
+interface FederationTabProps {
+  restrictions?: FederationRestrictions;
 }
-const FederationTab: React.FC<IFederationTabProps> = ({ restrictions }) => {
+const FederationTab: React.FC<FederationTabProps> = ({ restrictions }) => {
   if (!restrictions) {
     return null;
   }

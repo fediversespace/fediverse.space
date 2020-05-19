@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router";
-import { IAppState } from "../../redux/types";
+import { AppState } from "../../redux/types";
 import { setAuthToken } from "../../util";
 import { Page } from "../atoms";
 
-interface IVerifyLoginScreenProps {
+interface VerifyLoginScreenProps {
   search: string;
 }
-const VerifyLoginScreen: React.FC<IVerifyLoginScreenProps> = ({ search }) => {
+const VerifyLoginScreen: React.FC<VerifyLoginScreenProps> = ({ search }) => {
   const [didSaveToken, setDidSaveToken] = useState(false);
   const token = new URLSearchParams(search).get("token");
 
   useEffect(() => {
     // Save the auth token
-    if (!!token) {
+    if (token) {
       setAuthToken(token);
       setDidSaveToken(true);
     }
@@ -22,15 +22,14 @@ const VerifyLoginScreen: React.FC<IVerifyLoginScreenProps> = ({ search }) => {
 
   if (!token) {
     return <Redirect to="/admin/login" />;
-  } else if (!didSaveToken) {
+  }
+  if (!didSaveToken) {
     return <Page />;
   }
   return <Redirect to="/admin" />;
 };
 
-const mapStateToProps = (state: IAppState) => {
-  return {
-    search: state.router.location.search
-  };
-};
+const mapStateToProps = (state: AppState) => ({
+  search: state.router.location.search,
+});
 export default connect(mapStateToProps)(VerifyLoginScreen);

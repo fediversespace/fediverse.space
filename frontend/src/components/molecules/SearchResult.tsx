@@ -4,7 +4,7 @@ import * as numeral from "numeral";
 import React from "react";
 import sanitize from "sanitize-html";
 import styled from "styled-components";
-import { ISearchResultInstance } from "../../redux/types";
+import { SearchResultInstance } from "../../redux/types";
 import { InstanceType } from "../atoms";
 
 const StyledCard = styled(Card)`
@@ -32,18 +32,18 @@ const StyledUserCount = styled.div`
 const StyledDescription = styled.div`
   margin-top: 10px;
 `;
-interface ISearchResultProps {
-  result: ISearchResultInstance;
+interface SearchResultProps {
+  result: SearchResultInstance;
   onClick: () => void;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
 }
-const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick, onMouseEnter, onMouseLeave }) => {
+const SearchResult: React.FC<SearchResultProps> = ({ result, onClick, onMouseEnter, onMouseLeave }) => {
   let shortenedDescription;
   if (result.description) {
     shortenedDescription = result.description && sanitize(result.description);
     if (shortenedDescription.length > 100) {
-      shortenedDescription = shortenedDescription.substring(0, 100) + "...";
+      shortenedDescription = `${shortenedDescription.substring(0, 100)}...`;
     }
   }
 
@@ -59,7 +59,7 @@ const SearchResult: React.FC<ISearchResultProps> = ({ result, onClick, onMouseEn
   return (
     <StyledCard
       elevation={Elevation.ONE}
-      interactive={true}
+      interactive
       key={result.name}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
