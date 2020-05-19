@@ -13,7 +13,7 @@ test-frontend:
       - frontend/.yarn
   only:
     changes:
-      - frontend/*
+      - frontend/**/*
 
 test-backend:
   stage: test
@@ -22,7 +22,7 @@ test-backend:
     MIX_ENV: test
   only:
     changes:
-      - backend/*
+      - backend/**/*
   before_script:
     - cd backend
   script:
