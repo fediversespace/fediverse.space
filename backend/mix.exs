@@ -68,7 +68,8 @@ defmodule Backend.MixProject do
       {:poison, "~> 4.0", override: true},
       {:scrivener_ecto, "~> 2.2"},
       {:recase, "~> 0.6.0"},
-      {:ex_rated, "~> 1.3"}
+      {:ex_rated, "~> 1.3"},
+      {:html_sanitize_ex, "~> 1.4"}
     ]
   end
 

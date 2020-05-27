@@ -159,8 +159,8 @@ defmodule Backend.Crawler do
     ## Update the instance we crawled ##
     instance = %Instance{
       domain: domain,
-      description: result.description,
-      version: result.version,
+      description: HtmlSanitizeEx.basic_html(result.description),
+      version: HtmlSanitizeEx.basic_html(result.version),
       user_count: result.user_count,
       status_count: result.status_count,
       type: instance_type,
