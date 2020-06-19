@@ -11,10 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Bring back `develop` staging backup (now managed in DNS)
-- Increase default number of concurrent crawlers to 100
-- Accessibility improvements (according to axe review)
-
 ### Deprecated
 
 ### Removed
@@ -22,6 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [2.9.0 - 2020-06-19]
+
+### Changed
+
+- Bring back `develop` staging backup (now managed in DNS)
+- Increase default number of concurrent crawlers to 100
+- Accessibility improvements (according to axe review)
+- Update dependencies
+
+### Security
+- Add rate limiting of auth endpoints
+- Added security headers to netlify frontend
+- Sanitize crawled HTML in the backend
 
 ## [2.8.6 - 2020-01-16]
 
