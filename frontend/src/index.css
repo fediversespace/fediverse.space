@@ -12,3 +12,7 @@ body {
 .app-toaster {
   z-index: 1000;
 }
+
+.current-navbar-item {
+  background-color: #293742 !important;
+}

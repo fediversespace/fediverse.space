@@ -143,7 +143,7 @@ class InstanceTable extends React.PureComponent<InstanceTableProps> {
               const isEndOfSection = nextPage !== undefined && page + 1 !== nextPage && page !== totalPages;
 
               return (
-                <>
+                <React.Fragment key={page}>
                   <Button
                     key={page}
                     onClick={this.loadPageFactory(page)}
@@ -157,7 +157,7 @@ class InstanceTable extends React.PureComponent<InstanceTableProps> {
                       ...
                     </Button>
                   )}
-                </>
+                </React.Fragment>
               );
             })}
           </ButtonGroup>

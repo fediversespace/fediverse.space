@@ -24,6 +24,8 @@ There are several environment variables you can set to configure how the crawler
 - `FRONTEND_DOMAIN` (required). Used to generate login links for instance admins.
   - Don't enter `https://`, this is added automatically.
 - `SENDGRID_API_KEY`. Needed to send emails to the admin, or to instance admins who want to opt in/out.
+- `MASTODON_DOMAIN`. The domain (e.g. `mastodon.social`) that your bot login account is hosted on.
+- `MASTODON_TOKEN`. The access token for the bot login account.
 
 ## Deployment
 

@@ -17,7 +17,12 @@ defmodule BackendWeb.RateLimiter do
   end
 
   def rate_limit_authentication(conn, options \\ []) do
-    %{"id" => domain} = conn.params
+    domain =
+      if Map.has_key?(conn.params, "id") do
+        Map.get(conn.params, "id")
+      else
+        Map.get(conn.params, "domain")
+      end
     options = Keyword.put(options, :bucket_name, "authorization: #{domain}")
     rate_limit(conn, options)
   end

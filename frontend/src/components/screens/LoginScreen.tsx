@@ -1,4 +1,4 @@
-import { Button, Classes, FormGroup, H1, H4, Icon, InputGroup, Intent } from "@blueprintjs/core";
+import { Button, Classes, FormGroup, H1, H2, Icon, InputGroup, Intent } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import React from "react";
 import { Redirect } from "react-router";
@@ -132,7 +132,7 @@ class LoginScreen extends React.PureComponent<{}, LoginScreenState> {
     const loginWithDm = () => this.login("fediverseAccount");
     return (
       <>
-        <H4>Choose an authentication method</H4>
+        <H2>Choose an authentication method</H2>
         <LoginTypeContainer>
           {loginTypes.email && (
             <LoginTypeButton large icon={IconNames.ENVELOPE} onClick={loginWithEmail} loading={!!isSendingLoginRequest}>

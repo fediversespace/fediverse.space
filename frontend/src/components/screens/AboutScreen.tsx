@@ -1,4 +1,4 @@
-import { Classes, Code, H1, H2, H4 } from "@blueprintjs/core";
+import { Classes, Code, H1, H2, H3 } from "@blueprintjs/core";
 import * as React from "react";
 import styled from "styled-components";
 // import appsignalLogo from "../../assets/appsignal.svg";
@@ -36,16 +36,16 @@ const AboutScreen: React.FC = () => (
     <br />
     <H2>FAQ</H2>
 
-    <H4>Why can&apos;t I see details about my instance?</H4>
+    <H3>Why can&apos;t I see details about my instance?</H3>
     <p className={Classes.RUNNING_TEXT}>
       fediverse.space only supports servers using the Mastodon API, the Misskey API, the GNU Social API, or Nodeinfo.
       Instances with 10 or fewer users won&apos;t be crawled -- it&apos;s a tool for understanding communities, not
       individuals.
     </p>
 
-    <H4>
+    <H3>
       When is <Code>$OTHER_FEDIVERSE_SERVER</Code> going to be added?
-    </H4>
+    </H3>
     <p className={Classes.RUNNING_TEXT}>
       Check out{" "}
       <a href="https://gitlab.com/taobojlen/fediverse.space/issues/24" target="_blank" rel="noopener noreferrer">
@@ -54,10 +54,10 @@ const AboutScreen: React.FC = () => (
       .
     </p>
 
-    <H4>How do I add my personal instance?</H4>
+    <H3>How do I add my personal instance?</H3>
     <p className={Classes.RUNNING_TEXT}>Click on the Administration link in the top right to opt-in.</p>
 
-    <H4>How do you calculate the strength of relationships between instances?</H4>
+    <H3>How do you calculate the strength of relationships between instances?</H3>
     <p className={Classes.RUNNING_TEXT}>
       fediverse.space looks at public statuses from within the last month on the public timeline of each instance. It
       calculates at the ratio of

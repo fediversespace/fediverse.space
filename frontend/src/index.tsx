@@ -19,6 +19,11 @@ import { createBrowserHistory } from "history";
 import AppRouter from "./AppRouter";
 import createRootReducer from "./redux/reducers";
 
+if (process.env.NODE_ENV === "development") {
+  const axe = require("react-axe"); // eslint-disable-line @typescript-eslint/no-var-requires
+  axe(React, ReactDOM, 1000);
+}
+
 // https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
 

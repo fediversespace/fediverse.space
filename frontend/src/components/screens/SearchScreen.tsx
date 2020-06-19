@@ -1,4 +1,4 @@
-import { Button, Callout, H2, InputGroup, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
+import { Button, Callout, H1, InputGroup, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { push } from "connected-react-router";
 import { get, isEqual } from "lodash";
@@ -121,7 +121,7 @@ class SearchScreen extends React.PureComponent<SearchScreenProps, SearchScreenSt
       <>
         {isSmallScreen && results.length === 0 && this.renderMobileWarning()}
         <SearchBarContainer hasSearchResults={!!query && !!results} hasError={!!error}>
-          <H2>Find an instance</H2>
+          <H1>Find an instance</H1>
           <InputGroup
             leftIcon={IconNames.SEARCH}
             rightElement={rightSearchBarElement}

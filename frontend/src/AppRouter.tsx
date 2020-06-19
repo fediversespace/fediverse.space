@@ -19,13 +19,15 @@ const AppRouter: React.FC = () => (
   <ConnectedRouter history={history}>
     <div className={`${Classes.DARK} App`}>
       <Nav />
-      <Route path="/instances" exact component={TableScreen} />
-      <Route path="/about" exact component={AboutScreen} />
-      <Route path="/admin/login" exact component={LoginScreen} />
-      <Route path="/admin/verify" exact component={VerifyLoginScreen} />
-      <Route path="/admin" exact component={AdminScreen} />
-      {/* We always want the GraphScreen to be rendered (since un- and re-mounting it is expensive */}
-      <GraphScreen />
+      <main role="main">
+        <Route path="/instances" exact component={TableScreen} />
+        <Route path="/about" exact component={AboutScreen} />
+        <Route path="/admin/login" exact component={LoginScreen} />
+        <Route path="/admin/verify" exact component={VerifyLoginScreen} />
+        <Route path="/admin" exact component={AdminScreen} />
+        {/* We always want the GraphScreen to be rendered (since un- and re-mounting it is expensive */}
+        <GraphScreen />
+      </main>
     </div>
   </ConnectedRouter>
 );
