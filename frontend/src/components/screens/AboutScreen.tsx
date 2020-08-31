@@ -1,7 +1,7 @@
 import { Classes, Code, H1, H2, H3 } from "@blueprintjs/core";
 import * as React from "react";
 import styled from "styled-components";
-// import appsignalLogo from "../../assets/appsignal.svg";
+import * as appsignalLogo from "../../assets/appsignal.png";
 import * as gitlabLogo from "../../assets/gitlab.png";
 import * as nlnetLogo from "../../assets/nlnet.png";
 import { Page } from "../atoms";
@@ -10,7 +10,7 @@ const SponsorContainer = styled.div`
   margin-bottom: 20px;
 `;
 const Sponsor = styled.div`
-  margin: 10px;
+  margin: 10px 40px 10px 0;
   display: inline-block;
 `;
 
@@ -75,11 +75,11 @@ const AboutScreen: React.FC = () => (
         </a>
       </Sponsor>
       <br />
-      {/* <Sponsor>
+      <Sponsor>
         <a href="https://appsignal.com" target="_blank" rel="noopener noreferrer">
-          <img src={appsignalLogo} alt="Appsignal logo" height={40} />
+          <img src={appsignalLogo} alt="Appsignal logo" height={50} />
         </a>
-      </Sponsor> */}
+      </Sponsor>
       <Sponsor>
         <a href="https://gitlab.com" target="_blank" rel="noopener noreferrer">
           <img src={gitlabLogo} alt="GitLab logo" height={40} />
