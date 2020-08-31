@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.9.2 - 2020-08-31]
+
+### Removed
+
+- Remove staging server
+
 ## [2.9.1 - 2020-08-31]
 
 ### Fixed
