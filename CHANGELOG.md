@@ -17,9 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Added AppSignal logo to "Special thanks" section
-
 ### Security
+
+## [2.9.1 - 2020-08-31]
+
+### Fixed
+
+- Added AppSignal logo to "Special thanks" section
 
 ## [2.9.0 - 2020-06-19]
 
