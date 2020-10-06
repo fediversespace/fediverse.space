@@ -17,7 +17,7 @@ test-frontend:
 
 test-backend:
   stage: test
-  image: elixir:1.9
+  image: elixir:1.10
   variables:
     MIX_ENV: test
   only:
