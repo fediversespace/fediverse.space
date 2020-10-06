@@ -61,7 +61,7 @@ defmodule Backend.MixProject do
       {:swoosh, "~> 0.23.3"},
       {:ex_twilio, "~> 0.7.0"},
       {:elasticsearch, "~> 1.0"},
-      {:appsignal, "~> 1.10.1"},
+      {:appsignal_phoenix, "~> 2.0.0-beta.1"},
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},
       {:nebulex, "~> 1.1"},
       {:hunter, "~> 0.5.1"},
