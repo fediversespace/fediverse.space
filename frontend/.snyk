@@ -9918,3 +9918,65 @@ patch:
         patched: '2020-10-06T13:34:20.685Z'
     - react-scripts > jest > jest-cli > @jest/core > @jest/reporters > jest-runtime > jest-config > @jest/test-sequencer > jest-runner > jest-jasmine2 > @jest/environment > @jest/transform > @babel/core > @babel/helper-module-transforms > @babel/helper-replace-supers > @babel/traverse > @babel/helper-function-name > @babel/template > @babel/types > lodash:
         patched: '2020-10-06T13:34:20.685Z'
+    - snyk > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > babel-plugin-styled-components > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-go-plugin > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/helper-module-imports > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/generator > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-go-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-cpp-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-docker-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-gradle-plugin > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-docker-plugin > snyk-nodejs-lockfile-parser > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-gradle-plugin > @snyk/java-call-graph-builder > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-mvn-plugin > @snyk/java-call-graph-builder > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > babel-plugin-styled-components > @babel/helper-module-imports > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/generator > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/helper-function-name > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/helper-split-export-declaration > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > babel-plugin-styled-components > @babel/helper-annotate-as-pure > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/cocoapods-lockfile-parser > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-gradle-plugin > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-mvn-plugin > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > @snyk/snyk-cocoapods-plugin > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-php-plugin > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - snyk > snyk-python-plugin > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/helper-function-name > @babel/helper-get-function-arity > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
+    - styled-components > @babel/traverse > @babel/helper-function-name > @babel/template > @babel/types > lodash:
+        patched: '2020-10-06T14:09:33.931Z'
