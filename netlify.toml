@@ -25,5 +25,5 @@
   X-Content-Type-Options = "nosniff"
   X-Frame-Options = "DENY"
   X-XSS-Protection = "1"
-  Content-Security-Policy = "default-src 'self' https://*.fediverse.space; style-src 'self' 'unsafe-inline'"
+  Content-Security-Policy = "default-src 'self' https://*.fediverse.space; style-src 'self' 'unsafe-inline'; script-src 'self' https://*.fediverse.space https://plausible.cursed.technology"
 
