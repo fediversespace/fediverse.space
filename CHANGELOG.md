@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.9.4 - 2020-10-09]
+
+### Fixed
+
+- Fix CSP issues for Plausible analytics
+
 ## [2.9.3 - 2020-10-09]
 
 ### Added
