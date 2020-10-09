@@ -11,18 +11,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Update dependencies
-- Update to Elixir 1.10
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Fixed CSP headers for data: images
-
 ### Security
+
+## [2.9.3 - 2020-10-09]
+
+### Added
+
+- Allow Plausible privacy-preserving analytics in CSP
+
+### Changed
+
+- Update dependencies
+- Update to Elixir 1.10
+
+### Fixed
+
+- Fixed CSP headers for data: images
 
 ## [2.9.2 - 2020-08-31]
 
