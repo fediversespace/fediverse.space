@@ -5,12 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "chrome",
+      "type": "mix_task",
       "request": "launch",
-      "name": "Launch Chrome",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}/frontend/src",
-      "runtimeExecutable": "/usr/bin/chromium-browser"
-    }
+      "name": "phx.server",
+      "task": "phx.server",
+      "taskArgs": [],
+      "projectDir": "${workspaceRoot}/backend",
+      "env": {
+        "SKIP_CRAWL": "1"
+      }
+    },
   ]
 }
