@@ -30,6 +30,10 @@ const AboutScreen: React.FC = () => (
       <a href="https://mastodon.social/@fediversespace" target="_blank" rel="noopener noreferrer">
         Mastodon
       </a>
+      , and read more about what I&apos;m up to on my{" "}
+      <a href="https://www.btao.org" target="_blank" rel="noopener noreferrer">
+        website
+      </a>
       .
     </p>
 
