@@ -3,7 +3,7 @@ defmodule Backend.Scheduler do
   This module runs recurring tasks.
   """
 
-  use Quantum.Scheduler, otp_app: :backend
+  use Quantum, otp_app: :backend
 
   alias Backend.{Crawl, CrawlInteraction, Edge, FederationRestriction, Instance, Repo}
   alias Backend.Mailer.AdminEmail

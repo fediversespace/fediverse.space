@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed crawler not finding API in some cases
+
 ### Security
 
 ## [2.9.4 - 2020-10-09]
