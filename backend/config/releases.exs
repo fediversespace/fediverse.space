@@ -41,3 +41,7 @@ config :backend, :crawler,
 config :backend, Backend.Mailer,
   adapter: Swoosh.Adapters.Sendgrid,
   api_key: System.get_env("SENDGRID_API_KEY")
+
+config :backend, Mastodon.Messenger,
+  domain: System.get_env("MASTODON_DOMAIN"),
+  token: System.get_env("MASTODON_TOKEN")

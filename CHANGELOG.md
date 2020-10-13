@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [2.9.6 - 2020-10-13]
+
+### Added
+
+- Added link to personal website on About page.
+
+### Fixed
+
+- Allow `data:` images in Netlify CSP.
+- Fix inability to DM login links in releases (#104).
+
 ## [2.9.5 - 2020-10-11]
 
 ### Fixed
