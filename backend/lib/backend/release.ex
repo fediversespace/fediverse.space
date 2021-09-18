@@ -14,7 +14,7 @@ defmodule Backend.Release do
   ]
 
   # Ecto repos to start, if any
-  @repos Application.get_env(:backend, :ecto_repos, [])
+  @repos Application.compile_env(:backend, :ecto_repos, [])
   # Elasticsearch clusters to start
   @clusters [Backend.Elasticsearch.Cluster]
   # Elasticsearch indexes to build

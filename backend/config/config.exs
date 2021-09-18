@@ -13,13 +13,13 @@ config :backend,
 # Configures the endpoint
 config :backend, BackendWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "XL4NKGBN9lZMrQbMEI1KJOlwAt8S7younVJl90TdAgzmwyapr3g7BRYSNYvX0sZ9",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: BackendWeb.ErrorView, accepts: ~w(json)]
 
 config :backend, Backend.Repo, queue_target: 5000
 
 config :backend, Backend.Elasticsearch.Cluster,
-  url: "http://localhost:9200",
+  url: "http://elastic:9200",
   api: Elasticsearch.API.HTTP,
   json_library: Jason
 
@@ -41,13 +41,16 @@ config :backend, Graph.Cache,
   # 1 hour
   gc_interval: 3600
 
-config :ex_twilio,
-  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
-  auth_token: System.get_env("TWILIO_AUTH_TOKEN")
 
 config :backend, Backend.Mailer,
-  adapter: Swoosh.Adapters.Sendgrid,
-  api_key: System.get_env("SENDGRID_API_KEY")
+  adapter: Swoosh.Adapters.SMTP,
+  relay: System.get_env("MAILER_RELAY"),
+  username: System.get_env("MAILER_USERNAME"),
+  password: System.get_env("MAILER_PASSWORD"),
+  ssl: true,
+  tls: :always,
+  auth: :always,
+  port: 465
 
 config :backend, Mastodon.Messenger,
   domain: System.get_env("MASTODON_DOMAIN"),
@@ -72,7 +75,6 @@ config :backend, :crawler,
   user_agent: "fediverse.space crawler",
   require_bidirectional_mentions: false,
   admin_phone: System.get_env("ADMIN_PHONE"),
-  twilio_phone: System.get_env("TWILIO_PHONE"),
   admin_email: System.get_env("ADMIN_EMAIL")
 
 config :backend, Backend.Scheduler,

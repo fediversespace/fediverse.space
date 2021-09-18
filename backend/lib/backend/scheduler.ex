@@ -280,7 +280,6 @@ defmodule Backend.Scheduler do
             end).()
 
       Logger.info(message)
-      send_admin_sms(message)
       AdminEmail.send("Potential spam", message)
     else
       Logger.debug("Did not find potential spam instances.")

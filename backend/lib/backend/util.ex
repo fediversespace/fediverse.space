@@ -113,21 +113,6 @@ defmodule Backend.Util do
     end)
   end
 
-  @doc """
-  Sends an SMS to the admin phone number if configured.
-  """
-  def send_admin_sms(body) do
-    if get_config(:admin_phone) != nil and get_config(:twilio_phone) != nil do
-      ExTwilio.Message.create(
-        to: get_config(:admin_phone),
-        from: get_config(:twilio_phone),
-        body: body
-      )
-    else
-      Logger.info("Could not send SMS to admin; not configured.")
-    end
-  end
-
   @spec clean_domain(String.t()) :: String.t()
   def clean_domain(domain) do
     cleaned =
@@ -170,7 +155,9 @@ defmodule Backend.Util do
            timeout: timeout
          ) do
       {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
-      {:ok, _} -> {:error, %HTTPoison.Error{reason: "Non-200 response"}}
+      {:ok, %{status_code: 401}} -> Jason.decode("[]")
+      {:ok, %{status_code: 404}} -> Jason.decode("[]")
+      {:ok, %{body: body}} -> {:error, %HTTPoison.Error{reason: "Non-200 response. Body: #{body}"}}
       {:error, err} -> {:error, err}
     end
   end

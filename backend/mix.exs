@@ -23,11 +23,11 @@ defmodule Backend.MixProject do
       extra_applications: [
         :logger,
         :runtime_tools,
-        :mnesia,
         :gollum,
-        :ex_twilio,
         :elasticsearch,
-        :appsignal
+        :appsignal,
+        :swoosh,
+        :gen_smtp
       ]
     ]
   end
@@ -51,14 +51,14 @@ defmodule Backend.MixProject do
       {:plug_cowboy, "~> 2.1"},
       {:httpoison, "~> 1.7", override: true},
       {:timex, "~> 3.5"},
-      {:honeydew, "~> 1.4.3"},
+      {:honeydew, "~> 1.5.0"},
       {:quantum, "~> 3.3"},
       {:corsica, "~> 1.1.2"},
       {:sobelow, "~> 0.8", only: [:dev, :test]},
       {:gollum, "~> 0.3.2"},
       {:public_suffix, git: "https://github.com/axelson/publicsuffix-elixir"},
       {:swoosh, "~> 1.0"},
-      {:ex_twilio, "~> 0.8"},
+      {:gen_smtp, "~> 1.1"},
       {:elasticsearch, "~> 1.0"},
       {:appsignal, "~> 1.0"},
       {:credo, "~> 1.1", only: [:dev, :test], runtime: false},

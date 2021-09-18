@@ -20,6 +20,7 @@ export const QUALITATIVE_COLOR_SCHEME = [
   "#AD99FF",
   "#0E5A8A",
   "#0A6640",
+  "#AAB42F",
   "#A66321",
   "#A82A2A",
 ];
@@ -56,4 +57,5 @@ export const INSTANCE_TYPES = [
   "hubzilla",
   "plume",
   "wordpress",
+  "smithereen",
 ];

@@ -28,19 +28,19 @@ config :backend, BackendWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   server: true
 
-config :ex_twilio,
-  account_sid: System.get_env("TWILIO_ACCOUNT_SID"),
-  auth_token: System.get_env("TWILIO_AUTH_TOKEN")
-
 config :backend, :crawler,
   admin_phone: System.get_env("ADMIN_PHONE"),
-  twilio_phone: System.get_env("TWILIO_PHONE"),
   admin_email: System.get_env("ADMIN_EMAIL"),
   frontend_domain: System.get_env("FRONTEND_DOMAIN")
 
 config :backend, Backend.Mailer,
-  adapter: Swoosh.Adapters.Sendgrid,
-  api_key: System.get_env("SENDGRID_API_KEY")
+  adapter: Swoosh.Adapters.SMTP,
+  relay: System.get_env("MAILER_RELAY"),
+  username: System.get_env("MAILER_USERNAME"),
+  password: System.get_env("MAILER_PASSWORD"),
+  ssl: true,
+  auth: :always,
+  port: 465
 
 config :backend, Mastodon.Messenger,
   domain: System.get_env("MASTODON_DOMAIN"),

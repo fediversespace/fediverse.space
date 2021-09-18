@@ -233,11 +233,11 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
         </StyledTabs>
         <StyledLinkToFdNetwork>
           <AnchorButton
-            href={`https://fediverse.network/${this.props.instanceName}`}
+            href={`https://fedidb.org/network/instance?domain=${this.props.instanceName}`}
             minimal
             rightIcon={IconNames.SHARE}
             target="_blank"
-            text="See more statistics at fediverse.network"
+            text="See more statistics at fedidb.org"
           />
         </StyledLinkToFdNetwork>
       </>

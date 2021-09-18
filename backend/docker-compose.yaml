@@ -1,0 +1,37 @@
+version: "2"
+
+networks:
+  space:
+    external: false
+
+services:
+  server:
+    build: .
+    restart: unless-stopped
+    networks:
+      - space
+    volumes:
+      - /home/gitea/data:/data
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD: postgres
+      - POSTGRES_USER: postgres
+    networks:
+      - space
+    volumes:
+      - /var/lib/postgresql/data
+
+  elastic:
+    image: elasticsearch:6.8.9
+    restart: unless-stopped
+    environment:
+      - discovery.type: single-node
+    networks: 
+      - space
+
+    
