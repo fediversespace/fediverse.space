@@ -12,8 +12,14 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
   @impl ApiCrawler
   def is_instance_type?(domain, result) do
     # We might already know that this is a Pleroma instance from nodeinfo
-    if result != nil and (Map.get(result, :instance_type) == :pleroma or  Map.get(result, :instance_type) == :smithereen) do
-      true
+    if result != nil do
+      cond do
+        Map.get(result, :instance_type) == :pleroma -> true
+        Map.get(result, :instance_type) == :smithereen -> true
+        Map.get(result, :instance_type) == :mastodon -> true
+        Map.get(result, :instance_type) == :friendica -> false
+        true -> false
+      end
     else
       case get_and_decode("https://#{domain}/api/v1/instance") do
         {:ok, %{"title" => _title}} -> true
