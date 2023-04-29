@@ -4,7 +4,8 @@ defmodule BackendWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
-    plug(:rate_limit, max_requests: 5, interval_seconds: 10) # requests to the same endpoint
+    # requests to the same endpoint
+    plug(:rate_limit, max_requests: 5, interval_seconds: 10)
   end
 
   pipeline :api_admin do

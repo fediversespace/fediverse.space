@@ -7,14 +7,6 @@ defmodule Backend.Application do
   import Backend.Util
 
   def start(_type, _args) do
-
-    :telemetry.attach(
-      "appsignal-ecto",
-      [:backend, :repo, :query],
-      &Appsignal.Ecto.handle_event/4,
-      nil
-    )
-
     crawl_worker_count = get_config(:crawl_workers)
 
     children = [

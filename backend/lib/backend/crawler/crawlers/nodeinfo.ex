@@ -129,6 +129,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
         "accept"
       ])
       |> Enum.flat_map(fn {type, domains} ->
+        # credo:disable-for-next-line Credo.Check.Refactor.Nesting
         Enum.map(domains, fn domain -> {domain, type} end)
       end)
       |> Enum.concat(quarantined_domains)

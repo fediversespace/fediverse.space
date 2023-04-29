@@ -2,7 +2,7 @@
 
 ## Notes
 
-- This project requires Elixir >= 1.10.
+- This project requires Elixir >= 1.14.
 - Run with `SKIP_CRAWL=true` to just run the server (useful for working on the API without also crawling)
 - This project is automatically scanned for potential vulnerabilities with [Sobelow](https://sobelow.io/).
 

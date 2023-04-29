@@ -41,7 +41,6 @@ config :backend, Graph.Cache,
   # 1 hour
   gc_interval: 3600
 
-
 config :backend, Backend.Mailer,
   adapter: Swoosh.Adapters.SMTP,
   relay: System.get_env("MAILER_RELAY"),

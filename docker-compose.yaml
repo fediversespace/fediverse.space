@@ -5,33 +5,32 @@ networks:
     external: false
 
 services:
-  server:
-    build: .
+  phoenix:
+    build: backend
     restart: unless-stopped
     networks:
       - space
-    volumes:
-      - /home/gitea/data:/data
     depends_on:
       - db
 
+  gephi:
+    build: gephi
+
   db:
-    image: postgres:12-alpine
+    image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_PASSWORD: postgres
-      - POSTGRES_USER: postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
     networks:
       - space
     volumes:
       - /var/lib/postgresql/data
 
   elastic:
-    image: elasticsearch:6.8.9
+    image: elasticsearch:8.7.0
     restart: unless-stopped
     environment:
-      - discovery.type: single-node
+      - discovery.type=single-node
     networks: 
       - space
-
-    

@@ -28,7 +28,7 @@ defmodule Graph.Cache do
         nodes = Api.list_nodes(domain)
         edges = Api.list_edges(domain)
         # Cache for 10 minutes
-        Cache.set(key, %{nodes: nodes, edges: edges}, ttl: 600)
+        Cache.put(key, %{nodes: nodes, edges: edges}, ttl: 600)
         %{nodes: nodes, edges: edges}
 
       data ->
@@ -48,7 +48,7 @@ defmodule Graph.Cache do
         Logger.debug("Instance cache: miss")
         instance = Api.get_instance_with_relationships(domain)
         # Cache for five minutes
-        Cache.set(key, instance, ttl: 300)
+        Cache.put(key, instance, ttl: 300)
         instance
 
       data ->
@@ -82,7 +82,7 @@ defmodule Graph.Cache do
           |> Repo.one()
 
         # Cache for five minutes
-        Cache.set(key, crawl, ttl: 300)
+        Cache.put(key, crawl, ttl: 300)
 
       data ->
         Appsignal.increment_counter("most_recent_crawl_cache.hits", 1)

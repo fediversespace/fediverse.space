@@ -17,6 +17,7 @@ defmodule Backend.Crawler.StaleInstanceManager do
   @impl true
   def init(_opts) do
     Logger.info("Starting crawler manager...")
+    Backend.Repo.start_link()
 
     instance_count =
       Instance

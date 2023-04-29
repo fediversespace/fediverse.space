@@ -18,7 +18,8 @@ defmodule Backend.Crawler.ApiCrawler do
   # {domain, type} e.g. {"gab.com", "reject"}
   @type federation_restriction :: {String.t(), String.t()}
 
-  @type instance_type :: :mastodon | :pleroma | :gab | :misskey | :gnusocial | :smithereen | :friendica
+  @type instance_type ::
+          :mastodon | :pleroma | :gab | :misskey | :gnusocial | :smithereen | :friendica
 
   defstruct [
     :version,

@@ -154,11 +154,20 @@ defmodule Backend.Util do
            recv_timeout: timeout,
            timeout: timeout
          ) do
-      {:ok, %{status_code: 200, body: body}} -> Jason.decode(body)
-      {:ok, %{status_code: 401}} -> Jason.decode("[]")
-      {:ok, %{status_code: 404}} -> Jason.decode("[]")
-      {:ok, %{body: body}} -> {:error, %HTTPoison.Error{reason: "Non-200 response. Body: #{body}"}}
-      {:error, err} -> {:error, err}
+      {:ok, %{status_code: 200, body: body}} ->
+        Jason.decode(body)
+
+      {:ok, %{status_code: 401}} ->
+        Jason.decode("[]")
+
+      {:ok, %{status_code: 404}} ->
+        Jason.decode("[]")
+
+      {:ok, %{body: body}} ->
+        {:error, %HTTPoison.Error{reason: "Non-200 response. Body: #{body}"}}
+
+      {:error, err} ->
+        {:error, err}
     end
   end
 

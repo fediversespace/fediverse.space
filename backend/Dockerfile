@@ -1,4 +1,4 @@
-FROM elixir:1.12-alpine as build
+FROM elixir:1.14-alpine as build
 
 # install build dependencies
 RUN apk add --update git build-base 
@@ -36,7 +36,7 @@ COPY rel rel
 RUN mix release
 
 # prepare release image
-FROM alpine:3.9 AS app
+FROM alpine:3.17 AS app
 RUN apk add --update bash openssl libstdc++ build-base
 
 RUN mkdir /app

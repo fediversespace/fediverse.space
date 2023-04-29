@@ -20,8 +20,6 @@ Read the latest updates on Mastodon: [@fediversespace](https://mastodon.social/@
 
 ## Requirements
 
-Note: examples here use `podman`. In most cases you should be able to replace `podman` with `docker`.
-
 Though containerized, backend development is easiest if you have the following installed.
 
 - For the crawler + API:
@@ -38,11 +36,7 @@ Though containerized, backend development is easiest if you have the following i
 ### Backend
 
 - `cp example.env .env` and modify environment variables as required
-- `podman build gephi && podman build phoenix`
-- `podman run --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:6.8.9`
-  - If you've `run` this container previously, use `podman start elasticsearch`
-- `podman run --name postgres -e "POSTGRES_USER=postgres" -e "POSTGRES_PASSWORD=postgres" -p 5432:5432 postgres:12`
-- `podman-compose -f compose.backend-services.yml -f compose.phoenix.yml`
+- `docker-compose up`
 - Create the elasticsearch index:
   - `iex -S mix app.start`
   - `Elasticsearch.Index.hot_swap(Backend.Elasticsearch.Cluster, :instances)`

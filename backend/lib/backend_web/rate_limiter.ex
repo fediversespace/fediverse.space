@@ -11,7 +11,8 @@ defmodule BackendWeb.RateLimiter do
 
   def rate_limit(conn, options \\ []) do
     case check_rate(conn, options) do
-      {:ok, _count}   -> conn # Do nothing, allow execution to continue
+      # Do nothing, allow execution to continue
+      {:ok, _count} -> conn
       {:error, _count} -> render_error(conn)
     end
   end
@@ -23,6 +24,7 @@ defmodule BackendWeb.RateLimiter do
       else
         Map.get(conn.params, "domain")
       end
+
     options = Keyword.put(options, :bucket_name, "authorization: #{domain}")
     rate_limit(conn, options)
   end
@@ -40,7 +42,7 @@ defmodule BackendWeb.RateLimiter do
   # "127.0.0.1:/api/v1/authorizations"
   defp bucket_name(conn) do
     path = Enum.join(conn.path_info, "/")
-    ip   = conn.remote_ip |> Tuple.to_list |> Enum.join(".")
+    ip = conn.remote_ip |> Tuple.to_list() |> Enum.join(".")
     "#{ip}:#{path}"
   end
 
@@ -48,6 +50,7 @@ defmodule BackendWeb.RateLimiter do
     conn
     |> put_status(:forbidden)
     |> json(%{error: "Rate limit exceeded."})
-    |> halt # Stop execution of further plugs, return response now
+    # Stop execution of further plugs, return response now
+    |> halt
   end
 end

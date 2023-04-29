@@ -5,19 +5,18 @@ test-frontend:
     - cd frontend
   stage: test
   script:
-    - yarn install
-    - yarn lint
+    - npm install
+    - npm run lint
   cache:
     paths:
       - frontend/node_modules/
-      - frontend/.yarn
   only:
     changes:
       - frontend/**/*
 
 test-backend:
   stage: test
-  image: elixir:1.10
+  image: elixir:1.14
   variables:
     MIX_ENV: test
   only:

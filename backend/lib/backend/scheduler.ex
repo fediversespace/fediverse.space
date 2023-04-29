@@ -269,14 +269,11 @@ defmodule Backend.Scheduler do
     if length(potential_spam_instances) > 0 do
       message =
         potential_spam_instances
-        |> Enum.map(fn %{count: count, base_domain: base_domain} ->
+        |> Enum.map_join("\n", fn %{count: count, base_domain: base_domain} ->
           "* #{count} new at #{base_domain}"
         end)
-        |> Enum.join("\n")
         |> (fn lines ->
-              "fediverse.space detected the following potential spam domains from the last #{
-                hour_range
-              } hours:\n#{lines}"
+              "fediverse.space detected the following potential spam domains from the last #{hour_range} hours:\n#{lines}"
             end).()
 
       Logger.info(message)

@@ -1,6 +1,5 @@
 defmodule BackendWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :backend
-  use Appsignal.Phoenix
 
   socket("/socket", BackendWeb.UserSocket,
     websocket: true,
@@ -46,7 +45,11 @@ defmodule BackendWeb.Endpoint do
   )
 
   plug(Corsica,
-    origins: ["http://localhost:3000", ~r{^https://(.*\.?)fediverse\.space$}, ~r{^https://(.*\.?)fediverse-space\.netlify\.app$}],
+    origins: [
+      "http://localhost:3000",
+      ~r{^https://(.*\.?)fediverse\.space$},
+      ~r{^https://(.*\.?)fediverse-space\.netlify\.app$}
+    ],
     allow_headers: ["content-type", "token"]
   )
 

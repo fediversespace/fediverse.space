@@ -65,9 +65,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     {interactions, statuses_seen} = get_interactions(domain)
 
     Logger.debug(
-      "#{domain}: found #{
-        interactions |> Map.values() |> Enum.reduce(0, fn count, acc -> count + acc end)
-      } mentions in #{statuses_seen} statuses."
+      "#{domain}: found #{interactions |> Map.values() |> Enum.reduce(0, fn count, acc -> count + acc end)} mentions in #{statuses_seen} statuses."
     )
 
     Map.merge(
@@ -184,8 +182,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
     fields =
       account["fields"]
-      |> Enum.map(fn %{"name" => name, "value" => value} -> name <> value end)
-      |> Enum.join("")
+      |> Enum.map_join("", fn %{"name" => name, "value" => value} -> name <> value end)
 
     # this also means that any users who mentioned ethnobotany in their profiles will be excluded lol ¯\_(ツ)_/¯
     (account["note"] <> fields)
