@@ -10,6 +10,7 @@ test-frontend:
   cache:
     paths:
       - frontend/node_modules/
+      - .npm/
   only:
     changes:
       - frontend/**/*
@@ -35,28 +36,3 @@ test-backend:
     paths:
       - backend/deps/
       - backend/_build/
-
-deploy-backend-production:
-  stage: deploy
-  environment:
-    name: production
-    url: https://phoenix.api.fediverse.space
-  image: ilyasemenov/gitlab-ci-git-push
-  only:
-    - master
-  except:
-    - schedules
-  script:
-    - git-push dokku@api.fediverse.space:phoenix master
-
-deploy-gephi-production:
-  stage: deploy
-  image: ilyasemenov/gitlab-ci-git-push
-  environment:
-    name: production
-  only:
-    - master
-  except:
-    - schedules
-  script:
-    - git-push dokku@api.fediverse.space:gephi master
