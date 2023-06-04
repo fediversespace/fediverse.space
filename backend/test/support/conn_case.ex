@@ -25,6 +25,8 @@ defmodule BackendWeb.ConnCase do
 
       # The default endpoint for testing
       @endpoint BackendWeb.Endpoint
+
+      use BackendWeb, :verified_routes
     end
   end
 

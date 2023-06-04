@@ -17,6 +17,8 @@ defmodule BackendWeb do
   and import those modules here.
   """
 
+  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
+
   def controller do
     quote do
       use Phoenix.Controller, namespace: BackendWeb
@@ -24,6 +26,8 @@ defmodule BackendWeb do
       import Plug.Conn
       import BackendWeb.Gettext
       alias BackendWeb.Router.Helpers, as: Routes
+
+      unquote(verified_routes())
     end
   end
 
@@ -39,6 +43,8 @@ defmodule BackendWeb do
       import BackendWeb.ErrorHelpers
       import BackendWeb.Gettext
       alias BackendWeb.Router.Helpers, as: Routes
+
+      unquote(verified_routes())
     end
   end
 
@@ -54,6 +60,15 @@ defmodule BackendWeb do
     quote do
       use Phoenix.Channel
       import BackendWeb.Gettext
+    end
+  end
+
+  def verified_routes do
+    quote do
+      use Phoenix.VerifiedRoutes,
+        endpoint: BackendWeb.Endpoint,
+        router: BackendWeb.Router,
+        statics: BackendWeb.static_paths()
     end
   end
 

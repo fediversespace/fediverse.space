@@ -14,7 +14,7 @@ defmodule BackendWeb.Endpoint do
     at: "/",
     from: :backend,
     gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: BackendWeb.static_paths()
   )
 
   # Code reloading can be explicitly enabled under the
