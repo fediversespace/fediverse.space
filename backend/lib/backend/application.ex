@@ -26,7 +26,6 @@ defmodule Backend.Application do
       ),
       Supervisor.child_spec({Task, fn -> HTTPoison.start() end}, id: :start_httpoison),
       Backend.Scheduler,
-      Backend.Elasticsearch.Cluster,
       Graph.Cache
     ]
 
