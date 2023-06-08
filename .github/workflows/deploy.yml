@@ -21,24 +21,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: depot/setup-action@v1
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build & push backend
+      - name: Build & push
         uses: depot/build-push-action@v1
         with:
           project: 3tz1wxj8cr
           context: backend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-      - name: Build & push gephi
-        uses: depot/build-push-action@v1
-        with:
-          project: 3tz1wxj8cr
-          context: gephi
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
