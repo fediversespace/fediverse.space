@@ -66,6 +66,8 @@ config :backend, :crawler,
     "gab.best",
     # spam
     "4chan.icu",
+    # spam
+    "activitypub-troll.cf",
     # *really* doesn't want to be listed on fediverse.space
     "pleroma.site",
     # dummy instances used for pleroma CI
