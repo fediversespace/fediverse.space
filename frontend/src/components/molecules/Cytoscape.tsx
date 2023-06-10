@@ -3,7 +3,7 @@ import { isEqual } from "lodash";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import styled from "styled-components";
-import tippy, { Instance } from "tippy.js";
+import tippy from "tippy.js";
 import {
   DEFAULT_NODE_COLOR,
   HOVERED_NODE_COLOR,
@@ -65,10 +65,10 @@ class Cytoscape extends React.PureComponent<CytoscapeProps> {
         trigger: "manual",
       });
       n.on("mouseover", () => {
-        (t as Instance).show();
+        (t as any).show();
       });
       n.on("mouseout", () => {
-        (t as Instance).hide();
+        (t as any).hide();
       });
     });
 
