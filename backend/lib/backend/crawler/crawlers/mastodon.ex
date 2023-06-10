@@ -14,6 +14,9 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
     # We might already know that this is a Pleroma instance from nodeinfo
     if result != nil do
       cond do
+        # for pleroma and smithereen, the instance_type will get overwritten
+        # with the correct value -- but we still want to return true here
+        # since they are compatible with the mastodon API
         Map.get(result, :instance_type) == :pleroma -> true
         Map.get(result, :instance_type) == :smithereen -> true
         Map.get(result, :instance_type) == :mastodon -> true
@@ -97,16 +100,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
          interactions \\ %{},
          statuses_seen \\ 0
        ) do
-    # If `statuses_seen == 0`, it's the first call of this function, which means we want to query the database for the
-    # most recent status we have.
-    min_timestamp =
-      if statuses_seen == 0 do
-        get_last_crawl_timestamp(domain)
-      else
-        min_timestamp
-      end
-
-    endpoint = "https://#{domain}/api/v1/timelines/public?local=true"
+    endpoint = "https://#{domain}/api/v1/timelines/public?local=true&limit=40"
 
     endpoint =
       if max_id do
@@ -117,7 +111,26 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
     Logger.debug("Crawling #{endpoint}")
 
-    statuses = http_client().get_and_decode!(endpoint)
+    case http_client().get_and_decode(endpoint) do
+      {:ok, statuses} ->
+        handle_statuses(statuses, domain, min_timestamp, interactions, statuses_seen)
+
+      # if there's an error (e.g. because the timeline prevents unauthenticated access)
+      # then stop here
+      {:error, _} ->
+        {interactions, statuses_seen}
+    end
+  end
+
+  defp handle_statuses(statuses, domain, min_timestamp, interactions, statuses_seen) do
+    # If `statuses_seen == 0`, it's the first call of this function, which means we want to query the database for the
+    # most recent status we have.
+    min_timestamp =
+      if statuses_seen == 0 do
+        get_last_crawl_timestamp(domain)
+      else
+        min_timestamp
+      end
 
     filtered_statuses =
       statuses
