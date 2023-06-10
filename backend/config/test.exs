@@ -18,3 +18,5 @@ config :backend, Backend.Repo,
   pool: Ecto.Adapters.SQL.Sandbox
 
 config :appsignal, :config, active: false
+
+config :backend, :crawler, status_count_limit: 5

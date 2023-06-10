@@ -98,7 +98,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
     endpoint = "https://#{domain}/api/notes/local-timeline"
 
     params = %{
-      limit: 20
+      limit: 100
     }
 
     params =
@@ -110,7 +110,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
 
     Logger.debug("Crawling #{endpoint} with untilId=#{until_id}")
 
-    statuses = http_client().post_and_decode!(endpoint, Jason.encode!(params))
+    statuses = http_client().post_and_decode!(endpoint, params)
 
     filtered_statuses =
       statuses

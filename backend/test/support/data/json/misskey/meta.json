@@ -1,0 +1,170 @@
+{
+  "maintainerName": "MisskeyHQ",
+  "maintainerEmail": "https://go.misskey.io/support",
+  "version": "13.12.2",
+  "name": "Misskey.io",
+  "uri": "https://misskey.io",
+  "description": "some description",
+  "langs": ["ja", "en", "zh", "ko", "fr", "de"],
+  "tosUrl": "http://go.misskey.io/tos",
+  "repositoryUrl": "https://github.com/syuilo/misskey",
+  "feedbackUrl": "https://github.com/syuilo/misskey/issues/new",
+  "disableRegistration": false,
+  "emailRequiredForSignup": true,
+  "enableHcaptcha": false,
+  "hcaptchaSiteKey": "95d75440-7e37-4419-a693-8f52c377f1c5",
+  "enableRecaptcha": false,
+  "recaptchaSiteKey": "6LfW8qQUAAAAAI_1WMThmcj6zO39laasAoEJHfFF",
+  "enableTurnstile": true,
+  "turnstileSiteKey": "0x4AAAAAAACJmZyh3LCvo-uf",
+  "swPublickey": "BHqCPVsCM8pMUo26Fenl6fuLPfuqQTNeo2Rpvt6KFxFEKznKAXZBHI2nk1aAanlJ1Me_PSr-MVkW3ho4RaYmZpk",
+  "themeColor": "#86b300",
+  "mascotImageUrl": "/assets/ai.png",
+  "bannerUrl": "https://s3.arkjp.net/misskey/65b25d3c-2ae4-474f-b1c0-050c8c8962e1.jpg",
+  "errorImageUrl": "https://s3.arkjp.net/misskey/94aab3c5-0b26-42a7-9fa9-83a69d7253cd.png",
+  "iconUrl": "https://s3.arkjp.net/misskey/webpublic-0c66b1ca-b8c0-4eaa-9827-47674f4a1580.png",
+  "backgroundImageUrl": "https://s3.arkjp.net/misskey/e23f6837-c477-4f40-bbc7-b8a06e3bc1cc.jpg",
+  "logoImageUrl": "https://s3.arkjp.net/misskey/31240fa8-98fa-4750-bfd4-767753d1c48d.png",
+  "maxNoteTextLength": 3000,
+  "defaultLightTheme": null,
+  "defaultDarkTheme": null,
+  "ads": [
+    {
+      "id": "8riz9d7mt0",
+      "url": "http://go.misskey.io/nextdns",
+      "place": "horizontal",
+      "ratio": 3,
+      "imageUrl": "https://s3.arkjp.net/misskey/03992473-790d-4e50-9f70-f12ed1a5aabb.png"
+    },
+    {
+      "id": "8rkte84ghf",
+      "url": "https://go.misskey.io/vultr",
+      "place": "horizontal",
+      "ratio": 3,
+      "imageUrl": "https://s3.arkjp.net/misskey/fa1421c3-fabc-4dbc-a688-52dfb7491660.webp"
+    },
+    {
+      "id": "97crkngnt7",
+      "url": "https://go.misskey.io/ads",
+      "place": "horizontal",
+      "ratio": 1,
+      "imageUrl": "https://s3.arkjp.net/misskey/d85e0e31-522b-4779-8479-b7acb65c86dc.png"
+    },
+    {
+      "id": "97crxz63al",
+      "url": "https://go.misskey.io/ads",
+      "place": "horizontal",
+      "ratio": 1,
+      "imageUrl": "https://s3.arkjp.net/misskey/d73e0b21-5910-42f7-9f1b-6983026ee1db.png"
+    },
+    {
+      "id": "97cspskh3f",
+      "url": "https://go.misskey.io/ads",
+      "place": "horizontal",
+      "ratio": 1,
+      "imageUrl": "https://s3.arkjp.net/misskey/36fe91e6-5d11-4f12-8bc8-426ab0ebd885.png"
+    },
+    {
+      "id": "9clihjru6p",
+      "url": "https://go.misskey.io/maZC",
+      "place": "horizontal",
+      "ratio": 40,
+      "imageUrl": "https://s3.arkjp.net/misskey/ee74935a-a1ec-4385-bb36-2377387118b8.png"
+    },
+    {
+      "id": "9e5idmskrv",
+      "url": "https://go.misskey.io/LfNP",
+      "place": "horizontal-big",
+      "ratio": 20,
+      "imageUrl": "https://s3.arkjp.net/misskey/4e03fca5-b25f-4950-974a-313a7d958b6d.png"
+    },
+    {
+      "id": "9eo9im87s6",
+      "url": "https://go.misskey.io/jHVi",
+      "place": "horizontal-big",
+      "ratio": 40,
+      "imageUrl": "https://s3.arkjp.net/misskey/7e903951-e7e1-4277-badf-0ea5bc9ab07a.png"
+    },
+    {
+      "id": "9f00tkswhg",
+      "url": "https://go.misskey.io/wD6e",
+      "place": "horizontal-big",
+      "ratio": 20,
+      "imageUrl": "https://s3.arkjp.net/misskey/015a3335-b21e-4897-a958-d6879b2a82f1.png"
+    },
+    {
+      "id": "9f3stos3s7",
+      "url": "https://go.misskey.io/iMxB",
+      "place": "horizontal-big",
+      "ratio": 40,
+      "imageUrl": "https://s3.arkjp.net/misskey/098ceb69-8238-4c3c-8f99-f9752294cb96.png"
+    },
+    {
+      "id": "9fgxdm8mpd",
+      "url": "https://go.misskey.io/dwRP",
+      "place": "horizontal-big",
+      "ratio": 60,
+      "imageUrl": "https://s3.arkjp.net/misskey/c4650ddc-687e-46c0-932a-c1f5ca8c9f83.png"
+    },
+    {
+      "id": "9fhdbdyevw",
+      "url": "https://go.misskey.io/pwYv",
+      "place": "horizontal",
+      "ratio": 40,
+      "imageUrl": "https://s3.arkjp.net/misskey/e2f6c692-0d16-4fe9-90c4-25eac1b31731.png"
+    },
+    {
+      "id": "9fgjjfdr3s",
+      "url": "https://go.misskey.io/VwEm",
+      "place": "horizontal-big",
+      "ratio": 60,
+      "imageUrl": "https://s3.arkjp.net/misskey/951bda53-3707-480e-ab5a-0000ca9c7578.png"
+    },
+    {
+      "id": "9fnpd9tsgs",
+      "url": "https://go.misskey.io/QwId",
+      "place": "horizontal-big",
+      "ratio": 80,
+      "imageUrl": "https://s3.arkjp.net/misskey/261f7323-7a5e-4734-92bc-6ad69a4226df.jpg"
+    },
+    {
+      "id": "9fmru4ok7f",
+      "url": "https://go.misskey.io/pwYv",
+      "place": "horizontal-big",
+      "ratio": 20,
+      "imageUrl": "https://s3.arkjp.net/misskey/563a709e-6d5e-4952-9cb5-ac6897f80990.png"
+    },
+    {
+      "id": "9ew2fhwyfc",
+      "url": "https://go.misskey.io/sjxJ",
+      "place": "horizontal-big",
+      "ratio": 60,
+      "imageUrl": "https://s3.arkjp.net/misskey/8dff6f2d-444f-459f-80ff-02cad454be91.png"
+    }
+  ],
+  "enableEmail": true,
+  "enableServiceWorker": true,
+  "translatorAvailable": true,
+  "serverRules": [],
+  "policies": {
+    "gtlAvailable": true,
+    "ltlAvailable": true,
+    "canPublicNote": true,
+    "canInvite": false,
+    "canManageCustomEmojis": false,
+    "canSearchNotes": false,
+    "canHideAds": false,
+    "driveCapacityMb": 10240,
+    "alwaysMarkNsfw": false,
+    "pinLimit": 3,
+    "antennaLimit": 5,
+    "wordMuteLimit": 200,
+    "webhookLimit": 3,
+    "clipLimit": 10,
+    "noteEachClipsLimit": 50,
+    "userListLimit": 5,
+    "userEachUserListsLimit": 20,
+    "rateLimitFactor": 2
+  },
+  "mediaProxy": "https://nos3.arkjp.net"
+}

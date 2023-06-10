@@ -1,0 +1,33 @@
+[
+  {
+    "id": "9ftvwz5kx8no7aeb",
+    "createdAt": "2023-06-10T18:18:57.656Z",
+    "userId": "9badbj0vp9",
+    "user": {
+      "id": "9badbj0vp9",
+      "name": "Some Name",
+      "username": "username",
+      "host": null,
+      "avatarUrl": "https://example.com/image.png",
+      "avatarBlurhash": "foobar",
+      "avatarColor": null,
+      "speakAsCat": true,
+      "emojis": [],
+      "onlineStatus": "online",
+      "driveCapacityOverrideMb": null
+    },
+    "text": "My post",
+    "cw": null,
+    "visibility": "public",
+    "renoteCount": 0,
+    "repliesCount": 0,
+    "reactions": {},
+    "reactionEmojis": [],
+    "emojis": [],
+    "tags": ["post"],
+    "fileIds": [],
+    "files": [],
+    "replyId": null,
+    "renoteId": null
+  }
+]

@@ -23,7 +23,7 @@ defmodule Backend.Http do
          ) do
       {:ok, %HTTPoison.Response{body: body, status_code: status_code}}
       when status_code >= 200 and status_code <= 299 ->
-        Jason.decode(body)
+        decode_body(body)
 
       {:ok, %HTTPoison.Response{body: body, status_code: status_code}} ->
         if not is_nil(default) do
@@ -50,11 +50,18 @@ defmodule Backend.Http do
     end
   end
 
+  @doc """
+  POSTs to the given URL with the given body and returns the JSON-decoded response.
+  The given body is JSON-encoded before sending.
+  """
   @impl true
-  def post_and_decode(url, body \\ nil) do
-    case HTTPoison.post(url, body, [{"User-Agent", get_config(:user_agent)}]) do
+  def post_and_decode(url, body \\ %{}) do
+    case HTTPoison.post(url, Jason.encode!(body), [
+           {"User-Agent", get_config(:user_agent)},
+           {"Content-Type", "application/json"}
+         ]) do
       {:ok, %HTTPoison.Response{body: body}} ->
-        Jason.decode(body)
+        decode_body(body)
 
       {:error, %HTTPoison.Error{} = error} ->
         {:error, %Error{message: HTTPoison.Error.message(error)}}
@@ -62,10 +69,25 @@ defmodule Backend.Http do
   end
 
   @impl true
-  def post_and_decode!(url, body \\ nil) do
+  def post_and_decode!(url, body \\ %{}) do
     case post_and_decode(url, body) do
-      {:ok, decoded} -> decoded
-      {:error, error} -> raise error
+      {:ok, decoded} ->
+        decoded
+
+      {:error, error} ->
+        raise error
+    end
+  end
+
+  defp decode_body(body) do
+    with {:ok, decoded} <- Jason.decode(body) do
+      if is_map(decoded) and (Map.has_key?(decoded, "errors") or Map.has_key?(decoded, "error")) do
+        {:error, %Error{message: "API error: " <> body}}
+      else
+        {:ok, decoded}
+      end
+    else
+      {:error, error} -> {:error, error}
     end
   end
 end
