@@ -20,16 +20,16 @@ Read the latest updates on Mastodon: [@fediversespace](https://mastodon.social/@
 
 ## Requirements
 
-Though containerized, backend development is easiest if you have the following installed.
+You'll need the following to work on fediverse.space:
 
 - For the crawler + API:
   - Elixir
   - Postgres
+  - Elasticsearch
 - For laying out the graph:
   - Java
 - For the frontend:
   - Node.js
-  - Yarn
 
 ## Running it
 
@@ -43,8 +43,8 @@ Though containerized, backend development is easiest if you have the following i
 
 ### Frontend
 
-- `cd frontend && yarn install`
-- `yarn start`
+- `cd frontend && npm install`
+- `npm start`
 
 ## Commands
 
@@ -54,7 +54,7 @@ Though containerized, backend development is easiest if you have the following i
 
 ### Frontend
 
-- `yarn build` creates an optimized build for deployment
+- `npm run build` creates an optimized build for deployment
 
 ## Privacy
 
@@ -86,7 +86,7 @@ You don't have to follow these instructions, but it's one way to set up a contin
 7. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
 8. Set up SSL for the Phoenix app
 
-- `dokku letsencrypt phoenix`
+- `dokku letsencrypt:enable phoenix`
 - `dokku letsencrypt:cron-job --add`
 
 9. Set up a cron job for the graph layout (use the `dokku` user). E.g.
