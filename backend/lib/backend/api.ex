@@ -148,10 +148,78 @@ defmodule Backend.Api do
   end
 
   def search_instances(query, filters, from \\ 0) do
-    # TODO: implement w. postgres FTS
+    page_size = 50
+
+    search_response =
+      Elasticsearch.post(
+        Backend.Elasticsearch.Cluster,
+        "/instances/_search",
+        build_es_query(query, filters, page_size, from)
+      )
+
+    with {:ok, result} <- search_response do
+      hits =
+        get_in(result, ["hits", "hits"])
+        |> Enum.map(fn h -> h |> Map.get("_source") |> convert_keys_to_atoms() end)
+
+      next =
+        if length(hits) < page_size do
+          nil
+        else
+          from + page_size
+        end
+
+      %{
+        hits: hits,
+        next: next
+      }
+    end
+  end
+
+  defp build_es_query(query, filters, page_size, from) do
+    opt_out_filter = %{"term" => %{"opt_out" => "false"}}
+    filters = [opt_out_filter | filters]
+
     %{
-      hits: [],
-      next: nil
+      "sort" => "_score",
+      "from" => from,
+      "size" => page_size,
+      # This must be >0, otherwise all documents will be returned
+      "min_score" => 1,
+      "query" => %{
+        "bool" => %{
+          "filter" => filters,
+          "should" => [
+            %{
+              "multi_match" => %{
+                "query" => query,
+                "fields" => [
+                  "description.*",
+                  "domain.english"
+                ]
+              }
+            },
+            %{
+              # If the query exactly matches a domain, that instance should always be the first result.
+              "wildcard" => %{
+                "domain.keyword" => %{
+                  "value" => query,
+                  "boost" => 100
+                }
+              }
+            },
+            %{
+              # Give substring matches in domains a large boost, too.
+              "wildcard" => %{
+                "domain.keyword" => %{
+                  "value" => "*#{query}*",
+                  "boost" => 10
+                }
+              }
+            }
+          ]
+        }
+      }
     }
   end
 end

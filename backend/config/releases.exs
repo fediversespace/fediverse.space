@@ -14,6 +14,9 @@ config :backend, Backend.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: ssl
 
+config :backend, Backend.Elasticsearch.Cluster,
+  url: System.get_env("ELASTICSEARCH_URL") || "http://localhost:9200"
+
 config :appsignal, :config,
   otp_app: :backend,
   revision: System.get_env("GIT_REV")

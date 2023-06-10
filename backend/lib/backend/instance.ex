@@ -62,4 +62,20 @@ defmodule Backend.Instance do
     |> validate_required([:domain])
     |> put_assoc(:peers, attrs.peers)
   end
+
+  defimpl Elasticsearch.Document, for: Backend.Instance do
+    def id(instance), do: instance.id
+    def routing(_), do: false
+
+    def encode(instance) do
+      # Make sure this corresponds with priv/elasticseach/instances.json
+      %{
+        domain: instance.domain,
+        description: instance.description,
+        type: instance.type,
+        user_count: instance.user_count,
+        opt_out: instance.opt_out
+      }
+    end
+  end
 end

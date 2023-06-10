@@ -5,22 +5,32 @@ networks:
     external: false
 
 services:
-  web:
-    image: ghcr.io/fediverse-space/fediverse.space:main
+  phoenix:
+    build: backend
     restart: unless-stopped
     networks:
       - space
     depends_on:
       - db
 
+  gephi:
+    build: gephi
+
   db:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
     networks:
       - space
     volumes:
       - /var/lib/postgresql/data
+
+  elastic:
+    image: elasticsearch:8.7.0
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+    networks: 
+      - space
