@@ -1,0 +1,89 @@
+{
+  "metadata": {
+    "nodeName": "Pixelfed",
+    "software": {
+      "homepage": "https://pixelfed.org",
+      "repo": "https://github.com/pixelfed/pixelfed"
+    },
+    "config": {
+      "open_registration": true,
+      "uploader": {
+        "max_photo_size": "15000",
+        "max_caption_length": "500",
+        "album_limit": "4",
+        "image_quality": 80,
+        "max_collection_length": 18,
+        "optimize_image": true,
+        "optimize_video": true,
+        "media_types": "image/jpeg,image/png,image/gif",
+        "enforce_account_limit": true
+      },
+      "activitypub": {
+        "enabled": true,
+        "remote_follow": true
+      },
+      "ab": {
+        "lc": false,
+        "rec": false,
+        "loops": false,
+        "top": false,
+        "polls": false,
+        "cached_public_timeline": false,
+        "gps": false,
+        "spa": true,
+        "emc": false
+      },
+      "site": {
+        "name": "Pixelfe",
+        "domain": "pixelfed.example.com",
+        "url": "https://pixelfed.example.com",
+        "description": "Pixelfed is an image sharing platform, an ethical alternative to centralized platforms."
+      },
+      "username": {
+        "remote": {
+          "formats": ["@", "from", "custom"],
+          "format": "@",
+          "custom": null
+        }
+      },
+      "features": {
+        "mobile_apis": true,
+        "circles": false,
+        "stories": false,
+        "video": false,
+        "import": {
+          "instagram": false,
+          "mastodon": false,
+          "pixelfed": false
+        },
+        "label": {
+          "covid": {
+            "enabled": true,
+            "org": "visit the WHO website",
+            "url": "https://www.who.int/emergencies/diseases/novel-coronavirus-2019/advice-for-public"
+          }
+        }
+      }
+    }
+  },
+  "protocols": ["activitypub"],
+  "services": {
+    "inbound": [],
+    "outbound": []
+  },
+  "software": {
+    "name": "pixelfed",
+    "version": "0.11.2"
+  },
+  "usage": {
+    "localPosts": "60",
+    "localComments": 0,
+    "users": {
+      "total": "16",
+      "activeHalfyear": 16,
+      "activeMonth": 2
+    }
+  },
+  "version": "2.0",
+  "openRegistrations": true
+}

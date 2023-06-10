@@ -154,5 +154,40 @@ defmodule Backend.Crawler.Crawlers.NodeinfoTest do
                peers: []
              }
     end
+
+    # don't know why some pixelfed instances return numbers as strings
+    # but i've seen it in the wild, so we need to handle it
+    test "handles nodeinfo with some numbers stringified (pixelfed)" do
+      expect(HttpMock, :get_and_decode, fn "https://pixelfed.social/.well-known/nodeinfo" ->
+        {:ok,
+         %{
+           "links" => [
+             %{
+               "rel" => "http://nodeinfo.diaspora.software/ns/schema/2.0",
+               "href" => "https://pixelfed.social/nodeinfo/2.0.json"
+             }
+           ]
+         }}
+      end)
+
+      expect(HttpMock, :get_and_decode, fn "https://pixelfed.social/nodeinfo/2.0.json" ->
+        {:ok, TestHelpers.load_json("nodeinfo/pixelfed.json")}
+      end)
+
+      result = Nodeinfo.crawl("pixelfed.social", %{})
+
+      assert result == %{
+               description:
+                 "Pixelfed is an image sharing platform, an ethical alternative to centralized platforms.",
+               user_count: 16,
+               status_count: 60,
+               statuses_seen: 0,
+               instance_type: :pixelfed,
+               version: "0.11.2",
+               federation_restrictions: [],
+               interactions: %{},
+               peers: []
+             }
+    end
   end
 end

@@ -85,7 +85,9 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
       description =
         [
           get_in(nodeinfo, ["metadata", "description"]),
-          get_in(nodeinfo, ["metadata", "nodeDescription"])
+          get_in(nodeinfo, ["metadata", "nodeDescription"]),
+          # pixelfed
+          get_in(nodeinfo, ["metadata", "config", "site", "description"])
         ]
         |> Enum.filter(fn d -> d != nil end)
         |> Enum.at(0)
@@ -96,8 +98,8 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
         ApiCrawler.get_default(),
         %{
           description: description,
-          user_count: user_count,
-          status_count: get_in(nodeinfo, ["usage", "localPosts"]),
+          user_count: handle_count(user_count),
+          status_count: nodeinfo |> get_in(["usage", "localPosts"]) |> handle_count(),
           instance_type: type,
           version: get_in(nodeinfo, ["software", "version"]),
           federation_restrictions: get_federation_restrictions(nodeinfo)
@@ -150,6 +152,16 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
       |> Enum.concat(quarantined_domains)
     else
       quarantined_domains
+    end
+  end
+
+  # handle a count that may be formatted as a string or an integer
+  defp handle_count(count) do
+    if is_integer(count) do
+      count
+    else
+      {count, _rem} = Integer.parse(count)
+      count
     end
   end
 end
