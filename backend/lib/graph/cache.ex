@@ -83,6 +83,7 @@ defmodule Graph.Cache do
 
         # Cache for five minutes
         Cache.put(key, crawl, ttl: 300)
+        crawl
 
       data ->
         Appsignal.increment_counter("most_recent_crawl_cache.hits", 1)
