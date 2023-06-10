@@ -13,7 +13,6 @@ export interface SearchFilter {
 type SearchFilterField = "type" | "user_count";
 const searchFilterFieldTranslations = {
   type: "Instance type",
-  // eslint-disable-next-line @typescript-eslint/camelcase
   user_count: "User count",
 };
 const searchFilterRelationTranslations = {

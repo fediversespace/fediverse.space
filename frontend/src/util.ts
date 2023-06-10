@@ -5,9 +5,9 @@ import { DESKTOP_WIDTH_THRESHOLD, InstanceDomainPath, INSTANCE_DOMAIN_PATH } fro
 import { AppState } from "./redux/types";
 
 let API_ROOT = "http://localhost:4000/api/";
-if (["true", true, 1, "1"].includes(process.env.REACT_APP_STAGING || "")) {
+if (["true", true, 1, "1"].includes(import.meta.env.VITE_STAGING || "")) {
   API_ROOT = "https://phoenix.api-develop.fediverse.space/api/";
-} else if (process.env.NODE_ENV === "production") {
+} else if (import.meta.env.PROD) {
   API_ROOT = "https://phoenix.api.fediverse.space/api/";
 }
 

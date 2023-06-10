@@ -1,9 +1,9 @@
 import { Classes, Code, H1, H2, H3 } from "@blueprintjs/core";
 import * as React from "react";
 import styled from "styled-components";
-import * as appsignalLogo from "../../assets/appsignal.png";
-import * as gitlabLogo from "../../assets/gitlab.png";
-import * as nlnetLogo from "../../assets/nlnet.png";
+import appsignalLogo from "../../assets/appsignal.png";
+import gitlabLogo from "../../assets/gitlab.png";
+import nlnetLogo from "../../assets/nlnet.png";
 import { Page } from "../atoms";
 
 const SponsorContainer = styled.div`

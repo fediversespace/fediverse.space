@@ -1,3 +1,3 @@
 declare module "cytoscape-popper" {
-  const prototype: {};
+  const prototype: unknown;
 }

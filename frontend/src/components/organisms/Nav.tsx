@@ -13,7 +13,7 @@ interface NavState {
 const graphIsActive = (currMatch: match<InstanceDomainPath>, location: Location) =>
   location.pathname === "/" || location.pathname.startsWith("/instance/");
 
-class Nav extends React.Component<{}, NavState> {
+class Nav extends React.Component<Record<string, never>, NavState> {
   constructor(props: any) {
     super(props);
     this.state = { aboutIsOpen: false };

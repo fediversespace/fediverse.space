@@ -15,6 +15,7 @@ import {
   H2,
   HTMLTable,
   Icon,
+  IconSize,
   NonIdealState,
   Position,
   Spinner,
@@ -296,7 +297,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
       statusesPerUserPerDay,
     } = this.props.instanceDetails;
     return (
-      <StyledHTMLTable small striped>
+      <StyledHTMLTable condensed striped>
         <tbody>
           <tr>
             <td>Version</td>
@@ -329,7 +330,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
                 position={Position.TOP}
                 className={Classes.DARK}
               >
-                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+                <Icon icon={IconNames.HELP} iconSize={IconSize.STANDARD} />
               </Tooltip>
             </td>
             <td>{(insularity && numeral.default(insularity).format("0.0%")) || "Unknown"}</td>
@@ -349,7 +350,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
                 position={Position.TOP}
                 className={Classes.DARK}
               >
-                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+                <Icon icon={IconNames.HELP} iconSize={IconSize.STANDARD} />
               </Tooltip>
             </td>
             <td>{(statusesPerDay && numeral.default(statusesPerDay).format("0.0")) || "Unknown"}</td>
@@ -369,7 +370,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
                 position={Position.TOP}
                 className={Classes.DARK}
               >
-                <Icon icon={IconNames.HELP} iconSize={Icon.SIZE_STANDARD} />
+                <Icon icon={IconNames.HELP} iconSize={IconSize.STANDARD} />
               </Tooltip>
             </td>
             <td>{(statusesPerUserPerDay && numeral.default(statusesPerUserPerDay).format("0.000")) || "Unknown"}</td>
@@ -420,7 +421,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
           would mean that every single status on {this.props.instanceName} contained a mention of someone on the other
           instance, and vice versa.
         </p>
-        <StyledHTMLTable small striped interactive={false}>
+        <StyledHTMLTable condensed striped interactive={false}>
           <thead>
             <tr>
               <th>Instance</th>
@@ -456,7 +457,7 @@ class InstanceScreenImpl extends React.PureComponent<InstanceScreenProps, Instan
         <p className={Classes.TEXT_MUTED}>
           All the instances, past and present, that {this.props.instanceName} knows about.
         </p>
-        <StyledHTMLTable small striped interactive={false} className="fediverse-sidebar-table">
+        <StyledHTMLTable condensed striped interactive={false} className="fediverse-sidebar-table">
           <tbody>{peerRows}</tbody>
         </StyledHTMLTable>
       </div>

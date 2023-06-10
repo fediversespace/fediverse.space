@@ -1,4 +1,4 @@
-import { Button, Callout, H1, InputGroup, Intent, NonIdealState, Spinner } from "@blueprintjs/core";
+import { Button, Callout, H1, InputGroup, Intent, NonIdealState, Spinner, SpinnerSize } from "@blueprintjs/core";
 import { IconNames } from "@blueprintjs/icons";
 import { push } from "connected-react-router";
 import { get, isEqual } from "lodash";
@@ -90,7 +90,7 @@ class SearchScreen extends React.PureComponent<SearchScreenProps, SearchScreenSt
               onMouseLeave={this.onMouseLeave}
             />
           ))}
-          {isLoadingResults && <StyledSpinner size={Spinner.SIZE_SMALL} />}
+          {isLoadingResults && <StyledSpinner size={SpinnerSize.SMALL} />}
           {!isLoadingResults && hasMoreResults && (
             <Button onClick={this.search} minimal>
               Load more results
@@ -102,7 +102,7 @@ class SearchScreen extends React.PureComponent<SearchScreenProps, SearchScreenSt
 
     let rightSearchBarElement;
     if (isLoadingResults) {
-      rightSearchBarElement = <Spinner size={Spinner.SIZE_SMALL} />;
+      rightSearchBarElement = <Spinner size={SpinnerSize.SMALL} />;
     } else if (query || error) {
       rightSearchBarElement = <Button minimal icon={IconNames.CROSS} onClick={this.clearQuery} aria-label="Search" />;
     } else {

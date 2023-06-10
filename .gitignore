@@ -6,6 +6,8 @@ data/
 
 backend/.sobelow
 node_modules/
+/frontend/build/
+/frontend/dist/
 
 # Environments
 .env

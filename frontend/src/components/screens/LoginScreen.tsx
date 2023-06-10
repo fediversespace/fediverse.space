@@ -44,7 +44,7 @@ interface LoginScreenState {
   selectedLoginType?: "email" | "fediverseAccount";
   error: boolean;
 }
-class LoginScreen extends React.PureComponent<{}, LoginScreenState> {
+class LoginScreen extends React.PureComponent<Record<string, never>, LoginScreenState> {
   public constructor(props: any) {
     super(props);
     this.state = {
