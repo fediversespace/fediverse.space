@@ -5,6 +5,7 @@ data/
 *.class
 
 backend/.sobelow
+node_modules/
 
 # Environments
 .env

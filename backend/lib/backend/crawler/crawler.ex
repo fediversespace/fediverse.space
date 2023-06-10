@@ -235,9 +235,12 @@ defmodule Backend.Crawler do
         Enum.map(result.federation_restrictions, fn {domain, _restriction_type} -> domain end)
       )
       |> Enum.map(&%{domain: &1, inserted_at: now, updated_at: now, next_crawl: now})
+      |> Enum.chunk_every(5000)
 
-    Instance
-    |> Repo.insert_all(new_instances, on_conflict: :nothing, conflict_target: :domain)
+    new_instances
+    |> Enum.each(fn chunk ->
+      Repo.insert_all(Instance, chunk, on_conflict: :nothing, conflict_target: :domain)
+    end)
 
     Repo.transaction(fn ->
       ## Save peer relationships ##
@@ -274,9 +277,10 @@ defmodule Backend.Crawler do
             updated_at: now
           }
         )
+        |> Enum.chunk_every(5000)
 
-      InstancePeer
-      |> Repo.insert_all(new_instance_peers)
+      new_instance_peers
+      |> Enum.each(fn chunk -> Repo.insert_all(InstancePeer, chunk) end)
     end)
 
     ## Save federation restrictions ##
