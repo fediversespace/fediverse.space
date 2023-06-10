@@ -3,13 +3,15 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import styled from "styled-components";
 
-import { Route, RouteComponentProps, Switch, withRouter } from "react-router";
+import { Route, Switch } from "react-router";
 import { InstanceScreen, SearchScreen } from ".";
 import { INSTANCE_DOMAIN_PATH } from "../../constants";
 import { loadInstance } from "../../redux/actions";
 import { AppState } from "../../redux/types";
 import { domainMatchSelector, isSmallScreen } from "../../util";
 import { Graph, SidebarContainer } from "../organisms";
+import { useLocation } from "react-router-dom";
+import type { Location } from "history";
 
 const GraphContainer = styled.div`
   display: flex;
@@ -24,7 +26,8 @@ const FullDiv = styled.div`
   right: 0;
 `;
 
-interface GraphScreenProps extends RouteComponentProps {
+interface GraphScreenProps {
+  location: Location;
   currentInstanceName: string | null;
   pathname: string;
   graphLoadError: boolean;
@@ -79,8 +82,12 @@ class GraphScreenImpl extends React.Component<GraphScreenProps, GraphScreenState
         {isSmallScreen || !this.state.hasBeenViewed || <Graph />}
         <SidebarContainer>
           <Switch>
-            <Route path={INSTANCE_DOMAIN_PATH} component={InstanceScreen} />
-            <Route exact path="/" component={SearchScreen} />
+            <Route path={INSTANCE_DOMAIN_PATH}>
+              <InstanceScreen />
+            </Route>
+            <Route exact path="/">
+              <SearchScreen />
+            </Route>
           </Switch>
         </SidebarContainer>
       </GraphContainer>
@@ -106,4 +113,9 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   loadInstance: (domain: string | null) => dispatch(loadInstance(domain) as any),
 });
 const GraphScreen = connect(mapStateToProps, mapDispatchToProps)(GraphScreenImpl);
-export default withRouter(GraphScreen);
+const Component = (props: Omit<React.ComponentProps<typeof GraphScreen>, "location">) => {
+  const location = useLocation();
+  return <GraphScreen {...props} location={location} />;
+};
+Component.displayName = "GraphScreen";
+export default Component;

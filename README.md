@@ -82,14 +82,19 @@ You don't have to follow these instructions, but it's one way to set up a contin
 - `dokku elasticsearch:create fediverse`
 - `dokku elasticsearch:link fediverse phoenix`
 
-6. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
-7. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
-8. Set up SSL for the Phoenix app
+6. Set the build dirs
+
+- `dokku builder:set phoenix build-dir backend`
+- `dokku builder:set gephi build-dir gephi`
+
+7. Update the backend configuration. In particular, change the `user_agent` in [config.exs](/backend/config/config.exs) to something descriptive.
+8. Push the apps, e.g. `git push dokku@<DOMAIN>:phoenix` (note that the first push cannot be from the CD pipeline).
+9. Set up SSL for the Phoenix app
 
 - `dokku letsencrypt:enable phoenix`
 - `dokku letsencrypt:cron-job --add`
 
-9. Set up a cron job for the graph layout (use the `dokku` user). E.g.
+10. Set up a cron job for the graph layout (use the `dokku` user). E.g.
 
 ```
 SHELL=/bin/bash

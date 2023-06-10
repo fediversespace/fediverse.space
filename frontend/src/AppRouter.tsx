@@ -3,7 +3,7 @@ import React from "react";
 import { Classes } from "@blueprintjs/core";
 
 import { ConnectedRouter } from "connected-react-router";
-import { Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { Nav } from "./components/organisms";
 import {
   AboutScreen,
@@ -20,11 +20,23 @@ const AppRouter: React.FC = () => (
     <div className={`${Classes.DARK} App`}>
       <Nav />
       <main role="main">
-        <Route path="/instances" exact component={TableScreen} />
-        <Route path="/about" exact component={AboutScreen} />
-        <Route path="/admin/login" exact component={LoginScreen} />
-        <Route path="/admin/verify" exact component={VerifyLoginScreen} />
-        <Route path="/admin" exact component={AdminScreen} />
+        <Switch>
+          <Route path="/instances" exact>
+            <TableScreen />
+          </Route>
+          <Route path="/about" exact>
+            <AboutScreen />
+          </Route>
+          <Route path="/admin/login" exact>
+            <LoginScreen />
+          </Route>
+          <Route path="/admin/verify" exact>
+            <VerifyLoginScreen />
+          </Route>
+          <Route path="/admin" exact>
+            <AdminScreen />
+          </Route>
+        </Switch>
         {/* We always want the GraphScreen to be rendered (since un- and re-mounting it is expensive */}
         <GraphScreen />
       </main>
