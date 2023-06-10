@@ -1,6 +1,8 @@
 defmodule BackendWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :backend
 
+  plug BackendWeb.Healthcheck
+
   socket("/socket", BackendWeb.UserSocket,
     websocket: true,
     longpoll: false
