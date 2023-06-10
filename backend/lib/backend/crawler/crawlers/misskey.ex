@@ -3,6 +3,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   Crawler for Misskey servers.
   """
   alias Backend.Crawler.ApiCrawler
+  alias Backend.Http
 
   @behaviour ApiCrawler
   import Backend.Crawler.Util
@@ -37,7 +38,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   @impl ApiCrawler
   def crawl(domain, nodeinfo) do
     with {:ok, %{"originalUsersCount" => user_count, "originalNotesCount" => status_count}} <-
-           post_and_decode("https://#{domain}/api/stats") do
+           http_client().post_and_decode("https://#{domain}/api/stats") do
       if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
         Map.merge(nodeinfo, crawl_large_instance(domain, user_count, status_count))
       else
@@ -109,7 +110,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
 
     Logger.debug("Crawling #{endpoint} with untilId=#{until_id}")
 
-    statuses = post_and_decode!(endpoint, Jason.encode!(params))
+    statuses = http_client().post_and_decode!(endpoint, Jason.encode!(params))
 
     filtered_statuses =
       statuses
@@ -153,9 +154,9 @@ defmodule Backend.Crawler.Crawlers.Misskey do
   end
 
   @spec get_version_and_description(String.t()) ::
-          {:ok, {String.t(), String.t()}} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
+          {:ok, {String.t(), String.t()}} | {:error, Jason.DecodeError.t() | Http.Error.t()}
   defp get_version_and_description(domain) do
-    case post_and_decode("https://#{domain}/api/meta") do
+    case http_client().post_and_decode("https://#{domain}/api/meta") do
       {:ok, %{"version" => version, "description" => description}} ->
         {:ok, {version, description}}
 
@@ -166,7 +167,7 @@ defmodule Backend.Crawler.Crawlers.Misskey do
 
   @spec get_peers(String.t()) :: {:ok, [String.t()]} | {:error, Jason.DecodeError.t()}
   defp get_peers(domain) do
-    case get_and_decode("https://#{domain}/api/v1/instance/peers") do
+    case http_client().get_and_decode("https://#{domain}/api/v1/instance/peers") do
       {:ok, peers} -> {:ok, peers}
       {:error, _} -> {:ok, []}
     end

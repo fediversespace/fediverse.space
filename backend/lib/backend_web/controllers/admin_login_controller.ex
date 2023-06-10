@@ -5,7 +5,7 @@ defmodule BackendWeb.AdminLoginController do
   alias Backend.Mailer.UserEmail
   alias Mastodon.Messenger
 
-  action_fallback BackendWeb.FallbackController
+  action_fallback(BackendWeb.FallbackController)
 
   @doc """
   Given an instance, looks up the login types (email or admin account) and returns them. The user can then
@@ -24,7 +24,7 @@ defmodule BackendWeb.AdminLoginController do
           [error: "It is only possible to administer Mastodon and Pleroma instances."]
 
         true ->
-          case get_and_decode("https://#{cleaned_domain}/api/v1/instance") do
+          case http_client().get_and_decode("https://#{cleaned_domain}/api/v1/instance") do
             {:ok, instance_data} ->
               [instance_data: instance_data, cleaned_domain: cleaned_domain]
 
@@ -40,7 +40,7 @@ defmodule BackendWeb.AdminLoginController do
     cleaned_domain = clean_domain(domain)
 
     {data_state, instance_data} =
-      get_and_decode("https://#{cleaned_domain}/api/v1/instance",
+      http_client().get_and_decode("https://#{cleaned_domain}/api/v1/instance",
         pool: :admin_login,
         timeout: 20_000
       )

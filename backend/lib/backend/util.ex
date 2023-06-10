@@ -143,69 +143,12 @@ defmodule Backend.Util do
     map |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
   end
 
-  @doc """
-  Gets and decodes a HTTP response.
-  """
-  @spec get_and_decode(String.t(), Atom.t(), Integer.t()) ::
-          {:ok, any()} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
-  def get_and_decode(url, pool \\ :crawler, timeout \\ 15_000) do
-    case HTTPoison.get(url, [{"User-Agent", get_config(:user_agent)}],
-           hackney: [pool: pool],
-           recv_timeout: timeout,
-           timeout: timeout
-         ) do
-      {:ok, %{status_code: 200, body: body}} ->
-        Jason.decode(body)
-
-      {:ok, %{status_code: 401}} ->
-        Jason.decode("[]")
-
-      {:ok, %{status_code: 404}} ->
-        Jason.decode("[]")
-
-      {:ok, %{body: body}} ->
-        {:error, %HTTPoison.Error{reason: "Non-200 response. Body: #{body}"}}
-
-      {:error, err} ->
-        {:error, err}
-    end
-  end
-
-  @spec get_and_decode!(String.t()) :: any()
-  def get_and_decode!(url) do
-    case get_and_decode(url) do
-      {:ok, decoded} -> decoded
-      {:error, error} -> raise error
-    end
-  end
-
-  @doc """
-  POSTS to a HTTP endpoint and decodes the JSON response.
-  """
-  @spec post_and_decode(String.t(), String.t()) ::
-          {:ok, any()} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
-  def post_and_decode(url, body \\ "") do
-    case HTTPoison.post(url, body, [{"User-Agent", get_config(:user_agent)}],
-           hackney: [pool: :crawler],
-           recv_timeout: 15_000,
-           timeout: 15_000
-         ) do
-      {:ok, %{status_code: 200, body: response_body}} -> Jason.decode(response_body)
-      {:ok, _} -> {:error, %HTTPoison.Error{reason: "Non-200 response"}}
-      {:error, err} -> {:error, err}
-    end
-  end
-
-  @spec post_and_decode!(String.t(), String.t()) :: any()
-  def post_and_decode!(url, body \\ "") do
-    case post_and_decode(url, body) do
-      {:ok, decoded} -> decoded
-      {:error, error} -> raise error
-    end
-  end
-
   @spec is_valid_domain?(String.t()) :: boolean
   def is_valid_domain?(domain) do
     Regex.match?(~r/^[\pL\d\.\-_]+\.[a-zA-Z]+$/, domain)
+  end
+
+  def http_client() do
+    Application.get_env(:backend, :http, Backend.Http)
   end
 end

@@ -21,7 +21,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
         true -> false
       end
     else
-      case get_and_decode("https://#{domain}/api/v1/instance") do
+      case http_client().get_and_decode("https://#{domain}/api/v1/instance") do
         {:ok, %{"title" => _title}} -> true
         _other -> false
       end
@@ -41,7 +41,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
   @impl ApiCrawler
   def crawl(domain, nodeinfo) do
-    instance = get_and_decode!("https://#{domain}/api/v1/instance")
+    instance = http_client().get_and_decode!("https://#{domain}/api/v1/instance")
     user_count = get_in(instance, ["stats", "user_count"])
 
     if is_above_user_threshold?(user_count) or has_opted_in?(domain) do
@@ -117,7 +117,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
     Logger.debug("Crawling #{endpoint}")
 
-    statuses = get_and_decode!(endpoint)
+    statuses = http_client().get_and_decode!(endpoint)
 
     filtered_statuses =
       statuses
@@ -161,7 +161,7 @@ defmodule Backend.Crawler.Crawlers.Mastodon do
 
   defp get_peers(domain) do
     # servers may not publish peers
-    case get_and_decode("https://#{domain}/api/v1/instance/peers") do
+    case http_client().get_and_decode("https://#{domain}/api/v1/instance/peers") do
       {:ok, peers} -> peers
       {:error, _err} -> []
     end

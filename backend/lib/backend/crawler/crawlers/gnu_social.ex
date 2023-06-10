@@ -14,7 +14,7 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
     if nodeinfo_result != nil do
       Map.get(nodeinfo_result, :instance_type) == :gnusocial
     else
-      case get_and_decode("https://#{domain}/api/statuses/public_timeline.json") do
+      case http_client().get_and_decode("https://#{domain}/api/statuses/public_timeline.json") do
         {:ok, statuses} -> is_list(statuses)
         {:error, _other} -> false
       end
@@ -86,7 +86,7 @@ defmodule Backend.Crawler.Crawlers.GnuSocial do
 
     Logger.debug("Crawling #{endpoint}")
 
-    statuses = get_and_decode!(endpoint)
+    statuses = http_client().get_and_decode!(endpoint)
 
     # Filter to statuses that are in the correct timeframe
     filtered_statuses =

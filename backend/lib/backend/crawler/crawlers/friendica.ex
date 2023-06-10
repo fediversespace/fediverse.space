@@ -51,7 +51,7 @@ defmodule Backend.Crawler.Crawlers.Friendica do
       |> Map.merge(nodeinfo_result)
 
     peers =
-      case get_and_decode("https://#{domain}/poco/@server") do
+      case http_client().get_and_decode("https://#{domain}/poco/@server") do
         {:ok, p} -> p
         {:error, _err} -> []
       end
@@ -71,7 +71,7 @@ defmodule Backend.Crawler.Crawlers.Friendica do
   end
 
   defp get_statistics(domain) do
-    get_and_decode("https://#{domain}/statistics.json")
+    http_client().get_and_decode("https://#{domain}/statistics.json")
   end
 
   defp to_domain(url) do

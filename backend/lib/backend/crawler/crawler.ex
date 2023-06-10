@@ -117,8 +117,8 @@ defmodule Backend.Crawler do
         try do
           %Crawler{state | result: curr.crawl(domain, result), found_api?: true}
         rescue
-          e in HTTPoison.Error ->
-            Map.put(state, :error, "HTTPoison error: " <> HTTPoison.Error.message(e))
+          e in Backend.HttpBehaviour.Error ->
+            Map.put(state, :error, "HTTP error: " <> e.message)
 
           e in Jason.DecodeError ->
             Map.put(state, :error, "Jason DecodeError: " <> Jason.DecodeError.message(e))

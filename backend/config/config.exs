@@ -16,10 +16,12 @@ config :backend, BackendWeb.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
   render_errors: [view: BackendWeb.ErrorView, accepts: ~w(json)]
 
+config :backend, :http, Backend.Http
+
 config :backend, Backend.Repo, queue_target: 5000
 
 config :backend, Backend.Elasticsearch.Cluster,
-  url: "http://elastic:9200",
+  url: "http://localhost:9200",
   api: Elasticsearch.API.HTTP,
   json_library: Jason
 

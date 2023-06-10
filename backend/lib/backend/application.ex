@@ -31,9 +31,10 @@ defmodule Backend.Application do
     ]
 
     children =
-      case Enum.member?(["true", 1, "1"], System.get_env("SKIP_CRAWL")) do
-        true -> children
-        false -> children ++ [Backend.Crawler.StaleInstanceManager]
+      if Enum.member?(["true", 1, "1"], System.get_env("SKIP_CRAWL")) or Mix.env() == :test do
+        children
+      else
+        children ++ [Backend.Crawler.StaleInstanceManager]
       end
 
     add_appsignal_probes()

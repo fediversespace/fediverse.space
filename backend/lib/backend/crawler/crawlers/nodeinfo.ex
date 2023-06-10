@@ -5,6 +5,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
   """
 
   alias Backend.Crawler.ApiCrawler
+  alias Backend.Http
   require Logger
   import Backend.Util
   import Backend.Crawler.Util
@@ -13,7 +14,7 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
   @impl ApiCrawler
   def allows_crawling?(domain) do
     [
-      ".well-known/nodeinfo"
+      "/.well-known/nodeinfo"
     ]
     |> Enum.map(fn endpoint -> "https://#{domain}#{endpoint}" end)
     |> urls_are_crawlable?()
@@ -36,26 +37,40 @@ defmodule Backend.Crawler.Crawlers.Nodeinfo do
   end
 
   @spec get_nodeinfo_url(String.t()) ::
-          {:ok, String.t()} | {:error, Jason.DecodeError.t() | HTTPoison.Error.t()}
+          {:ok, String.t()} | {:error, Jason.DecodeError.t() | Http.Error.t() | :invalid_body}
   defp get_nodeinfo_url(domain) do
-    case get_and_decode("https://#{domain}/.well-known/nodeinfo") do
-      {:ok, response} -> {:ok, process_nodeinfo_url(response)}
-      {:error, err} -> {:error, err}
+    with {:ok, response} <-
+           http_client().get_and_decode("https://#{domain}/.well-known/nodeinfo"),
+         {:ok, nodeinfo_url} <- process_nodeinfo_url(response) do
+      {:ok, nodeinfo_url}
+    else
+      {:error, error} -> {:error, error}
+      :error -> {:error, :invalid_body}
     end
   end
 
-  @spec process_nodeinfo_url(any()) :: String.t()
+  @spec process_nodeinfo_url(any()) :: {:ok, String.t()} | :error
   defp process_nodeinfo_url(response) do
-    response
-    |> Map.get("links")
-    |> Enum.filter(fn %{"rel" => rel} -> is_compatible_nodeinfo_version?(rel) end)
-    |> Kernel.hd()
-    |> Map.get("href")
+    links =
+      response
+      |> Map.get("links", [])
+      |> Enum.filter(fn %{"rel" => rel} -> is_compatible_nodeinfo_version?(rel) end)
+
+    if Enum.empty?(links) do
+      :error
+    else
+      href =
+        links
+        |> Kernel.hd()
+        |> Map.get("href")
+
+      {:ok, href}
+    end
   end
 
   @spec get_nodeinfo(String.t()) :: ApiCrawler.t()
   defp get_nodeinfo(nodeinfo_url) do
-    case get_and_decode(nodeinfo_url) do
+    case http_client().get_and_decode(nodeinfo_url) do
       {:ok, nodeinfo} -> {:ok, process_nodeinfo(nodeinfo)}
       {:error, err} -> {:error, err}
     end

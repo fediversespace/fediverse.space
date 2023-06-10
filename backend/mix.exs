@@ -72,7 +72,8 @@ defmodule Backend.MixProject do
       {:scrivener_ecto, "~> 2.2"},
       {:recase, "~> 0.7"},
       {:ex_rated, "~> 2.1"},
-      {:html_sanitize_ex, "~> 1.4"}
+      {:html_sanitize_ex, "~> 1.4"},
+      {:mox, "~> 1.0", only: [:test]}
     ]
   end
 
