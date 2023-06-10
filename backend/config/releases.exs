@@ -19,6 +19,8 @@ config :backend, Backend.Elasticsearch.Cluster,
 
 config :appsignal, :config,
   otp_app: :backend,
+  name: "fediverse.space",
+  active: true,
   revision: System.get_env("GIT_REV")
 
 port = String.to_integer(System.get_env("PORT") || "4000")

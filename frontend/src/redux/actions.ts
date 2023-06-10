@@ -85,38 +85,36 @@ export const loadInstance = (instanceName: string | null) => (dispatch: Dispatch
     .catch(() => dispatch(instanceLoadFailed()));
 };
 
-export const updateSearch = (query: string, filters: SearchFilter[]) => (
-  dispatch: Dispatch,
-  getState: () => AppState
-) => {
-  query = query.trim();
+export const updateSearch =
+  (query: string, filters: SearchFilter[]) => (dispatch: Dispatch, getState: () => AppState) => {
+    query = query.trim();
 
-  if (!query) {
-    dispatch(resetSearch());
-    return;
-  }
+    if (!query) {
+      dispatch(resetSearch());
+      return;
+    }
 
-  const prevQuery = getState().search.query;
-  const prevFilters = getState().search.filters;
-  const isNewQuery = prevQuery !== query || !isEqual(prevFilters, filters);
+    const prevQuery = getState().search.query;
+    const prevFilters = getState().search.filters;
+    const isNewQuery = prevQuery !== query || !isEqual(prevFilters, filters);
 
-  const { next } = getState().search;
-  let url = `search/?query=${query}`;
-  if (!isNewQuery && next) {
-    url += `&after=${next}`;
-  }
+    const { next } = getState().search;
+    let url = `search/?query=${query}`;
+    if (!isNewQuery && next) {
+      url += `&after=${next}`;
+    }
 
-  // Add filters
-  // The format is e.g. type_eq=mastodon or user_count_gt=1000
-  filters.forEach((filter) => {
-    url += `&${filter.field}_${filter.relation}=${filter.value}`;
-  });
+    // Add filters
+    // The format is e.g. type_eq=mastodon or user_count_gt=1000
+    filters.forEach((filter) => {
+      url += `&${filter.field}_${filter.relation}=${filter.value}`;
+    });
 
-  dispatch(requestSearchResult(query, filters));
-  return getFromApi(url)
-    .then((result) => dispatch(receiveSearchResults(result)))
-    .catch(() => dispatch(searchFailed()));
-};
+    dispatch(requestSearchResult(query, filters));
+    return getFromApi(url)
+      .then((result) => dispatch(receiveSearchResults(result)))
+      .catch(() => dispatch(searchFailed()));
+  };
 
 export const fetchGraph = () => (dispatch: Dispatch) => {
   dispatch(requestGraph());
@@ -125,22 +123,20 @@ export const fetchGraph = () => (dispatch: Dispatch) => {
     .catch(() => dispatch(graphLoadFailed()));
 };
 
-export const loadInstanceList = (page?: number, sort?: InstanceSort) => (
-  dispatch: Dispatch,
-  getState: () => AppState
-) => {
-  sort = sort || getState().data.instanceListSort;
-  dispatch(requestInstanceList(sort));
-  const params: string[] = [];
-  if (page) {
-    params.push(`page=${page}`);
-  }
-  if (sort) {
-    params.push(`sortField=${sort.field}`);
-    params.push(`sortDirection=${sort.direction}`);
-  }
-  const path = params ? `instances?${params.join("&")}` : "instances";
-  return getFromApi(path)
-    .then((instancesListResponse) => dispatch(receiveInstanceList(instancesListResponse)))
-    .catch(() => dispatch(instanceListLoadFailed()));
-};
+export const loadInstanceList =
+  (page?: number, sort?: InstanceSort) => (dispatch: Dispatch, getState: () => AppState) => {
+    sort = sort || getState().data.instanceListSort;
+    dispatch(requestInstanceList(sort));
+    const params: string[] = [];
+    if (page) {
+      params.push(`page=${page}`);
+    }
+    if (sort) {
+      params.push(`sortField=${sort.field}`);
+      params.push(`sortDirection=${sort.direction}`);
+    }
+    const path = params ? `instances?${params.join("&")}` : "instances";
+    return getFromApi(path)
+      .then((instancesListResponse) => dispatch(receiveInstanceList(instancesListResponse)))
+      .catch(() => dispatch(instanceListLoadFailed()));
+  };

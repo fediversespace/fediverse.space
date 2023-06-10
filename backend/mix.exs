@@ -23,7 +23,6 @@ defmodule Backend.MixProject do
         :logger,
         :runtime_tools,
         :gollum,
-        :elasticsearch,
         :appsignal,
         :swoosh,
         :gen_smtp
@@ -65,6 +64,7 @@ defmodule Backend.MixProject do
       {:swoosh, "~> 1.0"},
       {:gen_smtp, "~> 1.2"},
       {:elasticsearch, "~> 1.0"},
+      {:appsignal, "~> 2.7"},
       {:appsignal_phoenix, "~> 2.3"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:nebulex, "~> 2.4.2"},
