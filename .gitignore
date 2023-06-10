@@ -1,7 +1,6 @@
 *.csv
 .idea/
 *.gexf
-data/
 *.class
 
 backend/.sobelow

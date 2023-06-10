@@ -31,7 +31,8 @@ defmodule Backend.Application do
     ]
 
     children =
-      if Enum.member?(["true", 1, "1"], System.get_env("SKIP_CRAWL")) or Mix.env() == :test do
+      if Enum.member?(["true", 1, "1"], System.get_env("SKIP_CRAWL")) or
+           Application.get_env(:backend, :environment) == :test do
         children
       else
         children ++ [Backend.Crawler.StaleInstanceManager]

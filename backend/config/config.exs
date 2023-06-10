@@ -59,9 +59,9 @@ config :backend, Mastodon.Messenger,
 
 config :backend, :crawler,
   status_age_limit_days: 28,
-  status_count_limit: 5000,
+  status_count_limit: 1000,
   personal_instance_threshold: 10,
-  crawl_interval_mins: 30,
+  crawl_interval_mins: 60,
   crawl_workers: 100,
   blacklist: [
     # spam
@@ -99,6 +99,8 @@ config :backend, Backend.Scheduler,
     # Every 3 hours
     {"0 */3 * * *", {Backend.Scheduler, :check_for_spam_instances, []}}
   ]
+
+config :backend, :environment, Mix.env()
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
