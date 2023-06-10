@@ -35,7 +35,8 @@ config :backend, BackendWeb.Endpoint,
 config :backend, :crawler,
   admin_phone: System.get_env("ADMIN_PHONE"),
   admin_email: System.get_env("ADMIN_EMAIL"),
-  frontend_domain: System.get_env("FRONTEND_DOMAIN")
+  frontend_domain: System.get_env("FRONTEND_DOMAIN"),
+  crawl_workers: String.to_integer(System.get_env("CRAWL_WORKERS") || "100")
 
 config :backend, Backend.Mailer,
   adapter: Swoosh.Adapters.SMTP,
