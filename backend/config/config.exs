@@ -68,6 +68,12 @@ config :backend, :crawler,
     "4chan.icu",
     # spam
     "activitypub-troll.cf",
+    # spam
+    "misskey-forkbomb.cf",
+    # spam
+    "repl.co",
+    # malicious?
+    "ignorelist.com",
     # *really* doesn't want to be listed on fediverse.space
     "pleroma.site",
     # dummy instances used for pleroma CI
